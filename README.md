@@ -2,7 +2,7 @@
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
 — **renraku is coming soon** —  
-&nbsp;&nbsp;&nbsp; *concept node api json rpc*  
+&nbsp;&nbsp;&nbsp; *concept node api json rpc*
 
 ## explanation through examples
 
@@ -34,7 +34,6 @@ const server = new renraku.Server<ExampleApi>({
   // simple access control whitelist
   permissions: [
     {
-
       // origins that pass this regular expression are allowed
       origin: /^http\:\/\/localhost\:8080$/i,
 
@@ -78,12 +77,12 @@ async function main() {
 }
 ```
 
-### `example/source/common` — use interfaces for proper typings
+### `example/source/common` — proper typings
 
 ```ts
 import * as renraku from "renraku"
 
-// common api definition
+// common api definition shared by server and client alike
 export interface ExampleApi extends renraku.Api {
   topics: {
     exampleTopic: {
