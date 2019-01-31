@@ -61,7 +61,7 @@ async function main() {
 
   const {exampleTopic} = callable.topics
   const result1 = await exampleTopic.exampleMethodAlpha(3)
-  const result2 = await exampleTopic.exampleMethodAlpha(3, 2)
+  const result2 = await exampleTopic.exampleMethodBravo(3, 2)
 
   console.log(result1) //> 4
   console.log(result2) //> 5
