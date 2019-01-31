@@ -10,6 +10,14 @@
 		"api"
 	],
 	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/chase-moskal/renraku.git"
+	},
+	"bugs": {
+		"url": "https://github.com/chase-moskal/renraku/issues"
+	},
+	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"main": "index.js",
 	"files": [
 		"dist"
