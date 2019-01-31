@@ -1,14 +1,7 @@
 
-# 連絡 — RENRAKU — れんらく
+# 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
 *concept node api json rpc*
-
-```
-example-project/
-  isomorphic/
-  server/
-  client/
-```
 
 ## example/source/isomorphic
 
@@ -74,3 +67,5 @@ async function main() {
   console.log(result2) //> 5
 }
 ```
+
+*renraku means 'contact'*
