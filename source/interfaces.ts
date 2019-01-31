@@ -1,10 +1,12 @@
 
 export interface Api {
-	topics: { [topicName: string]: ApiTopic }
+	topics: {
+		[topicName: string]: ApiTopic
+	}
 }
 
 export interface ApiTopic {
-	[topic: string]: ApiTopicMethod
+	[methodName: string]: ApiTopicMethod
 }
 
 export interface ApiTopicMethod {

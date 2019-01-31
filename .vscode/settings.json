@@ -7,9 +7,9 @@
 	"files.insertFinalNewline": true,
 
 	"files.exclude": {
-		"dist": false,
 		"coverage": true,
 		"node_modules": true,
+		"package-lock.json": true,
 		"*.log*": true
 	},
 
