@@ -1,11 +1,11 @@
 
 import {Api, ServerOptions} from "./interfaces"
 
-export function makeServer<gApi extends Api = Api>(options: ServerOptions<gApi>) {
-	return new Server<gApi>(options)
+export function makeServer<A extends Api>(options: ServerOptions<A>) {
+	return new Server<A>(options)
 }
 
-export class Server<gApi extends Api = Api> {
-	constructor({callee, permissions}: ServerOptions<gApi>) {}
+export class Server<A extends Api> {
+	constructor({callee, permissions}: ServerOptions<A>) {}
 	start(port: number) {}
 }

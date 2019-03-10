@@ -37,6 +37,7 @@
 		"typescript": "^3.2.4"
 	},
 	"dependencies": {
-		"commotion": "0.0.0-dev.5"
+		"commotion": "0.0.0-dev.5",
+		"isomorphic-fetch": "^2.2.1"
 	}
 }

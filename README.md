@@ -13,11 +13,9 @@ import * as renraku from "renraku"
 import {ExampleApi} from "../common"
 
 // create a node api server
-//                            [typings win]
-//                                 \/
 const server = new renraku.Server<ExampleApi>({
 
-  // expose this functionality
+  // expose some async functionality
   callee: {
     topics: {
       exampleTopic: {
@@ -59,10 +57,14 @@ async function main() {
 
   // connect with the server and ascertain the callable object.
   // works in browser or on node
-  //                                   [typings win]
-  //                                        \/
   const {callable} = await renraku.connect<ExampleApi>({
-    serverUrl: "http://localhost:8001"
+    serverUrl: "http://localhost:8001",
+    apiSignature: {
+      exampleTopic: {
+        exampleMethodAlpha: {},
+        exampleMethodBravo: {}
+      }
+    }
   })
 
   // grab the example topic

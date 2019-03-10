@@ -1,11 +1,12 @@
 
 import * as commotion from "commotion"
 
-import {Api, ConnectOptions} from "./interfaces"
+import {Api, ConnectOptions, ConnectResult} from "./interfaces"
 
-export async function connect<gApi extends Api = Api>({
-	serverUrl
-}: ConnectOptions): Promise<{callable: gApi}> {
+export async function connect<A extends Api>({
+	serverUrl,
+	apiSignature
+}: ConnectOptions<A>): Promise<ConnectResult<A>> {
 
 	console.log("connect coming soon", commotion.jsonCall.length)
 

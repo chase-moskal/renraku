@@ -1,16 +1,21 @@
 
-export interface Api {
+export type Signature<T = {}> = {
+	[P in keyof T]: any
+}
+
+export interface ApiSignature<A extends Api> {
 	topics: {
-		[topicName: string]: ApiTopic
+		[P in keyof A["topics"]]: Signature<A["topics"][P]>
 	}
 }
 
-export interface ApiTopic {
-	[methodName: string]: ApiTopicMethod
-}
+export type Api<Topics = ApiTopics> = { topics: Topics }
+export type ApiTopics = { [topicName: string]: ApiTopic }
+export type ApiTopic = { [methodName: string]: ApiTopicMethod }
+export type ApiTopicMethod = (...args: any[]) => Promise<any>
 
-export interface ApiTopicMethod {
-	(...args: any[]): Promise<any>
+export abstract class AbstractApiTopic implements ApiTopic {
+	[methodName: string]: ApiTopicMethod
 }
 
 export interface Permission {
@@ -20,11 +25,16 @@ export interface Permission {
 	}
 }
 
-export interface ServerOptions<gApi extends Api = Api> {
-	callee: gApi
+export interface ServerOptions<A> {
+	callee: A
 	permissions: Permission[]
 }
 
-export interface ConnectOptions {
+export interface ConnectOptions<A extends Api> {
 	serverUrl: string
+	apiSignature: ApiSignature<A>
+}
+
+export interface ConnectResult<A> {
+	callable: A
 }
