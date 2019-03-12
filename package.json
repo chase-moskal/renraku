@@ -1,15 +1,20 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.0",
+	"version": "0.0.0-dev.1",
 	"description": "node json rpc",
+	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
+	"main": "dist",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist"
+	],
 	"keywords": [
 		"rpc",
 		"json",
 		"node-api",
 		"api"
 	],
-	"license": "ISC",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/chase-moskal/renraku.git"
@@ -18,16 +23,6 @@
 		"url": "https://github.com/chase-moskal/renraku/issues"
 	},
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
-	"main": "index.js",
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"prepare": "run-s build-clean build-scripts",
-		"build-clean": "rimraf dist && mkdirp dist",
-		"build-scripts": "barrelsby --directory source --delete && tsc",
-		"test": "exit 0"
-	},
 	"devDependencies": {
 		"@types/node": "^10.12.20",
 		"barrelsby": "^1.0.2",
