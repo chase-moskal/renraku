@@ -4,71 +4,44 @@
 — **renraku is coming soon** —  
 &nbsp;&nbsp;&nbsp; *concept node api json rpc*
 
-## explanation through examples
+## actions speak louder than words
 
-### `example/source/server` — expose functionality on the node server
+### `example/source/server.js` — expose functionality on the node server
 
 ```ts
 import * as renraku from "renraku"
-import {ExampleApi} from "../common"
 
-// create a node api server
-const server = new renraku.Server<ExampleApi>({
-
-  // expose some async functionality
-  callee: {
-    topics: {
+const server = renraku.createServer([
+  {
+    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+    forbidden: /\:8989$/i,
+    exposed: {
       exampleTopic: {
-        async exampleMethodAlpha(a) {
-          return a + 1
-        },
-        async exampleMethodBravo(a, b) {
-          return a + b
-        }
+        async exampleMethodAlpha(a) { return a + 1 },
+        async exampleMethodBravo(a, b) { return a + b }
       }
     }
-  },
+  }
+])
 
-  // simple access control whitelist
-  permissions: [
-    {
-      // origins that pass this regular expression are allowed
-      origin: /^http\:\/\/localhost\:8080$/i,
-
-      // explicit control over which topics and methods are allowed
-      allowedTopics: {
-        exampleTopic: ["exampleMethodAlpha", "exampleMethodBravo"]
-      }
-    }
-  ]
-})
-
-// start the api server
 server.start(8001)
 ```
 
-### `example/source/client` — remotely call the exposed functions
+### `example/source/client.js` — remotely call the exposed functions
 
 ```ts
 import * as renraku from "renraku"
-import {ExampleApi} from "../common"
 
 async function main() {
-
-  // connect with the server and ascertain the callable object.
-  // works in browser or on node
-  const {callable} = await renraku.connect<ExampleApi>({
+  const {exampleTopic} = await renraku.createClient({
     serverUrl: "http://localhost:8001",
-    apiSignature: {
+    shape: {
       exampleTopic: {
-        exampleMethodAlpha: {},
-        exampleMethodBravo: {}
+        exampleMethodAlpha: true,
+        exampleMethodBravo: true
       }
     }
   })
-
-  // grab the example topic
-  const {exampleTopic} = callable.topics
 
   // call the topic's methods
   const result1 = await exampleTopic.exampleMethodAlpha(3)
@@ -79,20 +52,37 @@ async function main() {
 }
 ```
 
-### `example/source/common` — proper typings
+## that's all you need, but you might want to 
+
+### `example/source/common.ts` — you might share
 
 ```ts
 import * as renraku from "renraku"
 
-// common api definition shared by server and client alike
+// typescript interface for the api, shared between server and client
 export interface ExampleApi extends renraku.Api {
-  topics: {
-    exampleTopic: {
-      exampleMethodAlpha(a: number): Promise<number>
-      exampleMethodBravo(a: number, b: number): Promise<number>
-    }
+  exampleTopic: {
+    exampleMethodAlpha(a: number): Promise<number>
+    exampleMethodBravo(a: number, b: number): Promise<number>
   }
 }
+
+// serverside implementation of api functionality
+export class ExampleApiImplementation implements renraku.Api {
+  exampleTopic = {
+    async exampleMethodAlpha(a) { return a + 1 },
+    async exampleMethodBravo(a, b) { return a + b }
+  }
+}
+
+// describes the clientside shape of the api to the renraku.createClient
+export interface ExampleApiShape implements renraku.Shape<ExampleApi> {
+  exampleTopic = {
+    exampleMethodAlpha: true,
+    exampleMethodBravo: true
+  }
+}
+
 ```
 
 — *renraku means 'contact'* —
