@@ -1,6 +1,6 @@
 
-import {connect} from "./connect"
-import {Api, AbstractApiTopic, ApiTopics} from "./interfaces"
+import {connect} from "./connect.js"
+import {Api, AbstractApiTopic, ApiTopics} from "./interfaces.js"
 
 export class ExampleMachine extends AbstractApiTopic {
 	async sum(a: number, b: number) { return a + b }

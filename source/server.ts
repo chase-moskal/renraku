@@ -1,5 +1,5 @@
 
-import {Api, ServerOptions} from "./interfaces"
+import {Api, ServerOptions} from "./interfaces.js"
 
 export function makeServer<A extends Api>(options: ServerOptions<A>) {
 	return new Server<A>(options)
