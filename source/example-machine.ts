@@ -1,23 +1,43 @@
 
-import {connect} from "./connect.js"
-import {Api, AbstractApiTopic, ApiTopics} from "./interfaces.js"
+import {Api, ApiTopic, AbstractApiTopic, ApiShape} from "./interfaces.js"
+import {createServer} from "./create-server.js"
+import {createClient} from "./create-client.js"
 
-export class ExampleMachine extends AbstractApiTopic {
-	async sum(a: number, b: number) { return a + b }
+export interface ExampleTopic extends ApiTopic {
+	exampleFunctionAlpha(a: number): Promise<number>
+	exampleFunctionBravo(a: number, b: number): Promise<number>
 }
 
-export type ExampleApi = Api<ApiTopics & { exampleMachine: ExampleMachine }>
+export interface ExampleApi extends Api {
+	exampleTopic: ExampleTopic
+}
 
-export async function testConnect() {
-	const {callable} = await connect<ExampleApi>({
-		serverUrl: "",
-		apiSignature: {
-			topics: {
-				exampleMachine: {
-					sum: true
-				}
+export class ExampleTopicImplementation extends AbstractApiTopic
+ implements ExampleTopic {
+	async exampleFunctionAlpha(a: number) { return a + 1 }
+	async exampleFunctionBravo(a: number, b: number) { return a + b }
+}
+
+export const exampleApiShape: ApiShape<ExampleApi> = {
+	exampleTopic: {
+		exampleFunctionAlpha: true,
+		exampleFunctionBravo: true
+	}
+}
+
+export async function lols() {
+	const server = createServer<ExampleApi>([
+		{
+			allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+			forbidden: /\:8989$/i,
+			exposed: {
+				exampleTopic: new ExampleTopicImplementation()
 			}
 		}
+	])
+
+	const {exampleTopic} = await createClient<ExampleApi>({
+		url: "",
+		shape: exampleApiShape
 	})
 }
-

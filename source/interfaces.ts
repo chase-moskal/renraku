@@ -1,40 +1,50 @@
 
-export type Signature<T = {}> = {
-	[P in keyof T]: any
+//
+// SHAPE
+//
+
+export type ApiShape<A extends Api> = {
+	[Topic in keyof A]: Shape<A[Topic]>
 }
 
-export interface ApiSignature<A extends Api> {
-	topics: {
-		[P in keyof A["topics"]]: Signature<A["topics"][P]>
-	}
+export type Shape<T = {}> = {
+	[P in keyof T]: boolean
 }
 
-export type Api<Topics = ApiTopics> = { topics: Topics }
-export type ApiTopics = { [topicName: string]: ApiTopic }
-export type ApiTopic = { [methodName: string]: ApiTopicMethod }
-export type ApiTopicMethod = (...args: any[]) => Promise<any>
+//
+// API TOPICS
+//
+
+export type Api = { [topicName: string]: ApiTopic }
+export type ApiTopic = { [functionName: string]: ApiTopicFunction }
+export type ApiTopicFunction = (...args: any[]) => Promise<any>
 
 export abstract class AbstractApiTopic implements ApiTopic {
-	[methodName: string]: ApiTopicMethod
+	[functionName: string]: ApiTopicFunction
 }
 
-export interface Permission {
-	origin: RegExp
-	allowedTopics: {
-		[topicName: string]: string[]
-	}
+//
+// SERVER
+//
+
+export interface Server {
+	start(port: number): void
+	stop(): void
 }
 
-export interface ServerOptions<A> {
-	callee: A
-	permissions: Permission[]
+export interface ServerExposure<A extends Api> {
+	allowed: RegExp
+	forbidden: RegExp
+	exposed: A
 }
 
-export interface ConnectOptions<A extends Api> {
-	serverUrl: string
-	apiSignature: ApiSignature<A>
-}
+export type ServerOptions<A extends Api> = ServerExposure<A>[]
 
-export interface ConnectResult<A> {
-	callable: A
+//
+// CLIENT
+//
+
+export interface ClientOptions<A extends Api> {
+	url: string
+	shape: ApiShape<A>
 }

@@ -13,7 +13,7 @@
 	"scripts": {
 		"prepare": "run-s clean barrel && run-p compile-esm compile-cjs",
 		"clean": "rimraf dist && mkdirp dist dist/cjs",
-		"barrel": "barrelsby --delete --directory source && replace --silent '\";$' '.js\"' source/index.ts",
+		"barrel": "barrelsby --delete --directory source --exclude '\\.test\\.ts$' && replace --silent '\";$' '.js\"' source/index.ts",
 		"compile-esm": "tsc",
 		"compile-cjs": "tsc --module commonjs --outDir dist/cjs"
 	},

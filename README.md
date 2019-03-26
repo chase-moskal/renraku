@@ -4,9 +4,34 @@
 — **renraku is coming soon** —  
 &nbsp;&nbsp;&nbsp; *concept node api json rpc*
 
+renraku creates fluent node api's
+
+traditionally, to make a call to an api, you'd do something like this:
+
+```js
+const userDetails = await api.apiCall("user.getDetails", [userId])
+```
+
+**introducing *renraku:***
+
+```js
+const userDetails = await api.user.getDetails(userId)
+```
+
+renraku's important features:
+- natural syntax with no more string literals to maintain
+- interchangable client object and server implementation (great for testing)
+- typings provide intellisense hints
+- typescript devs can see critical errors in realtime
+
+renraku terminology:
+- `api` contains topics
+- `topic` contains functions
+- `shape` is a json structure used to generate client callables
+
 ## actions speak louder than words
 
-### `example/source/server.js` — expose functionality on the node server
+### `example/source/server.js` — on your node server, expose some functionality
 
 ```ts
 import * as renraku from "renraku"
@@ -17,8 +42,8 @@ const server = renraku.createServer([
     forbidden: /\:8989$/i,
     exposed: {
       exampleTopic: {
-        async exampleMethodAlpha(a) { return a + 1 },
-        async exampleMethodBravo(a, b) { return a + b }
+        async exampleFunctionAlpha(a) { return a + 1 },
+        async exampleFunctionBravo(a, b) { return a + b }
       }
     }
   }
@@ -27,62 +52,116 @@ const server = renraku.createServer([
 server.start(8001)
 ```
 
-### `example/source/client.js` — remotely call the exposed functions
+- topic objects must only have async functions
+- you can pass multiple exposures to expose different topics to different origins
+
+### `example/source/client.js` — call your functions from node or a browser
 
 ```ts
 import * as renraku from "renraku"
 
 async function main() {
+
+  // create the renraku client
   const {exampleTopic} = await renraku.createClient({
-    serverUrl: "http://localhost:8001",
+    url: "http://localhost:8001",
     shape: {
       exampleTopic: {
-        exampleMethodAlpha: true,
-        exampleMethodBravo: true
+        exampleFunctionAlpha: true,
+        exampleFunctionBravo: true
       }
     }
   })
 
-  // call the topic's methods
-  const result1 = await exampleTopic.exampleMethodAlpha(3)
-  const result2 = await exampleTopic.exampleMethodBravo(3, 2)
+  // ergonomic usage
+  const result1 = await exampleTopic.exampleFunctionAlpha(3)
+  const result2 = await exampleTopic.exampleFunctionBravo(3, 2)
 
   console.log(result1) //> 4
   console.log(result2) //> 5
 }
 ```
 
-## that's all you need, but you might want to 
+- you have to describe the shape of the api.  
+  this allows renraku to generate callable topic functions.  
+  if you use typescript, it will enforce that the shape is maintained  
 
-### `example/source/common.ts` — you might share
+## extra features for typescript devs
+
+the javascript examples above are all you need to use renraku
+
+typescript devs can benefit by recieving compile-time errors when a clientside shape object doesn't match a serverside implementation
+
+to achieve this, carefully follow the examples below, and pay special attention to the usage of `AbstractApiTopic` on the serverside
+
+### `example/source/common.ts`
 
 ```ts
 import * as renraku from "renraku"
 
-// typescript interface for the api, shared between server and client
+// topic interface, shared between server and client
+export interface ExampleTopic extends renraku.ApiTopic {
+  exampleFunctionAlpha(a: number): Promise<number>
+  exampleFunctionBravo(a: number, b: number): Promise<number>
+}
+
+// api interface, shared between server and client
 export interface ExampleApi extends renraku.Api {
-  exampleTopic: {
-    exampleMethodAlpha(a: number): Promise<number>
-    exampleMethodBravo(a: number, b: number): Promise<number>
-  }
+  exampleTopic: ExampleTopic
 }
 
-// serverside implementation of api functionality
-export class ExampleApiImplementation implements renraku.Api {
-  exampleTopic = {
-    async exampleMethodAlpha(a) { return a + 1 },
-    async exampleMethodBravo(a, b) { return a + b }
-  }
+// api shape interface, for the client
+export const exampleApiShape: ApiShape<ExampleApi> = {
+	exampleTopic: {
+		exampleFunctionAlpha: true,
+		exampleFunctionBravo: true
+	}
 }
-
-// describes the clientside shape of the api to the renraku.createClient
-export interface ExampleApiShape implements renraku.Shape<ExampleApi> {
-  exampleTopic = {
-    exampleMethodAlpha: true,
-    exampleMethodBravo: true
-  }
-}
-
 ```
 
-— *renraku means 'contact'* —
+### `example/source/server.ts`
+
+```ts
+import * as renraku from "renraku"
+import {ExampleTopic} from "./common"
+
+class ExampleTopicImplementation extends AbstractApiTopic
+  implements ExampleTopic {
+  async exampleFunctionAlpha(a) { return a + 1 },
+  async exampleFunctionBravo(a, b) { return a + b }
+}
+
+const server = createServer([
+  {
+    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+    forbidden: /\:8989$/i,
+    exposed: {
+      exampleTopic: new ExampleTopicImplementation()
+    }
+  }
+])
+```
+
+### `examples/source/client.ts`
+
+```ts
+import * as renraku from "renraku"
+import {ExampleApi} from "./common"
+
+async function main() {
+
+  const {exampleTopic} = await renraku.createClient<ExampleApi>({
+    url: "...",
+    shape: {
+      exampleTopic: {
+        exampleFunctionAlpha: true,
+        exampleFunctionBravo: true
+      }
+    }
+  })
+}
+```
+
+<br/><br/>
+
+<em style="display: block; text-align: center">— renraku means 'contact' —</em>
