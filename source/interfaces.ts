@@ -3,24 +3,24 @@
 // SHAPE
 //
 
-export type ApiShape<A extends Api> = {
-	[Topic in keyof A]: Shape<A[Topic]>
-}
-
 export type Shape<T = {}> = {
 	[P in keyof T]: boolean
+}
+
+export type ApiShape<A extends Api> = {
+	[Topic in keyof A]: Shape<A[Topic]>
 }
 
 //
 // API TOPICS
 //
 
-export type Api = { [topicName: string]: ApiTopic }
-export type ApiTopic = { [functionName: string]: ApiTopicFunction }
-export type ApiTopicFunction = (...args: any[]) => Promise<any>
+export type Api = { [topicName: string]: Topic }
+export type Topic = { [functionName: string]: TopicFunction }
+export type TopicFunction = (...args: any[]) => Promise<any>
 
-export abstract class AbstractApiTopic implements ApiTopic {
-	[functionName: string]: ApiTopicFunction
+export abstract class AbstractTopic implements Topic {
+	[functionName: string]: TopicFunction
 }
 
 //

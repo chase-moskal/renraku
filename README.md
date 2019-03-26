@@ -4,46 +4,50 @@
 — **renraku is coming soon** —  
 &nbsp;&nbsp;&nbsp; *concept node api json rpc*
 
-renraku creates fluent node api's
+## renraku creates fluent node api's
 
 traditionally, to make a call to an api, you'd do something like this:
 
 ```js
+// old and bunk
 const userDetails = await api.apiCall("user.getDetails", [userId])
 ```
 
 **introducing *renraku:***
 
 ```js
-const userDetails = await api.user.getDetails(userId)
+// the future
+const userDetails = await user.getDetails(userId)
 ```
 
 renraku's important features:
 - natural syntax with no more string literals to maintain
 - interchangable client object and server implementation (great for testing)
 - typings provide intellisense hints
-- typescript devs can see critical errors in realtime
+- typescript devs see errors in realtime (errors like a client/server api signature mismatch)
 
 renraku terminology:
 - `api` contains topics
 - `topic` contains functions
-- `shape` is a json structure used to generate client callables
+- `shape` json structure describing topic signature
 
-## actions speak louder than words
+## renraku leads by example
 
 ### `example/source/server.js` — on your node server, expose some functionality
 
 ```ts
-import * as renraku from "renraku"
+import {createApiServer} from "renraku"
 
-const server = renraku.createServer([
+const server = createApiServer([
   {
     allowed: /^http\:\/\/localhost\:8\d{3}$/i,
     forbidden: /\:8989$/i,
     exposed: {
-      exampleTopic: {
-        async exampleFunctionAlpha(a) { return a + 1 },
-        async exampleFunctionBravo(a, b) { return a + b }
+      reactor: {
+        async generatePower(a, b) { return a + b },
+        async radioactiveMeltdown(): Promise<void> {
+          throw new Error("meltdown error")
+        }
       }
     }
   }
@@ -58,27 +62,28 @@ server.start(8001)
 ### `example/source/client.js` — call your functions from node or a browser
 
 ```ts
-import * as renraku from "renraku"
+import {createApiClient} from "renraku"
 
 async function main() {
 
   // create the renraku client
-  const {exampleTopic} = await renraku.createClient({
+  const {reactor} = await createApiClient({
     url: "http://localhost:8001",
     shape: {
-      exampleTopic: {
-        exampleFunctionAlpha: true,
-        exampleFunctionBravo: true
+      reactor: {
+        generatePower: true,
+        radioactiveMeltdown: true
       }
     }
   })
 
   // ergonomic usage
-  const result1 = await exampleTopic.exampleFunctionAlpha(3)
-  const result2 = await exampleTopic.exampleFunctionBravo(3, 2)
+  const result1 = await exampleTopic.generatePower(3)
+  console.log(result1)
+   //> 3
 
-  console.log(result1) //> 4
-  console.log(result2) //> 5
+  const result2 = await exampleTopic.radioactiveMeltdown()
+   //> Error: meltdown error
 }
 ```
 
@@ -86,57 +91,48 @@ async function main() {
   this allows renraku to generate callable topic functions.  
   if you use typescript, it will enforce that the shape is maintained  
 
-## extra features for typescript devs
+## enhancements for typescript devs
 
-the javascript examples above are all you need to use renraku
+to use renraku, the javascript examples above are all you need
 
-typescript devs can benefit by recieving compile-time errors when a clientside shape object doesn't match a serverside implementation
+additionally however, typescript devs can benefit by receiving compile-time errors, for example whenever a clientside shape object doesn't match a serverside implementation
 
 to achieve this, carefully follow the examples below, and pay special attention to the usage of `AbstractApiTopic` on the serverside
 
 ### `example/source/common.ts`
 
 ```ts
-import * as renraku from "renraku"
+import {Api, Topic} from "renraku"
 
 // topic interface, shared between server and client
-export interface ExampleTopic extends renraku.ApiTopic {
-  exampleFunctionAlpha(a: number): Promise<number>
-  exampleFunctionBravo(a: number, b: number): Promise<number>
+export interface ReactorTopic extends Topic {
+  generatePower(a: number): Promise<number>
+  radioactiveMeltdown(a: number, b: number): Promise<number>
 }
 
 // api interface, shared between server and client
-export interface ExampleApi extends renraku.Api {
-  exampleTopic: ExampleTopic
-}
-
-// api shape interface, for the client
-export const exampleApiShape: ApiShape<ExampleApi> = {
-	exampleTopic: {
-		exampleFunctionAlpha: true,
-		exampleFunctionBravo: true
-	}
+export interface NuclearApi extends Api {
+  reactor: ReactorTopic
 }
 ```
 
 ### `example/source/server.ts`
 
 ```ts
-import * as renraku from "renraku"
-import {ExampleTopic} from "./common"
+import {createApiServer, AbstractTopic} from "renraku"
+import {ReactorTopic} from "./common"
 
-class ExampleTopicImplementation extends AbstractApiTopic
-  implements ExampleTopic {
-  async exampleFunctionAlpha(a) { return a + 1 },
-  async exampleFunctionBravo(a, b) { return a + b }
+class Reactor extends AbstractTopic implements ReactorTopic {
+  async generatePower(a: number, b: number) { return a + b },
+  async radioactiveMeltdown() { throw new Error("meltdown error") }
 }
 
-const server = createServer([
+const server = createApiServer([
   {
     allowed: /^http\:\/\/localhost\:8\d{3}$/i,
     forbidden: /\:8989$/i,
     exposed: {
-      exampleTopic: new ExampleTopicImplementation()
+      reactor: new Reactor()
     }
   }
 ])
@@ -145,23 +141,28 @@ const server = createServer([
 ### `examples/source/client.ts`
 
 ```ts
-import * as renraku from "renraku"
-import {ExampleApi} from "./common"
+import {createApiClient} from "renraku"
+import {NuclearApi, nuclearApiShape} from "./common"
+
+const nuclearApiShape: ApiShape<NuclearApi> = {
+  reactor: {
+    generatePower: true,
+    radioactiveMeltdown: true
+  }
+}
 
 async function main() {
-
-  const {exampleTopic} = await renraku.createClient<ExampleApi>({
-    url: "...",
-    shape: {
-      exampleTopic: {
-        exampleFunctionAlpha: true,
-        exampleFunctionBravo: true
-      }
-    }
+  const {reactor} = await createApiClient<NuclearApi>({
+    url: "https://localhost:8001",
+    shape: nuclearApiShape
   })
+
+  const result = await reactor.generatePower(1, 2)
+  console.log(result)
+   //> 3
 }
 ```
 
-<br/><br/>
+<br/>
 
 <em style="display: block; text-align: center">— renraku means 'contact' —</em>

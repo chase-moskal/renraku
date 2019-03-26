@@ -1,7 +1,7 @@
 
 import {Api, ServerOptions, Server} from "./interfaces.js"
 
-export function createServer<A extends Api = Api>(
+export function createApiServer<A extends Api = Api>(
 	options: ServerOptions<A>
 ): Server {
 
