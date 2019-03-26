@@ -20,7 +20,7 @@ const userDetails = await api.apiCall("user.getDetails", [userId])
 const userDetails = await user.getDetails(userId)
 ```
 
-renraku's important features:
+renraku features:
 - natural syntax with no more string literals to maintain
 - interchangable client object and server implementation (great for testing)
 - typings provide intellisense hints
@@ -153,7 +153,7 @@ const nuclearApiShape: ApiShape<NuclearApi> = {
 
 async function main() {
   const {reactor} = await createApiClient<NuclearApi>({
-    url: "https://localhost:8001",
+    url: "http://localhost:8001",
     shape: nuclearApiShape
   })
 
