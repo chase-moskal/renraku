@@ -80,11 +80,11 @@ async function main() {
   })
 
   // ergonomic usage
-  const result1 = await exampleTopic.generatePower(3)
+  const result1 = await reactor.generatePower(1, 2)
   console.log(result1)
    //> 3
 
-  const result2 = await exampleTopic.radioactiveMeltdown()
+  const result2 = await reactor.radioactiveMeltdown()
    //> Error: meltdown error
 }
 ```
