@@ -2,11 +2,11 @@
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
 — **node api library** —  
-&nbsp;&nbsp; *the seamless client calling experience*
+&nbsp;&nbsp; *featuring seamless calling*
 
 ## RENRAKU creates seamless node api's
 
-traditionally, to make a call to an api, you'd do something like this:
+traditionally, to call an api, you'd do something like this:
 
 ```js
 // old and not cool
