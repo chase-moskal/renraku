@@ -1,7 +1,7 @@
 
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
-— **RENRAKU node api library** —  
+— **node api library** —  
 &nbsp;&nbsp; *the seamless client calling experience*
 
 ## RENRAKU creates seamless node api's
