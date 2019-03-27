@@ -26,15 +26,16 @@ export function createApiServer<A extends Api = Api>({
 		const requestBody = request.body
 
 		logger.info(``)
-		logger.info(`🔔 `, origin)
-		logger.debug(` - request body:`, requestBody)
+		logger.info(`🔔`, origin)
+		logger.debug(` request body:`, requestBody)
 
 		try {
 			const result = await apiCall({origin, debug, requestBody, exposures})
 			response.body = JSON.stringify(result)
-			logger.debug(` - result:`, result)
+			logger.debug(` result:`, result)
 		}
 		catch (error) {
+			logger.error(error)
 			if (error instanceof ServerError)
 				context.throw(error.code, error.message)
 			else
