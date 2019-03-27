@@ -9,7 +9,7 @@
 traditionally, to make a call to an api, you'd do something like this:
 
 ```js
-// old and bunk
+// old and not cool
 const userDetails = await api.apiCall("user.getDetails", [userId])
 ```
 
