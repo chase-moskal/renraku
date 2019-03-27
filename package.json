@@ -15,7 +15,9 @@
 		"clean": "rimraf dist && mkdirp dist dist/cjs",
 		"barrel": "barrelsby --delete --directory source --exclude '\\.test\\.ts$' && replace --silent '\";$' '.js\"' source/index.ts",
 		"compile-esm": "tsc",
-		"compile-cjs": "tsc --module commonjs --outDir dist/cjs"
+		"compile-cjs": "tsc --module commonjs --outDir dist/cjs",
+		"start": "node dist/cjs/example-test-server",
+		"test": "exit 0"
 	},
 	"keywords": [
 		"rpc",
@@ -32,6 +34,8 @@
 	},
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
+		"@types/koa": "^2.0.48",
+		"@types/koa__cors": "^2.2.3",
 		"@types/node": "^11.11.6",
 		"barrelsby": "^2.0.0",
 		"mkdirp": "^0.5.1",
@@ -41,7 +45,10 @@
 		"typescript": "^3.3.4000"
 	},
 	"dependencies": {
+		"@koa/cors": "^3.0.0",
 		"commotion": "0.0.0-dev.5",
-		"isomorphic-fetch": "^2.2.1"
+		"isomorphic-fetch": "^2.2.1",
+		"koa": "^2.7.0",
+		"koa-body": "^4.1.0"
 	}
 }

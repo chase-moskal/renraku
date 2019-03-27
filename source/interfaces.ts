@@ -29,7 +29,7 @@ export abstract class AbstractTopic implements Topic {
 
 export interface Server {
 	start(port: number): void
-	stop(): void
+	stop(): Promise<void>
 }
 
 export interface ServerExposure<A extends Api> {
@@ -38,7 +38,7 @@ export interface ServerExposure<A extends Api> {
 	exposed: A
 }
 
-export type ServerOptions<A extends Api> = ServerExposure<A>[]
+export type ServerExposures<A extends Api> = ServerExposure<A>[]
 
 //
 // CLIENT

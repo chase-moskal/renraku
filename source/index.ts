@@ -5,4 +5,6 @@
 export * from "./create-api-client.js"
 export * from "./create-api-server.js"
 export * from "./example-nuclear-reactor.js"
+export * from "./example-test-server.js"
 export * from "./interfaces.js"
+export * from "./json-call.js"
