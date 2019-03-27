@@ -16,7 +16,7 @@
 		"barrel": "barrelsby --delete --directory source --exclude '\\.test\\.ts$' && replace --silent '\";$' '.js\"' source/index.ts",
 		"compile-esm": "tsc",
 		"compile-cjs": "tsc --module commonjs --outDir dist/cjs",
-		"start": "node dist/cjs/example-test-server",
+		"start": "node dist/cjs/example/example-server",
 		"test": "exit 0"
 	},
 	"keywords": [

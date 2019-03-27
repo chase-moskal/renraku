@@ -1,4 +1,6 @@
 
+import {Logger} from "./toolbox/logflume/interfaces.js"
+
 //
 // SHAPE
 //
@@ -46,6 +48,12 @@ export interface RequestBody {
 	params: any[]
 }
 
+export interface ServerOptions<A extends Api> {
+	exposures: ServerExposures<A>
+	debug?: boolean
+	logger?: Logger
+}
+
 //
 // CLIENT
 //
@@ -53,4 +61,6 @@ export interface RequestBody {
 export interface ClientOptions<A extends Api> {
 	url: string
 	shape: ApiShape<A>
+	debug?: boolean
+	logger?: Logger
 }
