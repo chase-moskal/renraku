@@ -40,6 +40,12 @@ export interface ServerExposure<A extends Api> {
 
 export type ServerExposures<A extends Api> = ServerExposure<A>[]
 
+export interface RequestBody {
+	topic: string
+	func: string
+	params: any[]
+}
+
 //
 // CLIENT
 //

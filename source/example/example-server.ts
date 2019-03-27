@@ -4,8 +4,7 @@ import {createApiServer} from "../server/create-api-server.js"
 
 import {NuclearApi, ReactorTopic} from "./example-common.js"
 
-class Reactor extends AbstractTopic
- implements ReactorTopic {
+class Reactor extends AbstractTopic implements ReactorTopic {
 	async generatePower(a: number, b: number) { return a + b }
 	async radioactiveMeltdown() { throw new Error("meltdown error") }
 }

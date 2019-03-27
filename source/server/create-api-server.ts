@@ -6,9 +6,16 @@ import {Server as HttpServer} from "http"
 
 import {Api, ServerExposures, Server} from "../interfaces.js"
 
+import {ServerError} from "./server-error.js"
+import {revealExposed} from "./reveal-exposed.js"
+import {performFunctionCall} from "./perform-function-call.js"
+import {validateRequestBody} from "./validate-request-body.js"
+
 export function createApiServer<A extends Api = Api>(
 	exposures: ServerExposures<A>
 ): Server {
+
+	const debug = false
 
 	const app = new Koa()
 	app.use(cors())
@@ -17,35 +24,19 @@ export function createApiServer<A extends Api = Api>(
 	app.use(async context => {
 		const {request, response} = context
 		const {origin} = request.headers
-
-		const exposure = exposures.find(exposure => {
-			const {allowed, forbidden} = exposure
-			return allowed.test(origin) && !forbidden.test(origin)
-		})
-
-		if (!exposure) context.throw(403, "origin forbidden")
-		const {exposed} = exposure
-
-		const {topic, func, params} = request.body
-		if (!topic) context.throw(400, "'topic' required")
-		if (!func) context.throw(400, "'func' required")
-		if (!params || !Array.isArray(params))
-			context.throw(400, "'params' array required")
-
-		if (!(topic in exposed))
-			context.throw(400, `topic "${topic}" not available`)
-
-		if (!(func in exposed[topic]))
-			context.throw(400, `func "${func}" not available`)
-
-		const callable = exposed[topic][func]
-
+		const requestBody = request.body
 		try {
-			const result = await callable(...params)
+			const exposed = revealExposed<A>({origin, exposures})
+			const callable = validateRequestBody({exposed, requestBody})
+			const {params} = requestBody
+			const result = await performFunctionCall({callable, params, debug})
 			response.body = JSON.stringify(result)
 		}
 		catch (error) {
-			context.throw(400, `api error occurred: ${topic}.${func}`)
+			if (error instanceof ServerError)
+				context.throw(error.code, error.message)
+			else
+				context.throw(500, debug ? error.message : "unknown error")
 		}
 	})
 
