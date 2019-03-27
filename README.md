@@ -33,7 +33,7 @@ renraku terminology:
 
 ## renraku leads by example
 
-### `example/source/server.js` — on your node server, expose some functionality
+### `server.js` — on your node server, expose some functionality
 
 ```ts
 import {createApiServer} from "renraku"
@@ -59,7 +59,7 @@ server.start(8001)
 - topic objects must only have async functions
 - you can pass multiple exposures to expose different topics to different origins
 
-### `example/source/client.js` — call your functions from node or a browser
+### `client.js` — call your functions from node or a browser
 
 ```ts
 import {createApiClient} from "renraku"
@@ -99,7 +99,7 @@ additionally however, typescript devs can benefit by receiving compile-time erro
 
 to achieve this, carefully follow the examples below, and pay special attention to the usage of `AbstractApiTopic` on the serverside
 
-### `example/source/common.ts`
+### `common.ts`
 
 ```ts
 import {Api, Topic} from "renraku"
@@ -116,7 +116,7 @@ export interface NuclearApi extends Api {
 }
 ```
 
-### `example/source/server.ts`
+### `server.ts`
 
 ```ts
 import {createApiServer, AbstractTopic} from "renraku"
@@ -138,7 +138,7 @@ const server = createApiServer([
 ])
 ```
 
-### `examples/source/client.ts`
+### `client.ts`
 
 ```ts
 import {createApiClient} from "renraku"
