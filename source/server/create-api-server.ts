@@ -6,10 +6,8 @@ import {Server as HttpServer} from "http"
 
 import {Api, ServerExposures, Server} from "../interfaces.js"
 
+import {apiCall} from "./api-call.js"
 import {ServerError} from "./server-error.js"
-import {revealExposed} from "./reveal-exposed.js"
-import {performFunctionCall} from "./perform-function-call.js"
-import {validateRequestBody} from "./validate-request-body.js"
 
 export function createApiServer<A extends Api = Api>(
 	exposures: ServerExposures<A>
@@ -26,10 +24,7 @@ export function createApiServer<A extends Api = Api>(
 		const {origin} = request.headers
 		const requestBody = request.body
 		try {
-			const exposed = revealExposed<A>({origin, exposures})
-			const callable = validateRequestBody({exposed, requestBody})
-			const {params} = requestBody
-			const result = await performFunctionCall({callable, params, debug})
+			const result = apiCall({origin, debug, requestBody, exposures})
 			response.body = JSON.stringify(result)
 		}
 		catch (error) {
