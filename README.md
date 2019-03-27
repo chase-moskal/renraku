@@ -1,10 +1,10 @@
 
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
-— **renraku is coming soon** —  
-&nbsp;&nbsp;&nbsp; *concept node api json rpc*
+— **RENRAKU node api library** —  
+&nbsp;&nbsp; *the seamless client calling experience*
 
-## renraku creates fluent node api's
+## RENRAKU creates seamless node api's
 
 traditionally, to make a call to an api, you'd do something like this:
 
@@ -13,45 +13,47 @@ traditionally, to make a call to an api, you'd do something like this:
 const userDetails = await api.apiCall("user.getDetails", [userId])
 ```
 
-**introducing *renraku:***
+**introducing *RENRAKU!***
 
 ```js
 // the future
 const userDetails = await user.getDetails(userId)
 ```
 
-renraku features:
+RENRAKU features:
 - natural syntax with no more string literals to maintain
 - interchangable client object and server implementation (great for testing)
 - typings provide intellisense hints
 - typescript devs see errors in realtime (errors like a client/server api signature mismatch)
 
-renraku terminology:
+RENRAKU terminology:
 - `api` contains topics
 - `topic` contains functions
 - `shape` is json describing topic signature
 
-## renraku leads by example
+## RENRAKU leads by example
 
 ### `server.js` — on your node server, expose some functionality
 
 ```ts
 import {createApiServer} from "renraku"
 
-const server = createApiServer([
-  {
-    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-    forbidden: /\:8989$/i,
-    exposed: {
-      reactor: {
-        async generatePower(a, b) { return a + b },
-        async radioactiveMeltdown(): Promise<void> {
-          throw new Error("meltdown error")
+const server = createApiServer({
+  exposures: [
+    {
+      allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+      forbidden: /\:8989$/i,
+      exposed: {
+        reactor: {
+          async generatePower(a, b) { return a + b },
+          async radioactiveMeltdown(): Promise<void> {
+            throw new Error("meltdown error")
+          }
         }
       }
     }
-  }
-])
+  ]
+})
 
 server.start(8001)
 ```
@@ -87,13 +89,13 @@ async function main() {
 }
 ```
 
-- you have to describe the shape of the api.  
-  this allows renraku to generate callable topic functions.  
-  if you use typescript, it will enforce that the shape is maintained  
+- you have to describe the shape of the api to the client.  
+  this allows RENRAKU to generate callable topic functions.  
+  if you use typescript, it will enforce that the shape is correctly maintained  
 
-## enhancements for typescript devs
+## RENRAKU is good for typescript devs
 
-to use renraku, the javascript examples above are all you need
+to use RENRAKU, the javascript examples above are all you need
 
 additionally however, typescript devs can benefit by receiving compile-time errors, for example whenever a clientside shape object doesn't match a serverside implementation
 
@@ -120,22 +122,24 @@ export interface NuclearApi extends Api {
 
 ```ts
 import {createApiServer, AbstractTopic} from "renraku"
-import {ReactorTopic} from "./common"
+import {NuclearApi, ReactorTopic} from "./common"
 
 class Reactor extends AbstractTopic implements ReactorTopic {
   async generatePower(a: number, b: number) { return a + b },
   async radioactiveMeltdown() { throw new Error("meltdown error") }
 }
 
-const server = createApiServer([
-  {
-    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-    forbidden: /\:8989$/i,
-    exposed: {
-      reactor: new Reactor()
+const server = createApiServer<NuclearApi>({
+  exposures: [
+    {
+      allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+      forbidden: /\:8989$/i,
+      exposed: {
+        reactor: new Reactor()
+      }
     }
-  }
-])
+  ]
+)
 ```
 
 ### `client.ts`
@@ -165,4 +169,4 @@ async function main() {
 
 <br/>
 
-<em style="display: block; text-align: center">— renraku means 'contact' —</em>
+<em style="display: block; text-align: center">— RENRAKU means 'contact' —</em>
