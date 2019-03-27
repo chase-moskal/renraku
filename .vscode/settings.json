@@ -9,6 +9,7 @@
 	"typescript.tsdk": "node_modules/typescript/lib/",
 
 	"files.exclude": {
+		"dist": true,
 		"*.log*": true,
 		"coverage": true,
 		"node_modules": true,
@@ -20,6 +21,7 @@
 	},
 
 	"[markdown]": {
+		"editor.tabSize": 2,
 		"editor.insertSpaces": true
 	}
 }
