@@ -4,7 +4,7 @@ import * as cors from "@koa/cors"
 import * as koaBody from "koa-body"
 import {Server as HttpServer} from "http"
 
-import {Api, ServerExposures, Server} from "./interfaces.js"
+import {Api, ServerExposures, Server} from "../interfaces.js"
 
 export function createApiServer<A extends Api = Api>(
 	exposures: ServerExposures<A>

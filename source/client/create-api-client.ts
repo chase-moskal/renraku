@@ -1,7 +1,7 @@
 
 import * as commotion from "commotion"
 
-import {Api, ClientOptions} from "./interfaces.js"
+import {Api, ClientOptions} from "../interfaces.js"
 
 export async function createApiClient<A extends Api>({
 	url,
