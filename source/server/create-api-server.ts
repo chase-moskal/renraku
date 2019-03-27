@@ -16,17 +16,19 @@ export function createApiServer<A extends Api = Api>({
 	logger = new DisabledLogger()
 }: ServerOptions<A>): Server {
 
-	const app = new Koa()
-	app.use(cors())
-	app.use(koaBody())
+	const koa = new Koa()
+	koa.use(cors())
+	koa.use(koaBody())
 
-	app.use(async context => {
+	koa.use(async context => {
 		const {request, response} = context
 		const {origin} = request.headers
 		const requestBody = request.body
+
 		logger.info(``)
 		logger.info(`🔔 `, origin)
 		logger.debug(` - request body:`, requestBody)
+
 		try {
 			const result = await apiCall({origin, debug, requestBody, exposures})
 			response.body = JSON.stringify(result)
@@ -43,11 +45,13 @@ export function createApiServer<A extends Api = Api>({
 	let server: HttpServer
 
 	return {
+
 		start(port: number) {
 			if (server) throw new Error("cannot start when already running")
-			server = app.listen(port)
+			server = koa.listen(port)
 			logger.log(`🌐  api server listening on port ${port}`)
 		},
+
 		async stop() {
 			const result = await server
 				? new Promise<void>((resolve, reject) => {
