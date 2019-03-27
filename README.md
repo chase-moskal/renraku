@@ -29,7 +29,7 @@ renraku features:
 renraku terminology:
 - `api` contains topics
 - `topic` contains functions
-- `shape` json structure describing topic signature
+- `shape` is json describing topic signature
 
 ## renraku leads by example
 
