@@ -39,20 +39,20 @@ RENRAKU terminology:
 import {createApiServer} from "renraku"
 
 const server = createApiServer({
-  exposures: [
-    {
-      allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-      forbidden: /\:8989$/i,
-      exposed: {
-        reactor: {
-          async generatePower(a, b) { return a + b },
-          async radioactiveMeltdown(): Promise<void> {
-            throw new Error("meltdown error")
-          }
+  exposures: [{
+    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+    forbidden: /\:8989$/i,
+    exposed: {
+      reactor: {
+        async generatePower(a, b) {
+          return a + b
+        },
+        async radioactiveMeltdown(): Promise<void> {
+          throw new Error("meltdown error")
         }
       }
     }
-  ]
+  }]
 })
 
 server.start(8001)
@@ -130,15 +130,13 @@ class Reactor extends AbstractTopic implements ReactorTopic {
 }
 
 const server = createApiServer<NuclearApi>({
-  exposures: [
-    {
-      allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-      forbidden: /\:8989$/i,
-      exposed: {
-        reactor: new Reactor()
-      }
+  exposures: [{
+    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+    forbidden: /\:8989$/i,
+    exposed: {
+      reactor: new Reactor()
     }
-  ]
+  }]
 )
 ```
 
