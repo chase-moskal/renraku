@@ -9,7 +9,7 @@ export async function createApiClient<A extends Api>({
 	url,
 	shape
 }: ClientOptions<A>): Promise<A> {
-	const client = <A>{}
+	const client = <Api>{}
 
 	for (const topic of keys(shape)) {
 		client[topic] = {}
@@ -21,5 +21,5 @@ export async function createApiClient<A extends Api>({
 		}
 	}
 
-	return client
+	return <A>client
 }
