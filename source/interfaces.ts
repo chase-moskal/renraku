@@ -18,12 +18,8 @@ export type ApiShape<A extends Api> = {
 //
 
 export type Api = { [topicName: string]: Topic }
-export type Topic = { [functionName: string]: TopicFunction }
 export type TopicFunction = (...args: any[]) => Promise<any>
-
-export abstract class AbstractTopic implements Topic {
-	[functionName: string]: TopicFunction
-}
+export type Topic<X = any> = { [functionName in keyof X]: TopicFunction }
 
 //
 // SERVER

@@ -1,10 +1,10 @@
 
 import {Api, Topic, ApiShape} from "../interfaces.js"
 
-export interface ReactorTopic extends Topic {
+export type ReactorTopic = Topic<{
 	generatePower(a: number, b: number): Promise<number>
 	radioactiveMeltdown(): Promise<void>
-}
+}>
 
 export interface NuclearApi extends Api {
 	reactor: ReactorTopic
