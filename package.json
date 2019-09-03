@@ -1,6 +1,6 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.5",
+	"version": "0.0.0-dev.6",
 	"description": "node json rpc",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
@@ -16,7 +16,9 @@
 		"barrel": "barrelsby --delete --directory source --exclude '\\.test\\.ts$' && replace --silent '\";$' '.js\"' source/index.ts",
 		"compile-esm": "tsc",
 		"compile-cjs": "tsc --module commonjs --outDir dist/cjs",
-		"start": "node dist/cjs/example/example-server",
+		"start-api": "node -e 'require(\"./dist/cjs/example/example-server\").exampleServer()'",
+		"start-http": "serve -l 8000",
+		"start": "run-p start-api start-http",
 		"test": "exit 0"
 	},
 	"keywords": [
@@ -42,6 +44,7 @@
 		"npm-run-all": "^4.1.5",
 		"replace": "^1.1.1",
 		"rimraf": "^3.0.0",
+		"serve": "^11.1.0",
 		"typescript": "^3.6.2"
 	},
 	"dependencies": {

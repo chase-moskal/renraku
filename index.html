@@ -3,26 +3,8 @@
 	<head>
 		<title>renraku client testing</title>
 		<script type="module">
-
-			import {createApiClient} from "./dist/client/create-api-client.js"
-
-			async function main() {
-				const {reactor} = await createApiClient({
-					url: "http://localhost:8001",
-					shape: {
-						reactor: {
-							generatePower: true,
-							radioactiveMeltdown: true
-						}
-					}
-				})
-				const result = await reactor.generatePower(1, 2)
-				console.log(result)
-				window["reactor"] = reactor
-			}
-
-			main()
-
+			import {exampleClient} from "./dist/example/example-client.js"
+			exampleClient()
 		</script>
 	</head>
 </html>

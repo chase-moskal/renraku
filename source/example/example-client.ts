@@ -10,12 +10,12 @@ export const nuclearShape: ApiShape<NuclearApi> = {
 	}
 }
 
-export async function exampleClientMain() {
+export async function exampleClient() {
 	const {reactor} = await createApiClient<NuclearApi>({
-		url: "",
+		url: "http://localhost:8001",
 		shape: nuclearShape
 	})
 	const result = await reactor.generatePower(1, 2)
-	console.log(result)
+	console.log(result === 3 ? "✔ success" : "✘ failed")
 	return reactor
 }
