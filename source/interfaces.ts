@@ -2,6 +2,14 @@
 import {Logger} from "./toolbox/logflume/interfaces.js"
 
 //
+// API TOPICS
+//
+
+export type Api = { [topicName: string]: Topic }
+export type TopicFunction = (...args: any[]) => Promise<any>
+export type Topic<X = any> = { [functionName in keyof X]: TopicFunction }
+
+//
 // SHAPE
 //
 
@@ -10,16 +18,8 @@ export type Shape<T = {}> = {
 }
 
 export type ApiShape<A extends Api> = {
-	[Topic in keyof A]: Shape<A[Topic]>
+	[topicName in keyof A]: Shape<A[topicName]>
 }
-
-//
-// API TOPICS
-//
-
-export type Api = { [topicName: string]: Topic }
-export type TopicFunction = (...args: any[]) => Promise<any>
-export type Topic<X = any> = { [functionName in keyof X]: TopicFunction }
 
 //
 // SERVER
