@@ -15,7 +15,7 @@ export interface NuclearApi extends Api {
 export async function exampleServer() {
 	const server = createApiServer<NuclearApi>({
 		debug: true,
-		logger: new ConsoleLogger(),
+		logger: console,
 		exposures: [
 			{
 				allowed: /^http\:\/\/localhost\:8\d{3}$/i,
