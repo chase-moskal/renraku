@@ -1,5 +1,5 @@
 
-import {Logger} from "./toolbox/logflume/interfaces.js"
+import {Logger} from "./toolbox/logging.js"
 
 //
 // API TOPICS
@@ -57,6 +57,4 @@ export interface ServerOptions<A extends Api> {
 export interface ClientOptions<A extends Api> {
 	url: string
 	shape: ApiShape<A>
-	debug?: boolean
-	logger?: Logger
 }

@@ -1,7 +1,6 @@
 
 import {Api, Topic} from "../interfaces.js"
 import {createApiServer} from "../server/create-api-server.js"
-import {ConsoleLogger} from "../toolbox/logflume/console-logger.js"
 
 export class Reactor implements Topic<Reactor> {
 	async generatePower(a: number, b: number) { return a + b }

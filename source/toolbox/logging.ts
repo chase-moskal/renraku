@@ -6,3 +6,11 @@ export interface Logger {
 	debug: typeof console.debug
 	error: typeof console.error
 }
+
+export class DisabledLogger implements Logger {
+	log() {}
+	info() {}
+	warn() {}
+	debug() {}
+	error() {}
+}

@@ -4,8 +4,8 @@ import * as cors from "@koa/cors"
 import * as koaBody from "koa-body"
 import {Server as HttpServer} from "http"
 
+import {DisabledLogger} from "../toolbox/logging.js"
 import {Api, Server, ServerOptions} from "../interfaces.js"
-import {DisabledLogger} from "../toolbox/logflume/disabled-logger.js"
 
 import {apiCall} from "./api-call.js"
 import {ServerError} from "./server-error.js"
