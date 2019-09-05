@@ -7,21 +7,25 @@ export class Reactor implements Topic<Reactor> {
 	async radioactiveMeltdown() { throw new Error("meltdown error") }
 }
 
-export interface NuclearApi extends Api {
-	reactor: Topic<Reactor>
+export interface NuclearApi extends Api<NuclearApi> {
+	reactor: Reactor
 }
 
 export async function exampleServer() {
-	const server = createApiServer<NuclearApi>({
+	const exposed: NuclearApi = {
+		reactor: {
+			async generatePower(a: number, b: number) { return a + b },
+			async radioactiveMeltdown() { throw new Error("meltdown error") }
+		}
+	}
+	const server = createApiServer({
 		debug: true,
 		logger: console,
 		exposures: [
 			{
 				allowed: /^http\:\/\/localhost\:8\d{3}$/i,
 				forbidden: /\:8989$/i,
-				exposed: <NuclearApi>{
-					reactor: new Reactor()
-				}
+				exposed
 			}
 		]
 	})

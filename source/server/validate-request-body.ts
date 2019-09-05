@@ -1,10 +1,9 @@
 
-import {Api, RequestBody} from "../interfaces.js"
-
+import {RequestBody} from "../interfaces.js"
 import {ServerError} from "./server-error.js"
 
 export function validateRequestBody({exposed, requestBody}: {
-	exposed: Api
+	exposed: any
 	requestBody: RequestBody
 }) {
 	const {topic, func, params} = requestBody

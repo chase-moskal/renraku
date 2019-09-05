@@ -5,9 +5,9 @@ import {Logger} from "./toolbox/logging.js"
 // API TOPICS
 //
 
-export type Api = { [topicName: string]: Topic }
 export type TopicFunction = (...args: any[]) => Promise<any>
-export type Topic<X = any> = { [functionName in keyof X]: TopicFunction }
+export type Topic<X = {}> = { [functionName in keyof X]: TopicFunction }
+export type Api<X = {}> = { [topicName in keyof X]: Topic<X[topicName]> }
 
 //
 // SHAPE
@@ -44,7 +44,7 @@ export interface RequestBody {
 	params: any[]
 }
 
-export interface ServerOptions<A extends Api> {
+export interface ServerOptions<A extends Api = Api> {
 	exposures: ServerExposures<A>
 	debug?: boolean
 	logger?: Logger

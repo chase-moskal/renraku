@@ -1,7 +1,6 @@
 
 import {ServerExposures, Api} from "../interfaces.js"
-
-import {ServerError} from "./server-error"
+import {ServerError} from "./server-error.js"
 
 export function revealExposed<A extends Api>({origin, exposures}: {
 	origin: string

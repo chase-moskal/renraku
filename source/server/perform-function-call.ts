@@ -1,6 +1,5 @@
 
 import {TopicFunction} from "../interfaces.js"
-
 import {ServerError} from "./server-error.js"
 
 export async function performFunctionCall({callable, params, debug}: {
