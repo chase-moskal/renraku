@@ -36,7 +36,7 @@ RENRAKU terminology:
 ### `server.js` — on your node server, expose some functionality
 
 ```ts
-import {createApiServer} from "renraku"
+import {createApiServer} from "renraku/dist/server/create-api-server.js"
 
 const server = createApiServer({
   exposures: [{
@@ -64,7 +64,7 @@ server.start(8001)
 ### `client.js` — call your functions from node or a browser
 
 ```ts
-import {createApiClient} from "renraku"
+import {createApiClient} from "renraku/dist/client/create-api-client.js"
 
 async function main() {
 
@@ -100,70 +100,6 @@ to use RENRAKU, the javascript examples above are all you need
 additionally however, typescript devs can benefit by receiving compile-time errors, for example whenever a clientside shape object doesn't match a serverside implementation
 
 to achieve this, carefully follow the examples below, and pay special attention to the usage of `AbstractApiTopic` on the serverside
-
-### `common.ts`
-
-```ts
-import {Api, Topic} from "renraku"
-
-// topic interface, shared between server and client
-export interface ReactorTopic extends Topic {
-  generatePower(a: number): Promise<number>
-  radioactiveMeltdown(a: number, b: number): Promise<number>
-}
-
-// api interface, shared between server and client
-export interface NuclearApi extends Api {
-  reactor: ReactorTopic
-}
-```
-
-### `server.ts`
-
-```ts
-import {createApiServer, AbstractTopic} from "renraku"
-import {NuclearApi, ReactorTopic} from "./common"
-
-class Reactor extends AbstractTopic implements ReactorTopic {
-  async generatePower(a: number, b: number) { return a + b },
-  async radioactiveMeltdown() { throw new Error("meltdown error") }
-}
-
-const server = createApiServer<NuclearApi>({
-  exposures: [{
-    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-    forbidden: /\:8989$/i,
-    exposed: {
-      reactor: new Reactor()
-    }
-  }]
-)
-```
-
-### `client.ts`
-
-```ts
-import {createApiClient} from "renraku"
-import {NuclearApi, nuclearApiShape} from "./common"
-
-const nuclearApiShape: ApiShape<NuclearApi> = {
-  reactor: {
-    generatePower: true,
-    radioactiveMeltdown: true
-  }
-}
-
-async function main() {
-  const {reactor} = await createApiClient<NuclearApi>({
-    url: "http://localhost:8001",
-    shape: nuclearApiShape
-  })
-
-  const result = await reactor.generatePower(1, 2)
-  console.log(result)
-   //> 3
-}
-```
 
 <br/>
 
