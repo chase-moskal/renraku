@@ -2,6 +2,7 @@
 import * as Koa from "koa"
 import * as cors from "@koa/cors"
 import * as koaBody from "koa-body"
+// import * as Router from "koa-router"
 import {Server as HttpServer} from "http"
 
 import {DisabledLogger} from "../toolbox/logging.js"
@@ -13,10 +14,10 @@ import {ServerError} from "./server-error.js"
 export function createApiServer<A extends Api = Api>({
 	exposures,
 	debug = false,
+	koa = new Koa(),
 	logger = new DisabledLogger()
 }: ServerOptions<A>): Server {
 
-	const koa = new Koa()
 	koa.use(cors())
 	koa.use(koaBody())
 
@@ -46,13 +47,12 @@ export function createApiServer<A extends Api = Api>({
 	let server: HttpServer
 
 	return {
-
+		koa,
 		start(port: number) {
 			if (server) throw new Error("cannot start when already running")
 			server = koa.listen(port)
 			logger.log(`🌐  api server listening on port ${port}`)
 		},
-
 		async stop() {
 			const result = await server
 				? new Promise<void>((resolve, reject) => {

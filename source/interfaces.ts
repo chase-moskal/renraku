@@ -1,5 +1,7 @@
 
+import * as Koa from "koa"
 import {Logger} from "./toolbox/logging.js"
+
 
 //
 // API TOPICS
@@ -26,6 +28,7 @@ export type ApiShape<A extends Api> = {
 //
 
 export interface Server {
+	koa: Koa
 	start(port: number): void
 	stop(): Promise<void>
 }
@@ -46,6 +49,7 @@ export interface RequestBody {
 
 export interface ServerOptions<A extends Api = Api> {
 	exposures: ServerExposures<A>
+	koa?: Koa
 	debug?: boolean
 	logger?: Logger
 }
