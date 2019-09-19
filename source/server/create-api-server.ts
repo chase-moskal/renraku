@@ -2,7 +2,6 @@
 import * as Koa from "koa"
 import * as cors from "@koa/cors"
 import * as koaBody from "koa-body"
-// import * as Router from "koa-router"
 import {Server as HttpServer} from "http"
 
 import {DisabledLogger} from "../toolbox/logging.js"

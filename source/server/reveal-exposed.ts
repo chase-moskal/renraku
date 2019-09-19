@@ -8,7 +8,7 @@ export function revealExposed<A extends Api>({origin, exposures}: {
 }): A {
 	const exposure = exposures.find(exposure => {
 		const {allowed, forbidden} = exposure
-		return allowed.test(origin) && !forbidden.test(origin)
+		return allowed.test(origin) && forbidden ? !forbidden.test(origin) : true
 	})
 	if (!exposure) throw new ServerError(403, "origin forbidden")
 	return exposure.exposed
