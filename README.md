@@ -64,12 +64,12 @@ server.start(8001)
 ### `client.js` — call your functions from node or a browser
 
 ```ts
-import {createApiClient} from "renraku/dist/client/create-api-client.js"
+import {createBrowserApiClient} from "renraku/dist/client/create-browser-api-client.js"
 
 async function main() {
 
   // create the renraku client
-  const {reactor} = await createApiClient({
+  const {reactor} = await createBrowserApiClient({
     url: "http://localhost:8001",
     shape: {
       reactor: {
