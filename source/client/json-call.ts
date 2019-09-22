@@ -1,7 +1,5 @@
 
-import * as fetch from "isomorphic-fetch"
-
-export async function jsonCall<T = any>(url: string, upload: any): Promise<T> {
+export async function jsonCall<T = any>(fetch: typeof window.fetch, url: string, upload: any): Promise<T> {
 	const response = await fetch(url, {
 		method: "POST",
 		headers: {

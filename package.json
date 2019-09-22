@@ -1,6 +1,6 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.10",
+	"version": "0.0.0-dev.11",
 	"description": "node json rpc",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
