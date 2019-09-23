@@ -2,13 +2,14 @@
 import {TopicFunction} from "../interfaces.js"
 import {ServerError} from "./server-error.js"
 
-export async function performFunctionCall({callable, params, debug}: {
+export async function performMethodCall({that, method, params, debug}: {
+	that: Object
+	method: TopicFunction
 	params: any[]
 	debug: boolean
-	callable: TopicFunction
 }): Promise<any> {
 	try {
-		return callable(...params)
+		return method.apply(that, params)
 	}
 	catch (error) {
 		if (debug) throw error

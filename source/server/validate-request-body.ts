@@ -23,5 +23,8 @@ export function validateRequestBody({exposed, requestBody}: {
 	if (!(func in exposed[topic]))
 		throw new ServerError(400, `func "${func}" not available`)
 
-	return exposed[topic][func]
+	return {
+		that: exposed[topic],
+		method: exposed[topic][func]
+	}
 }
