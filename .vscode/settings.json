@@ -9,7 +9,7 @@
 	"typescript.tsdk": "node_modules/typescript/lib/",
 
 	"files.exclude": {
-		"dist": true,
+		"dist": false,
 		"*.log*": true,
 		"coverage": true,
 		"node_modules": true,
@@ -18,6 +18,14 @@
 
 	"search.exclude": {
 		"dist": true
+	},
+
+	"files.watcherExclude": {
+		"dist/**": true,
+		"source-a*/**": true,
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true,
+		"**/node_modules/*/**": true,
 	},
 
 	"[markdown]": {
