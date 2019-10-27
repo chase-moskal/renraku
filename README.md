@@ -25,6 +25,8 @@ RENRAKU features:
 - interchangable client object and server implementation (great for testing)
 - typings provide intellisense hints
 - typescript devs see errors in realtime (errors like a client/server api signature mismatch)
+- cors security for public endpoints
+- signed request security via a certificate whitelist
 
 RENRAKU terminology:
 - `api` contains topics
@@ -33,73 +35,18 @@ RENRAKU terminology:
 
 ## RENRAKU leads by example
 
-### `server.js` — on your node server, expose some functionality
+### [`example-server.ts`](source/example/example-server.ts) — on your node server, expose some functionality
 
-```ts
-import {createApiServer} from "renraku/dist/server/create-api-server.js"
+### [`example-client.ts`](source/example/example-client.ts) — call your functions from node or a browser
 
-const server = createApiServer({
-  exposures: [{
-    allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-    forbidden: /\:8989$/i,
-    exposed: {
-      reactor: {
-        async generatePower(a, b) {
-          return a + b
-        },
-        async radioactiveMeltdown(): Promise<void> {
-          throw new Error("meltdown error")
-        }
-      }
-    }
-  }]
-})
-
-server.start(8001)
-```
-
-- topic objects must only have async functions
-- you can pass multiple exposures to expose different topics to different origins
-
-### `client.js` — call your functions from node or a browser
-
-```ts
-import {createBrowserApiClient} from "renraku/dist/client/create-browser-api-client.js"
-
-async function main() {
-
-  // create the renraku client
-  const {reactor} = await createBrowserApiClient({
-    url: "http://localhost:8001",
-    shape: {
-      reactor: {
-        generatePower: true,
-        radioactiveMeltdown: true
-      }
-    }
-  })
-
-  // ergonomic usage
-  const result1 = await reactor.generatePower(1, 2)
-  console.log(result1)
-   //> 3
-
-  const result2 = await reactor.radioactiveMeltdown()
-   //> Error: meltdown error
-}
-```
-
-- you have to describe the shape of the api to the client.  
-  this allows RENRAKU to generate callable topic functions.  
-  if you use typescript, it will enforce that the shape is correctly maintained  
+- the client provides a shape object so RENRAKU can generate callable functions.  
+  typescript will enforce that the shape is correctly maintained  
 
 ## RENRAKU is good for typescript devs
 
-to use RENRAKU, the javascript examples above are all you need
+javascript is all you need to use RENRAKU
 
-additionally however, typescript devs can benefit by receiving compile-time errors, for example whenever a clientside shape object doesn't match a serverside implementation
-
-to achieve this, carefully follow the examples below, and pay special attention to the usage of `AbstractApiTopic` on the serverside
+however, typescript devs can benefit by receiving compile-time errors, for example whenever a clientside shape object doesn't match a serverside implementation
 
 <br/>
 
