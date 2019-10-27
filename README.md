@@ -26,7 +26,7 @@ RENRAKU features:
 - typings provide intellisense hints
 - typescript devs see errors in realtime (errors like a client/server api signature mismatch)
 - cors security for public endpoints
-- signed request security via a certificate whitelist
+- *todo:* signed request security via a certificate whitelist
 
 RENRAKU terminology:
 - `api` contains topics
