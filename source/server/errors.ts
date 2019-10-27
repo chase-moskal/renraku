@@ -7,3 +7,6 @@ export class ServerError extends Error {
 		this.code = code
 	}
 }
+
+export const err = (code: number, message: string) =>
+	new ServerError(code, message)

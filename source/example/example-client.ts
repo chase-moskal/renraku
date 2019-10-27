@@ -1,9 +1,9 @@
 
 import {ApiShape} from "../interfaces.js"
-import {NuclearApi} from "./example-server.js"
+import {Api} from "./example-server.js"
 import {createBrowserApiClient} from "../client/create-browser-api-client.js"
 
-export const nuclearShape: ApiShape<NuclearApi> = {
+export const nuclearShape: ApiShape<Api> = {
 	reactor: {
 		generatePower: true,
 		radioactiveMeltdown: true
@@ -11,7 +11,7 @@ export const nuclearShape: ApiShape<NuclearApi> = {
 }
 
 export async function exampleClient() {
-	const {reactor} = await createBrowserApiClient<NuclearApi>({
+	const {reactor} = await createBrowserApiClient<Api>({
 		url: "http://localhost:8001",
 		shape: nuclearShape
 	})

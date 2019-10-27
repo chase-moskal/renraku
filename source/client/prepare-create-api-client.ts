@@ -1,9 +1,9 @@
 
 import {jsonCall} from "./json-call.js"
-import {Api, ClientOptions, RequestBody} from "../interfaces.js"
+import {TopicApi, ClientOptions, Order} from "../interfaces.js"
 
 export const prepareCreateApiClient = (fetch: typeof window.fetch) =>
-	async function createApiClient<A extends Api>({
+	async function createApiClient<A extends TopicApi<A> = TopicApi>({
 		url,
 		shape
 	}: ClientOptions<A>): Promise<A> {
@@ -14,7 +14,7 @@ export const prepareCreateApiClient = (fetch: typeof window.fetch) =>
 
 			for (const func of Object.keys((<any>shape)[topic])) {
 				client[topic][func] = async function(...params: any[]): Promise<any> {
-					return jsonCall(fetch, url, <RequestBody>{topic, func, params})
+					return jsonCall(fetch, url, <Order>{topic, func, params})
 				}
 			}
 		}

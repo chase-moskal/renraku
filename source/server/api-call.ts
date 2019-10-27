@@ -1,26 +1,33 @@
 
-import {Api, ServerExposures, RequestBody} from "../interfaces.js"
+import {validateOrder} from "./validate-order.js"
+import {Order, Exposure, TopicApi} from "../interfaces.js"
+import {enforcePermissions} from "./enforce-permissions.js"
 
-import {revealExposed} from "./reveal-exposed.js"
-import {performMethodCall} from "./perform-method-call.js"
-import {validateRequestBody} from "./validate-request-body.js"
-
-export async function apiCall<A extends Api>({
-	origin, debug, requestBody, exposures
+export async function apiCall({
+	id,
+	body,
+	topics,
+	signature,
 }: {
-	origin: string
-	debug: boolean
-	requestBody: RequestBody
-	exposures: ServerExposures<A>
-}): Promise<any> {
+	id: string
+	body: string
+	topics: TopicApi
+	signature: string
+}) {
 
-	// permissions and origin whitelisting/blacklisting
-	const exposed = revealExposed<A>({origin, exposures})
+	// parse and validate an incoming "order"
+	const order: Order = JSON.parse(body.trim())
+	validateOrder(order)
 
-	// request validation
-	const {that, method} = validateRequestBody({exposed, requestBody})
-	const {params} = requestBody
+	// relate the incoming order to the configured topics
+	const {func, topic} = order
+	const exposure: Exposure<any> = (<any>topics)[topic]
+	const {exposed: that} = exposure
+	const method = that[func]
 
-	// calling exposed implementation and handling errors
-	return performMethodCall({that, method, params, debug})
+	// enforce cors or certificate whitelist
+	enforcePermissions({id, order, body, origin, signature, exposure})
+
+	// execute the call and send back the results
+	return method.apply(that, order.params)
 }
