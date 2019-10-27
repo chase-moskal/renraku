@@ -11,8 +11,8 @@ import {
 	ServerOptions,
 } from "../interfaces.js"
 
-import {ServerError} from "./errors.js"
 import {apiCall} from "./api-call.js"
+import {ServerError} from "./errors.js"
 
 export function createApiServer<A extends TopicApi<A> = TopicApi>({
 	topics,
@@ -33,13 +33,18 @@ export function createApiServer<A extends TopicApi<A> = TopicApi>({
 			["x-signature"]: signature,
 		} = headers
 
-		logger.info(``)
-		logger.info(`🔔`, origin)
-		logger.debug(` request:`, body)
-
 		try {
-			const result = await apiCall({id, signature, body, topics})
-			response.body = JSON.stringify(result)
+			response.body = JSON.stringify(
+				await apiCall({
+					id,
+					body,
+					debug,
+					origin,
+					logger,
+					topics,
+					signature,
+				})
+			)
 		}
 		catch (error) {
 			logger.error(error)
