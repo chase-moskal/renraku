@@ -1,10 +1,10 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.14",
+	"version": "0.0.0-dev.15",
 	"description": "node json rpc",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
-	"main": "dist/cjs/index.js",
+	"main": "dist-cjs/index.js",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
@@ -12,10 +12,10 @@
 	],
 	"scripts": {
 		"prepare": "run-s clean && run-p compile-esm compile-cjs",
-		"clean": "rimraf dist && mkdirp dist dist/cjs",
+		"clean": "rimraf dist && mkdirp dist dist-cjs",
 		"compile-esm": "tsc",
-		"compile-cjs": "tsc --module commonjs --outDir dist/cjs",
-		"start-api": "node -e 'require(\"./dist/cjs/example/example-server\").exampleServer()'",
+		"compile-cjs": "tsc --module commonjs --outDir dist-cjs",
+		"start-api": "node -e 'require(\"./dist-cjs/example/example-server\").exampleServer()'",
 		"start-http": "serve -l 8000",
 		"start": "run-p start-api start-http",
 		"test": "exit 0"
