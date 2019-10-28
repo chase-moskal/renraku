@@ -1,6 +1,6 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.15",
+	"version": "0.0.0-dev.16",
 	"description": "node json rpc",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
@@ -8,7 +8,8 @@
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
-		"dist"
+		"dist",
+		"dist-cjs"
 	],
 	"scripts": {
 		"prepare": "run-s clean && run-p compile-esm compile-cjs",
