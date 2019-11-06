@@ -6,16 +6,16 @@ import * as koaBodyParser from "koa-bodyparser"
 
 import {DisabledLogger} from "../toolbox/logging.js"
 import {
+	Api,
 	Server,
-	TopicApi,
 	ServerOptions,
 } from "../interfaces.js"
 
 import {apiCall} from "./api-call.js"
 import {ServerError} from "./errors.js"
 
-export function createApiServer<A extends TopicApi<A> = TopicApi>({
-	topics,
+export function createApiServer<A extends Api<A> = Api>({
+	exposures,
 	debug = false,
 	koa = new Koa(),
 	logger = new DisabledLogger()
@@ -41,7 +41,7 @@ export function createApiServer<A extends TopicApi<A> = TopicApi>({
 					debug,
 					origin,
 					logger,
-					topics,
+					exposures,
 					signature,
 				})
 			)

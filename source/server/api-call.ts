@@ -1,8 +1,8 @@
 
 import {err} from "./errors.js"
 import {Logger} from "../toolbox/logging.js"
-import {Order, Exposure, TopicApi} from "../interfaces.js"
 import {enforcePermissions} from "./enforce-permissions.js"
+import {Order, ApiToExposures, Methods} from "../interfaces.js"
 
 export async function apiCall({
 	id,
@@ -10,16 +10,16 @@ export async function apiCall({
 	debug,
 	origin,
 	logger,
-	topics,
 	signature,
+	exposures,
 }: {
 	id: string
 	body: string
 	debug: boolean
 	origin: string
 	logger: Logger
-	topics: TopicApi
 	signature: string
+	exposures: ApiToExposures<any>
 }) {
 
 	// parse and validate an incoming "order"
@@ -37,8 +37,8 @@ export async function apiCall({
 	}
 
 	// relate the incoming order to the configured topics
-	const exposure: Exposure<any> = (<any>topics)[topic]
-	const {exposed: that} = exposure
+	const exposure = exposures[topic]
+	const that: Methods<any> = exposure.methods
 	const method = that[func]
 
 	// enforce cors or certificate whitelist

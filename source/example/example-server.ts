@@ -1,27 +1,34 @@
 
-import {TopicApi, Topic} from "../interfaces.js"
+import {Api} from "../interfaces.js"
 import {createApiServer} from "../server/create-api-server.js"
 
-export class Reactor implements Topic<Reactor> {
-	async generatePower(a: number, b: number) { return a + b }
-	async radioactiveMeltdown() { throw new Error("meltdown error") }
-}
-
-export interface Api extends TopicApi<Api> {
-	reactor: Reactor
+export interface NuclearApi extends Api<NuclearApi> {
+	reactor: {
+		methods: {
+			generatePower(a: number, b: number): Promise<number>
+			radioactiveMeltdown(): Promise<void>
+		}
+	}
 }
 
 export async function exampleServer() {
-	const server = createApiServer<Api>({
+	const server = createApiServer<NuclearApi>({
 		debug: true,
 		logger: console,
-		topics: {
+		exposures: {
 			reactor: {
+				methods: {
+					async generatePower(a: number, b: number) {
+						return a + b
+					},
+					async radioactiveMeltdown() {
+						throw new Error("meltdown error")
+					}
+				},
 				cors: {
 					allowed: /^http\:\/\/localhost\:8\d{3}$/i,
 					forbidden: /\:8989$/i,
-				},
-				exposed: new Reactor()
+				}
 			}
 		}
 	})

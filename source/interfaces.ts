@@ -3,12 +3,20 @@ import * as Koa from "koa"
 import {Logger} from "./toolbox/logging.js"
 
 //
-// TOPICS
+// API TYPE SIGNATURES
 //
 
-export type TopicMethod = (...args: any[]) => Promise<any>
-export type Topic<X = {}> = {[func in keyof X]: TopicMethod}
-export type TopicApi<X extends {} = {}> = {[topicName in keyof X]: Topic}
+export type Methods<T extends {} = {}> = {
+	[P in keyof T]: (...args: any[]) => Promise<any>
+}
+
+export interface Topic {
+	methods: Methods
+}
+
+export type Api<T extends {} = {}> = {
+	[P in keyof T]: Topic
+}
 
 //
 // SHAPES
@@ -18,8 +26,10 @@ export type Shape<T = {}> = {
 	[P in keyof T]: boolean
 }
 
-export type ApiShape<A extends TopicApi> = {
-	[topicName in keyof A]: Shape<A[topicName]>
+export type ApiShape<A extends Api<A> = Api> = {
+	[P in keyof A]: {
+		methods: Shape<A[P]["methods"]>
+	}
 }
 
 //
@@ -38,8 +48,8 @@ export interface Order {
 	params: any[]
 }
 
-export interface Exposure<T extends Topic = Topic> {
-	exposed: T
+export interface Exposure<M extends Methods = Methods> {
+	methods: M
 	cors?: {
 		allowed: RegExp
 		forbidden: RegExp
@@ -49,14 +59,14 @@ export interface Exposure<T extends Topic = Topic> {
 	}
 }
 
-export type ApiToExposures<A extends TopicApi = TopicApi> = {
-	[P in keyof A]: Exposure<A[P]>
+export type ApiToExposures<A extends Api<A> = Api> = {
+	[P in keyof A]: Exposure<A[P]["methods"]>
 }
 
-export interface ServerOptions<A extends TopicApi = {}> {
-	debug: boolean
-	topics: ApiToExposures<A>
+export interface ServerOptions<A extends Api<A> = Api> {
+	exposures: ApiToExposures<A>
 	koa?: Koa
+	debug?: boolean
 	logger?: Logger
 }
 
@@ -64,7 +74,7 @@ export interface ServerOptions<A extends TopicApi = {}> {
 // CLIENT
 //
 
-export interface ClientOptions<A extends TopicApi> {
+export interface ClientOptions<A extends Api<A> = Api> {
 	url: string
 	shape: ApiShape<A>
 }
