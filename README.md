@@ -4,6 +4,7 @@
 ## RENRAKU is a web api library
 - **create an api server,** and listen on port 8001
   ```ts
+  import {createApiServer} from "renraku/dist/server/create-api-server.js"
   const server = createApiServer({
     debug: true,
     logger: console,
@@ -32,6 +33,7 @@
 
 - **create an api client,** and call a method
   ```ts
+  import {createBrowserApiClient} from "renraku/dist/client/create-browser-api-client.js"
   const {reactor} = await createBrowserApiClient({
     url: "http://localhost:8001",
     shape: {
