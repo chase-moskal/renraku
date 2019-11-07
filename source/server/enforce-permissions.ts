@@ -11,23 +11,26 @@ export function enforcePermissions({
 	body,
 	order,
 	origin,
-	exposure,
 	signature,
+	exposures,
 }: {
 	id: string
 	order: Order
 	body: string
 	origin: string
 	signature: string
-	exposure: Exposure
-}) {
-	const {topic} = order
+	exposures: {[key: string]: Exposure<any>}
+}): () => Promise<any> {
+	const {topic, func, params} = order
+	const exposure = exposures[topic]
+	if (!exposure) throw err(400, `unknown exposure topic "${topic}"`)
+	const method = exposure.methods[func]
+
 	const {cors, whitelist} = exposure
 	let permission = false
 
 	if (cors && whitelist) throw err(500, `topic "${topic}" must have either `
 		+ `"cors" or "whitelist" permissions, not both`)
-
 	else if (whitelist) {
 		if (!id) throw err(400, `id must be provided for whitelist security`)
 		const publicKey = whitelist[id]
@@ -36,7 +39,6 @@ export function enforcePermissions({
 		if (verified) permission = true
 		else throw err(500, `failed signature verification`)
 	}
-
 	else if (cors) {
 		const {allowed, forbidden} = cors
 		if (allowed.test(origin)) {
@@ -48,9 +50,12 @@ export function enforcePermissions({
 		}
 		else throw err(401, `not allowed`)
 	}
-
 	else throw err(500, `topic "${topic}" must have "cors" or "whitelist" `
 		+ `permissions`)
 
-	if (!permission) throw err(403, `forbidden`)
+	if (permission) {
+		if (!method) throw err(400, `unknown topic method "${func}"`)
+		return () => method.apply(exposure.methods, params)
+	}
+	else throw err(403, `forbidden`)
 }

@@ -36,16 +36,18 @@ export async function apiCall({
 		logger.info(`🔔 ${topic}.${func}(${debug ? params.join(", ") : "..."})`)
 	}
 
-	// relate the incoming order to the configured topics
-	const exposure = exposures[topic]
-	const that: Methods<any> = exposure.methods
-	const method = that[func]
-
 	// enforce cors or certificate whitelist
-	enforcePermissions({id, order, body, origin, signature, exposure})
+	const execute = enforcePermissions({
+		id,
+		body,
+		order,
+		origin,
+		signature,
+		exposures,
+	})
 
 	// execute the call
-	const result = await method.apply(that, order.params)
+	const result = await execute()
 	if (debug) logger.debug(`   `, result)
 
 	// return the result
