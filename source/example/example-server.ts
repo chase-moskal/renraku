@@ -1,15 +1,6 @@
 
-import {Api} from "../interfaces.js"
+import {NuclearApi} from "./example-common.js"
 import {createApiServer} from "../server/create-api-server.js"
-
-export interface NuclearApi extends Api<NuclearApi> {
-	reactor: {
-		methods: {
-			generatePower(a: number, b: number): Promise<number>
-			radioactiveMeltdown(): Promise<void>
-		}
-	}
-}
 
 export async function exampleServer() {
 	const server = createApiServer<NuclearApi>({
