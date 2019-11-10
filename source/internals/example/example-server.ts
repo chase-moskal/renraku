@@ -1,9 +1,9 @@
 
+import {apiServer} from "../../api-server.js"
 import {NuclearApi} from "./example-common.js"
-import {createApiServer} from "../server/create-api-server.js"
 
 export async function exampleServer() {
-	const server = createApiServer<NuclearApi>({
+	const server = apiServer<NuclearApi>({
 		debug: true,
 		logger: console,
 		exposures: {
@@ -24,5 +24,4 @@ export async function exampleServer() {
 		}
 	})
 	server.start(8001)
-	return server
 }

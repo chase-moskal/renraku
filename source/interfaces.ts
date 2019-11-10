@@ -1,6 +1,13 @@
 
 import * as Koa from "koa"
-import {Logger} from "./toolbox/logging.js"
+
+export interface Logger {
+	log: typeof console.log
+	warn: typeof console.warn
+	info: typeof console.info
+	debug: typeof console.debug
+	error: typeof console.error
+}
 
 //
 // API TYPE SIGNATURES
@@ -40,12 +47,6 @@ export interface Server {
 	koa: Koa
 	start(port: number): void
 	stop(): Promise<void>
-}
-
-export interface Order {
-	topic: string
-	func: string
-	params: any[]
 }
 
 export interface Exposure<M extends Methods = Methods> {

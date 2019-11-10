@@ -1,6 +1,7 @@
 
 import {err} from "./errors.js"
-import {Order, Exposure} from "../interfaces.js"
+import {Exposure} from "../../interfaces.js"
+import {Order} from "../internal-interfaces.js"
 
 function verifySignature(body: string, signature: string, publicKey: string) {
 	return false

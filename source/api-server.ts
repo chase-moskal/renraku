@@ -4,17 +4,17 @@ import * as cors from "@koa/cors"
 import {Server as HttpServer} from "http"
 import * as koaBodyParser from "koa-bodyparser"
 
-import {DisabledLogger} from "../toolbox/logging.js"
+import {DisabledLogger} from "./internals/logging.js"
 import {
 	Api,
 	Server,
 	ServerOptions,
-} from "../interfaces.js"
+} from "./interfaces.js"
 
-import {apiCall} from "./api-call.js"
-import {ServerError} from "./errors.js"
+import {apiCall} from "./internals/server/api-call.js"
+import {ServerError} from "./internals/server/errors.js"
 
-export function createApiServer<A extends Api<A> = Api>({
+export function apiServer<A extends Api<A> = Api>({
 	exposures,
 	debug = false,
 	koa = new Koa(),

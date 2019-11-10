@@ -3,8 +3,8 @@
 	<head>
 		<title>renraku client testing</title>
 		<script type="module">
-			import {exampleClient} from "./dist/example/example-client.js"
-			exampleClient()
+			import {exampleClient} from "./dist/internals/example/example-client.js"
+			window.reactor = exampleClient()
 		</script>
 	</head>
 </html>
