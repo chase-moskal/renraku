@@ -12,7 +12,6 @@ import {
 } from "./interfaces.js"
 
 import {apiCall} from "./internals/server/api-call.js"
-import {RenrakuApiError} from "./internals/errors.js"
 
 export function apiServer<A extends Api<A> = Api>({
 	exposures,

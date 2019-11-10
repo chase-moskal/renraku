@@ -15,10 +15,9 @@ export async function jsonCall<T = any>(
 		},
 		body: JSON.stringify(upload)
 	})
-	const {status: code} = response
 
+	const {status: code} = response
 	if (code !== 200) throw err(code, await response.text())
 	else if (!response.ok) throw err(code, `fetch response not ok`)
 	return response.json()
-
 }

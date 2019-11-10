@@ -2,8 +2,6 @@
 import {apiServer} from "../../api-server.js"
 import {NuclearApi} from "./example-common.js"
 
-import {err} from "../errors.js"
-
 export async function exampleServer() {
 	const server = apiServer<NuclearApi>({
 		logger: console,
@@ -14,7 +12,7 @@ export async function exampleServer() {
 						return a + b
 					},
 					async radioactiveMeltdown() {
-						throw err(400, "meltdown error")
+						throw new Error("meltdown error")
 					}
 				},
 				cors: {
