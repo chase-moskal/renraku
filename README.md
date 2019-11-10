@@ -17,7 +17,6 @@
 
     // create the server
     const server = apiServer<NuclearApi>({
-      debug: true,
       logger: console,
       exposures: {
         reactor: {
@@ -43,7 +42,6 @@
   ```
   - you just give renraku some async methods to expose
   - permissions are explicit
-  - in `debug` mode, api errors are sent back to the clients
 
 - **browser: create an api client,** and call a method *[(example-client.ts)](source/internals/example/example-client.ts)*
   ```ts

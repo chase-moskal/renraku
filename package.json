@@ -1,7 +1,7 @@
 {
 	"name": "renraku",
 	"version": "0.0.0-dev.17",
-	"description": "node json rpc",
+	"description": "web api library",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
 	"main": "dist-cjs/index.js",
@@ -24,8 +24,9 @@
 	"keywords": [
 		"rpc",
 		"json",
-		"node-api",
-		"api"
+		"api",
+		"web-api",
+		"node-api"
 	],
 	"repository": {
 		"type": "git",
@@ -37,9 +38,6 @@
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/isomorphic-fetch": "0.0.35",
-		"@types/koa": "^2.0.52",
-		"@types/koa-bodyparser": "^4.3.0",
-		"@types/koa__cors": "^2.2.3",
 		"@types/node": "^12.12.7",
 		"mkdirp": "^0.5.1",
 		"npm-run-all": "^4.1.5",
@@ -49,6 +47,9 @@
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
+		"@types/koa": "^2.0.52",
+		"@types/koa-bodyparser": "^4.3.0",
+		"@types/koa__cors": "^2.2.3",
 		"@koa/cors": "^3.0.0",
 		"isomorphic-fetch": "^2.2.1",
 		"koa": "^2.11.0",

@@ -1,5 +1,5 @@
 
-import {err} from "./errors.js"
+import {err} from "../errors.js"
 import {Logger} from "../../interfaces.js"
 import {Order} from "../internal-interfaces.js"
 import {ApiToExposures} from "../../interfaces.js"
@@ -32,10 +32,8 @@ export async function apiCall({
 		+ `array required`)
 
 	// log the event
-	if (debug) {
-		logger.info(``)
-		logger.info(`🔔 ${topic}.${func}(${debug ? params.join(", ") : "..."})`)
-	}
+	logger.info(``)
+	logger.info(`🔔 ${topic}.${func}(${debug ? params.join(", ") : "..."})`)
 
 	// enforce cors or certificate whitelist
 	const execute = enforcePermissions({

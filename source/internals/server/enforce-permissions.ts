@@ -1,5 +1,5 @@
 
-import {err} from "./errors.js"
+import {err} from "../errors.js"
 import {Exposure} from "../../interfaces.js"
 import {Order} from "../internal-interfaces.js"
 
@@ -33,9 +33,9 @@ export function enforcePermissions({
 	if (cors && whitelist) throw err(500, `topic "${topic}" must have either `
 		+ `"cors" or "whitelist" permissions, not both`)
 	else if (whitelist) {
-		if (!id) throw err(400, `id must be provided for whitelist security`)
+		if (!id) throw err(401, `client id not provided`)
 		const publicKey = whitelist[id]
-		if (!publicKey) throw err(400, `id "${id}" not found in whitelist`)
+		if (!publicKey) throw err(403, `client id forbidden`)
 		const verified = verifySignature(body, signature, publicKey)
 		if (verified) permission = true
 		else throw err(500, `failed signature verification`)

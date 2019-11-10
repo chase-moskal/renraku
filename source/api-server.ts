@@ -12,7 +12,7 @@ import {
 } from "./interfaces.js"
 
 import {apiCall} from "./internals/server/api-call.js"
-import {ServerError} from "./internals/server/errors.js"
+import {RenrakuApiError} from "./internals/errors.js"
 
 export function apiServer<A extends Api<A> = Api>({
 	exposures,
@@ -48,8 +48,8 @@ export function apiServer<A extends Api<A> = Api>({
 		}
 		catch (error) {
 			logger.error(error)
-			const code = error instanceof ServerError ? error.code : 500
-			context.throw(code, debug ? error.message : "error")
+			const code = error.code ? error.code : 500
+			context.throw(code, error.message)
 		}
 	})
 

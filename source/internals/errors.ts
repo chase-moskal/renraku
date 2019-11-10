@@ -1,6 +1,7 @@
 
-export class ServerError extends Error {
+export class RenrakuApiError extends Error {
 	readonly code: number
+	readonly name = this.constructor.name
 
 	constructor(code: number, message: string) {
 		super(message)
@@ -9,4 +10,4 @@ export class ServerError extends Error {
 }
 
 export const err = (code: number, message: string) =>
-	new ServerError(code, message)
+	new RenrakuApiError(code, message)
