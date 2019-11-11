@@ -1,5 +1,5 @@
 
-import {err} from "../errors.js"
+import {err} from "../../errors.js"
 
 export async function jsonCall<T = any>(
 	fetch: typeof window.fetch,

@@ -7,7 +7,7 @@ export async function exampleServer() {
 		logger: console,
 		exposures: {
 			reactor: {
-				methods: {
+				exposed: {
 					async generatePower(a: number, b: number) {
 						return a + b
 					},

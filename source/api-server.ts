@@ -4,7 +4,7 @@ import * as cors from "@koa/cors"
 import {Server as HttpServer} from "http"
 import * as koaBodyParser from "koa-bodyparser"
 
-import {DisabledLogger} from "./internals/logging.js"
+import {DisabledLogger} from "./logging.js"
 import {
 	Api,
 	Server,

@@ -1,7 +1,8 @@
 
+import {err} from "../../errors.js"
 import {jsonCall} from "./json-call.js"
 import {Order} from "../internal-interfaces.js"
-import {Api, Topic, ClientOptions} from "../../interfaces.js"
+import {Api, ClientOptions, Topic} from "../../interfaces.js"
 
 export const prepareApiClient = (fetch: typeof window.fetch) =>
 	function apiClient<A extends Api<A> = Api>({
@@ -11,13 +12,17 @@ export const prepareApiClient = (fetch: typeof window.fetch) =>
 		const client: any = {}
 
 		for (const topic of Object.keys(shape)) {
-			client[topic] = <Topic>{methods: {}}
+			client[topic] = <Topic>{}
 
 			// attach method callers
-			for (const func of Object.keys((<any>shape)[topic].methods)) {
-				client[topic].methods[func] = async function(...params: any[]): Promise<any> {
-					return jsonCall(fetch, url, <Order>{topic, func, params})
+			for (const [key, value] of Object.entries((<any>shape)[topic])) {
+				if (value === "method") {
+					const func = key
+					client[topic][func] = async function(...params: any[]): Promise<any> {
+						return jsonCall(fetch, url, <Order>{topic, func, params})
+					}
 				}
+				else throw err(400, `unknown shape item "${value}"`)
 			}
 		}
 

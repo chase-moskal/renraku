@@ -13,12 +13,10 @@ export interface Logger {
 // API TYPE SIGNATURES
 //
 
-export type Methods<T extends {} = {}> = {
-	[P in keyof T]: (...args: any[]) => Promise<any>
-}
+export type Method = (...args: any[]) => Promise<any>
 
-export interface Topic {
-	methods: Methods
+export type Topic<T extends {} = {}> = {
+	[P in keyof T]: Method
 }
 
 export type Api<T extends {} = {}> = {
@@ -30,13 +28,13 @@ export type Api<T extends {} = {}> = {
 //
 
 export type Shape<T = {}> = {
-	[P in keyof T]: boolean
+	[P in keyof T]: T[P] extends Method
+		? "method"
+		: never
 }
 
 export type ApiShape<A extends Api<A> = Api> = {
-	[P in keyof A]: {
-		methods: Shape<A[P]["methods"]>
-	}
+	[P in keyof A]: Shape<A[P]>
 }
 
 //
@@ -49,19 +47,33 @@ export interface Server {
 	stop(): Promise<void>
 }
 
-export interface Exposure<M extends Methods = Methods> {
-	methods: M
-	cors?: {
-		allowed: RegExp
-		forbidden: RegExp
-	},
-	whitelist?: {
-		[key: string]: string
-	}
+export interface CorsPermissions {
+	allowed: RegExp
+	forbidden: RegExp
 }
 
+export interface WhitelistPermissions {
+	[key: string]: string
+}
+
+export interface BasicExposure<E extends Topic> {
+	exposed: E
+}
+
+export interface CorsExposure<E extends Topic> extends BasicExposure<E> {
+	cors: CorsPermissions
+}
+
+export interface WhitelistExposure<E extends Topic> extends BasicExposure<E> {
+	whitelist: WhitelistPermissions
+}
+
+export type Exposure<E extends Topic> = CorsExposure<E> | WhitelistExposure<E>
+export type UnknownExposure<E extends Topic = any> =
+	BasicExposure<E> & Partial<CorsExposure<E>> & Partial<WhitelistExposure<E>>
+
 export type ApiToExposures<A extends Api<A> = Api> = {
-	[P in keyof A]: Exposure<A[P]["methods"]>
+	[P in keyof A]: Exposure<A[P]>
 }
 
 export interface ServerOptions<A extends Api<A> = Api> {

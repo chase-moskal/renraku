@@ -20,7 +20,7 @@
       logger: console,
       exposures: {
         reactor: {
-          methods: {
+          exposed: {
             async generatePower(a: number, b: number) {
               return a + b
             },
@@ -57,7 +57,7 @@
     })
 
     // call an api method
-    const result = await reactor.methods.generatePower(1, 2)
+    const result = await reactor.generatePower(1, 2)
 
     console.log(result === 3 ? "✔ success" : "✘ failed")
     return reactor
@@ -65,7 +65,6 @@
   ```
   - shape object describes api surface area, so renraku can build the client
   - typescript enforces that the shape object matches the interface
-  - `methods` exists to leave room for future renraku features, perhaps `events`
 
 ## RENRAKU believes in testability and ergonomics
 - traditionally to call an api, you'll find a nasty pattern:
