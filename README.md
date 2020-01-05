@@ -45,7 +45,7 @@
 
 - **browser: create an api client,** and call a method *[(example-client.ts)](source/internals/example/example-client.ts)*
   ```ts
-  import {apiClient} from "renraku/dist/api-server.js"
+  import {apiClient} from "renraku/dist/api-client.js"
   import {NuclearApi, nuclearShape} from "renraku/dist/internals/example/example-common.js"
 
   export async function exampleClient() {
