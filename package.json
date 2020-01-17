@@ -17,7 +17,7 @@
 		"clean": "rimraf dist && mkdirp dist dist-cjs",
 		"compile-esm": "tsc",
 		"compile-cjs": "tsc --module commonjs --outDir dist-cjs",
-		"start-api": "node -e 'require(\"./dist-cjs/internals/example/example-server\").exampleServer()'",
+		"start-api": "node -e 'require(\"./dist-cjs/internals/examples/example-server\").exampleServer()'",
 		"start-http": "serve -l 8000",
 		"start": "run-p start-api start-http",
 		"generate-keys": "./generate-keys",
