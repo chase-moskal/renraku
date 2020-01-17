@@ -90,4 +90,10 @@ export interface ServerOptions<A extends Api<A> = Api> {
 export interface ClientOptions<A extends Api<A> = Api> {
 	url: string
 	shape: ApiShape<A>
+	credentials?: Credentials
+}
+
+export interface Credentials {
+	id: string
+	privateKey: string
 }

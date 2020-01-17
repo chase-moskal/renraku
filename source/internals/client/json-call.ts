@@ -1,19 +1,40 @@
 
 import {err} from "../../errors.js"
+import {Credentials} from "../../interfaces.js"
+import {sign} from "../signatures/sign.js"
 
-export async function jsonCall<T = any>(
-	fetch: typeof window.fetch,
-	url: string,
-	upload: any
-): Promise<T> {
+export async function jsonCall<T = any>({
+	url,
+	data,
+	fetch,
+	credentials,
+}: {
+	data: any
+	url: string
+	fetch: typeof window.fetch
+	credentials?: Credentials
+}): Promise<T> {
+
+	const body = JSON.stringify(data)
+
+	const headers: {[key: string]: string} = {
+		"Accept": "application/json",
+		"Content-Type": "application/json",
+	}
+
+	const signature = credentials
+		? sign({body, privateKey: credentials.privateKey})
+		: null
+
+	if (signature) {
+		headers["x-id"] = credentials.id
+		headers["x-signature"] = signature
+	}
 
 	const response = await fetch(url, {
+		body,
+		headers,
 		method: "POST",
-		headers: {
-			"Accept": "application/json",
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(upload)
 	})
 
 	const {status: code} = response
