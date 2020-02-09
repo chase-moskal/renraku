@@ -1,8 +1,10 @@
 
 import {err} from "../../errors.js"
 import {Logger} from "../../interfaces.js"
-import {Order} from "../internal-interfaces.js"
 import {ApiToExposures} from "../../interfaces.js"
+
+import {Order} from "../internal-interfaces.js"
+
 import {enforcePermissions} from "./enforce-permissions.js"
 
 export async function apiCall({

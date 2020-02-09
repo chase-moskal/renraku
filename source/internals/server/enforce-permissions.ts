@@ -1,9 +1,10 @@
 
 import {err} from "../../errors.js"
-import {Order} from "../internal-interfaces.js"
+import {verifyCors} from "../../verify-cors.js"
 import {UnknownExposure} from "../../interfaces.js"
 
-import {verifyCors} from "../../verify-cors.js"
+import {Order} from "../internal-interfaces.js"
+
 import {verifyWhitelist} from "./verify-whitelist.js"
 
 export function enforcePermissions({

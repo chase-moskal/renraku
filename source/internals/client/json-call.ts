@@ -1,7 +1,8 @@
 
+import {signatureSign} from "redcrypto/dist/signature-sign.js"
+
 import {err} from "../../errors.js"
 import {Credentials} from "../../interfaces.js"
-import {sign} from "../signatures/sign.js"
 
 export async function jsonCall<T = any>({
 	url,
@@ -23,7 +24,7 @@ export async function jsonCall<T = any>({
 	}
 
 	const signature = credentials
-		? sign({body, privateKey: credentials.privateKey})
+		? signatureSign({body, privateKey: credentials.privateKey})
 		: null
 
 	if (signature) {

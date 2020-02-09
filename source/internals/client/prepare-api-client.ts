@@ -1,8 +1,10 @@
 
 import {err} from "../../errors.js"
-import {jsonCall} from "./json-call.js"
+import {Api, ClientOptions, Topic} from "../../interfaces.js"
+
 import {Order} from "../internal-interfaces.js"
-import {Api, ClientOptions, Topic, Credentials} from "../../interfaces.js"
+
+import {jsonCall} from "./json-call.js"
 
 export const prepareApiClient = (fetch: typeof window.fetch) =>
 	function apiClient<A extends Api<A> = Api>({
