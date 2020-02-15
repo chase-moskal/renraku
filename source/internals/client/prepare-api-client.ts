@@ -1,8 +1,7 @@
 
 import {err} from "../../errors.js"
-import {Api, ClientOptions, Topic} from "../../interfaces.js"
-
 import {Order} from "../internal-interfaces.js"
+import {Api, ClientOptions, Topic} from "../../interfaces.js"
 
 import {jsonCall} from "./json-call.js"
 

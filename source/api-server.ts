@@ -1,8 +1,15 @@
 
-import * as Koa from "koa"
-import * as cors from "@koa/cors"
+// TODO cjs
+import mod from "module"
+const require = mod.createRequire(import.meta.url)
+import * as _Koa from "koa"
+import * as _cors from "@koa/cors"
+import * as _koaBodyParser from "koa-bodyparser"
+const Koa = require("koa") as typeof _Koa
+const cors = require("@koa/cors") as typeof _cors
+const koaBodyParser = require("koa-bodyparser") as typeof _koaBodyParser
+
 import {Server as HttpServer} from "http"
-import * as koaBodyParser from "koa-bodyparser"
 
 import {DisabledLogger} from "./logging.js"
 import {
