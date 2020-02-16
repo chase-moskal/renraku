@@ -1,19 +1,20 @@
 
-import {signatureSign} from "redcrypto/dist/signature-sign.js"
-
 import {err} from "../../errors.js"
 import {Credentials} from "../../interfaces.js"
+import {SignatureSign} from "../internal-interfaces.js"
 
 export async function jsonCall<T = any>({
 	url,
 	data,
 	fetch,
 	credentials,
+	signatureSign,
 }: {
 	data: any
 	url: string
 	fetch: typeof window.fetch
 	credentials?: Credentials
+	signatureSign?: SignatureSign
 }): Promise<T> {
 
 	const body = JSON.stringify(data)
@@ -23,13 +24,18 @@ export async function jsonCall<T = any>({
 		"Content-Type": "application/json",
 	}
 
-	const signature = credentials
-		? signatureSign({body, privateKey: credentials.privateKey})
-		: null
-
-	if (signature) {
-		headers["x-id"] = credentials.id
-		headers["x-signature"] = signature
+	if (credentials) {
+		if (signatureSign) {
+			const signature = signatureSign({
+				body,
+				privateKey: credentials.privateKey
+			})
+			headers["x-id"] = credentials.id
+			headers["x-signature"] = signature
+		}
+		else {
+			throw err(-1, "json-call with credentials requires signature-sign")
+		}
 	}
 
 	const response = await fetch(url, {

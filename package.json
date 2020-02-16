@@ -13,7 +13,7 @@
 		"prepare": "run-s clean && run-p compile generate-keys && run-s test",
 		"clean": "rimraf dist *.pem && mkdirp dist",
 		"compile": "tsc",
-		"start-api": "node -e 'import {exampleServer} from \"./dist/internals/examples/example-server\"; exampleServer()'",
+		"start-api": "node -e 'import(\"./dist/internals/examples/example-server.js\").then(mod => mod.exampleServer())'",
 		"start-http": "serve -l 8000",
 		"start": "run-p start-api start-http",
 		"generate-keys": "./node_modules/redcrypto/generate-keys",

@@ -18,14 +18,14 @@ import {
 	ServerOptions,
 } from "./interfaces.js"
 
-import {apiCall} from "./internals/server/api-call.js"
+import {apiCall} from "./internals/node/api-call.js"
 
-export function apiServer<A extends Api<A> = Api>({
+export async function apiServer<A extends Api<A> = Api>({
 	exposures,
 	debug = false,
 	koa = new Koa(),
 	logger = new DisabledLogger()
-}: ServerOptions<A>): Server {
+}: ServerOptions<A>): Promise<Server> {
 
 	koa.use(cors())
 	koa.use(koaBodyParser())

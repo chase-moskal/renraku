@@ -87,6 +87,8 @@ export interface ServerOptions<A extends Api<A> = Api> {
 // CLIENT
 //
 
+export type ApiClient<A extends Api<A>> = (options: ClientOptions) => Promise<A>
+
 export interface ClientOptions<A extends Api<A> = Api> {
 	url: string
 	shape: ApiShape<A>

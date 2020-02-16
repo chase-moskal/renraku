@@ -1,11 +1,14 @@
 
 import {err} from "../../errors.js"
-import {Order} from "../internal-interfaces.js"
 import {Api, ClientOptions, Topic} from "../../interfaces.js"
+import {SignatureSign, Order} from "../internal-interfaces.js"
 
 import {jsonCall} from "./json-call.js"
 
-export const prepareApiClient = (fetch: typeof window.fetch) =>
+export const prepareApiClient = ({fetch, signatureSign}: {
+	fetch: typeof window.fetch
+	signatureSign?: SignatureSign
+}) =>
 	function apiClient<A extends Api<A> = Api>({
 		url,
 		shape,
@@ -25,6 +28,7 @@ export const prepareApiClient = (fetch: typeof window.fetch) =>
 							url,
 							fetch,
 							credentials,
+							signatureSign,
 							data: <Order>{topic, func, params},
 						})
 					}

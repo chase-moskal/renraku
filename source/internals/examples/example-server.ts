@@ -3,7 +3,7 @@ import {apiServer} from "../../api-server.js"
 import {NuclearApi} from "./example-common.js"
 
 export async function exampleServer() {
-	const server = apiServer<NuclearApi>({
+	const server = await apiServer<NuclearApi>({
 		logger: console,
 		exposures: {
 			reactor: {

@@ -20,7 +20,7 @@
   export async function exampleServer() {
 
     // create the server
-    const server = apiServer<NuclearApi>({
+    const server = await apiServer<NuclearApi>({
       logger: console,
       exposures: {
         reactor: {
@@ -47,7 +47,7 @@
   - you just give renraku some async methods to expose
   - this example shows a public endpoint, with some example cors rules
 
-- **browser: create an api client,** and call one of those exposed methods  
+- **browser or node: create an api client,** and call one of those exposed methods  
   &nbsp;&nbsp; *[(example-client.ts)](source/internals/examples/example-client.ts)*  
   ```ts
   import {apiClient} from "renraku/dist/api-client.js"
@@ -56,7 +56,7 @@
   export async function exampleClient() {
 
     // create the api client
-    const {reactor} = apiClient<NuclearApi>({
+    const {reactor} = await apiClient<NuclearApi>({
       url: "http://localhost:8001",
       shape: nuclearShape
     })

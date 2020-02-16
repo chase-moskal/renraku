@@ -3,7 +3,7 @@ import {apiClient} from "../../api-client.js"
 import {NuclearApi, nuclearShape} from "./example-common.js"
 
 export async function exampleClient() {
-	const {reactor} = apiClient<NuclearApi>({
+	const {reactor} = await apiClient<NuclearApi>({
 		url: "http://localhost:8001",
 		shape: nuclearShape
 	})

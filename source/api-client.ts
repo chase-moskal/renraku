@@ -1,4 +1,9 @@
 
-import {prepareApiClient} from "./internals/client/prepare-api-client.js"
+import {smartImport} from "./internals/smart-import.js"
+import {Api, ApiClient, ClientOptions} from "./interfaces.js"
 
-export const apiClient = prepareApiClient(window.fetch)
+const promise = smartImport<{apiClient: ApiClient<any>}>("api-client.js")
+
+export async function apiClient<A extends Api<A>>(options: ClientOptions) {
+	return (await promise).apiClient(options)
+}
