@@ -51,7 +51,7 @@ export function enforcePermissions({
 	if (permitted) {
 		const method = exposed[func]
 		if (!method) throw err(400, `unknown exposure method "${func}"`)
-		return () => method.apply(exposure, params)
+		return () => method.apply(exposed, params)
 	}
 
 	// reject forbidden requests
