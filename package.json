@@ -1,6 +1,6 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.20",
+	"version": "0.0.0-dev.21",
 	"description": "web api library",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
