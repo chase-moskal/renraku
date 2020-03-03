@@ -1,7 +1,7 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.21",
-	"description": "web api library",
+	"version": "0.0.0-dev.22",
+	"description": "expose async functions as an api",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com",
 	"type": "module",
@@ -10,7 +10,7 @@
 		"source"
 	],
 	"scripts": {
-		"prepare": "run-s clean && run-p compile generate-keys && run-s test",
+		"prepare": "run-s clean && run-p compile && run-s test",
 		"clean": "rimraf dist *.pem && mkdirp dist",
 		"compile": "tsc",
 		"start-api": "node -e 'import(\"./dist/internals/examples/example-server.js\").then(mod => mod.exampleServer())'",
@@ -36,19 +36,17 @@
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/isomorphic-fetch": "0.0.35",
-		"@types/jest": "^24.9.0",
-		"@types/node": "^13.1.7",
-		"jest": "^24.9.0",
-		"mkdirp": "^0.5.1",
+		"@types/node": "^13.7.7",
+		"mkdirp": "^1.0.3",
 		"npm-run-all": "^4.1.5",
 		"replace": "^1.1.5",
-		"rimraf": "^3.0.0",
+		"rimraf": "^3.0.2",
 		"serve": "^11.3.0",
-		"typescript": "^3.7.4"
+		"typescript": "^3.8.3"
 	},
 	"dependencies": {
 		"@koa/cors": "^3.0.0",
-		"@types/koa": "^2.11.0",
+		"@types/koa": "^2.11.2",
 		"@types/koa-bodyparser": "^4.3.0",
 		"@types/koa__cors": "^3.0.1",
 		"isomorphic-fetch": "^2.2.1",
