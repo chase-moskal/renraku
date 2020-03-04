@@ -45,7 +45,6 @@ export async function jsonCall<T = any>({
 	})
 
 	const {status: code} = response
-	if (code !== 200) throw err(code, await response.text())
-	else if (!response.ok) throw err(code, `fetch response not ok`)
+	if (!response.ok) throw err(code, `fetch response not ok`)
 	return response.json()
 }
