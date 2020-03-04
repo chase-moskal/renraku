@@ -44,7 +44,22 @@ export async function jsonCall<T = any>({
 		method: "POST",
 	})
 
-	const {status: code} = response
-	if (!response.ok) throw err(code, `fetch response not ok`)
-	return response.json()
+	if (response.ok) {
+		let text
+		try {
+			text = await response.text()
+		}
+		catch (error) {
+			text = undefined
+		}
+
+		const json = text
+			? JSON.parse(text)
+			: undefined
+
+		return json
+	}
+	else {
+		throw err(response.status, `fetch response not ok`)
+	}
 }
