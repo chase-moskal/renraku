@@ -8,12 +8,12 @@ import {enforcePermissions} from "./enforce-permissions.js"
 
 export async function apiCall({
 	id,
-	body,
 	debug,
 	origin,
 	logger,
 	signature,
 	exposures,
+	body = "",
 }: {
 	id: string
 	body: string
