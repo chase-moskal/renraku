@@ -66,7 +66,7 @@ export async function apiServer<A extends Api<A> = Api>({
 		start(port: number) {
 			if (server) throw new Error("cannot start when already running")
 			server = koa.listen(port)
-			logger.log(`🌐 api server listening on port ${port}`)
+			logger.info(`🌐 api server listening on port ${port}`)
 		},
 		async stop() {
 			const result = await (
@@ -79,7 +79,7 @@ export async function apiServer<A extends Api<A> = Api>({
 					})
 					: Promise.resolve()
 			)
-			logger.log("✔️ api server stopped")
+			logger.info("✔️ api server stopped")
 			return result
 		}
 	}

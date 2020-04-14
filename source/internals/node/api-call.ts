@@ -33,8 +33,8 @@ export async function apiCall({
 		+ `array required`)
 
 	// log the event
-	logger.info(``)
-	logger.info(`🔔 ${topic}.${func}(${debug ? params.join(", ") : "..."})`)
+	logger.log(`🔔 ${topic}.${func}`)
+	if (debug) logger.debug("    arguments:", params)
 
 	// enforce cors or certificate whitelist
 	const execute = enforcePermissions({
@@ -48,7 +48,7 @@ export async function apiCall({
 
 	// execute the call
 	const result = await execute()
-	if (debug) logger.debug(`   `, result)
+	if (debug) logger.debug("    returns:", result)
 
 	// return the result
 	return result
