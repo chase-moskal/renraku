@@ -33,22 +33,33 @@ export async function apiCall({
 		+ `array required`)
 
 	// log the event
-	logger.log(`🔔 ${topic}.${func}`)
-	if (debug) logger.debug("    arguments:", params)
+	let result: any
+	let error: Error
 
-	// enforce cors or certificate whitelist
-	const execute = enforcePermissions({
-		id,
-		body,
-		order,
-		origin,
-		signature,
-		exposures,
-	})
+	try {
 
-	// execute the call
-	const result = await execute()
-	if (debug) logger.debug("    returns:", result)
+		// enforce cors or certificate whitelist
+		const execute = enforcePermissions({
+			id,
+			body,
+			order,
+			origin,
+			signature,
+			exposures,
+		})
+
+		// execute the call
+		result = await execute()
+	}
+	catch (err) {
+		error = err
+	}
+	finally {
+		logger.log(`🔔 ${topic}.${func}`)
+		if (debug) logger.debug("arguments:", params)
+		if (debug) logger.debug("returns:", result)
+		if (error) throw error
+	}
 
 	// return the result
 	return result
