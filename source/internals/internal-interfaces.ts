@@ -1,5 +1,5 @@
 
-import {SignatureSignOptions} from "redcrypto/dist/interfaces.js"
+import {SignatureSignOptions} from "redcrypto/dist/types.js"
 
 export interface Order {
 	topic: string
