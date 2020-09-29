@@ -9,7 +9,7 @@ export const prepareApiClient = ({fetch, signatureSign}: {
 	fetch: typeof window.fetch
 	signatureSign?: SignatureSign
 }) =>
-	function apiClient<A extends Api<A> = Api>({
+	function apiClient<A extends Api>({
 		url,
 		shape,
 		credentials,

@@ -1,27 +1,24 @@
 
 import {apiServer} from "../../api-server.js"
-import {NuclearApi} from "./example-common.js"
-
-export function makeNuclearApi() {
-	return {
-		reactor: {
-			async generatePower(a: number, b: number) {
-				return a + b
-			},
-			async radioactiveMeltdown() {
-				throw new Error("meltdown error")
-			},
-		}
-	}
-}
+import {makeNuclearApi, NuclearApi} from "./example-common.js"
 
 /*
+
+// hypothetical simplified api
+// security rules apply to whole apis, not individual topics
+// simpler and less maintenance.. less control.. *is this better?*
 
 const server = await renrakuServer({
 	logger: console,
 	api: makeNuclearApi(),
-	process: async({task, args}) => {},
-	transformMeta: async(meta) => {},
+	origins: {
+		allowed: /^http\:\/\/localhost\:8\d{3}$/i,
+		forbidden: /\:8989$/i,
+	},
+	signers: {
+		"auth-server.public.key": "X8913u12893712...",
+		"admin-server.public.key": "Z9089023812u2...",
+	},
 })
 
 server.start(8001)

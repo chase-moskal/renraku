@@ -1,15 +1,23 @@
 
-import {Api, ApiShape} from "../../interfaces.js"
-import {makeNuclearApi} from "./example-server.js"
+import {asApi, ApiShape} from "../../interfaces.js"
 
 export type NuclearApi = ReturnType<typeof makeNuclearApi>
 
-// export interface NuclearApi extends Api {
-// 	reactor: {
-// 		generatePower(a: number, b: number): Promise<number>
-// 		radioactiveMeltdown(): Promise<void>
-// 	}
-// }
+export interface NuclearMeta {
+	appToken: string
+	accessToken: string
+}
+
+export const makeNuclearApi = () => asApi({
+	reactor: {
+		async generatePower(meta: NuclearMeta, a: number, b: number) {
+			return a + b
+		},
+		async radioactiveMeltdown(meta: NuclearMeta) {
+			throw new Error("meltdown error")
+		},
+	}
+})
 
 export const nuclearShape: ApiShape<NuclearApi> = {
 	reactor: {

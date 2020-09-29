@@ -20,7 +20,7 @@ import {
 
 import {apiCall} from "./internals/node/api-call.js"
 
-export async function apiServer<A extends Api<A> = Api>({
+export async function apiServer<A extends Api>({
 	exposures,
 	debug = false,
 	koa = new Koa(),

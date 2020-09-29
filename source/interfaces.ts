@@ -15,13 +15,19 @@ export interface Logger {
 
 export type Method = (...args: any[]) => Promise<any>
 
-export type Topic<T extends {} = {}> = {
-	[P in keyof T]: Method
+export type Topic = {
+	[key: string]: Method
 }
 
-export type Api<T extends {} = {}> = {
-	[P in keyof T]: Topic
+export type Api = {
+	[key: string]: Topic
 }
+
+export type Constraint<C extends any, T extends C> = T
+
+export const asApi = <A extends Api>(api: A) => api
+export const asTopic = <T extends Topic>(topic: T) => topic
+export const asMethod = <M extends Method>(method: M) => method
 
 //
 // SHAPES
@@ -33,7 +39,7 @@ export type Shape<T = {}> = {
 		: never
 }
 
-export type ApiShape<A extends Api<A> = Api> = {
+export type ApiShape<A extends Api> = {
 	[P in keyof A]: Shape<A[P]>
 }
 
@@ -72,11 +78,11 @@ export type Exposure<E extends Topic> = CorsExposure<E> | WhitelistExposure<E>
 export type UnknownExposure<E extends Topic = any> =
 	BasicExposure<E> & Partial<CorsExposure<E>> & Partial<WhitelistExposure<E>>
 
-export type ApiToExposures<A extends Api<A> = Api> = {
+export type ApiToExposures<A extends Api> = {
 	[P in keyof A]: Exposure<A[P]>
 }
 
-export interface ServerOptions<A extends Api<A> = Api> {
+export interface ServerOptions<A extends Api> {
 	exposures: ApiToExposures<A>
 	koa?: Koa
 	debug?: boolean
@@ -87,9 +93,9 @@ export interface ServerOptions<A extends Api<A> = Api> {
 // CLIENT
 //
 
-export type ApiClient<A extends Api<A>> = (options: ClientOptions) => Promise<A>
+export type ApiClient<A extends Api> = (options: ClientOptions<A>) => Promise<A>
 
-export interface ClientOptions<A extends Api<A> = Api> {
+export interface ClientOptions<A extends Api> {
 	url: string
 	shape: ApiShape<A>
 	credentials?: Credentials

@@ -1,27 +1,23 @@
 
 import {apiClient} from "../../api-client.js"
-import {NuclearApi, nuclearShape} from "./example-common.js"
-
-/*
-
-const meta = () => ({appToken, accessToken})
-
-const api = await renrakuClient({
-	logger: console,
-	shape: nuclearShape,
-	link: "http://localhost:8001",
-	process: async({task, args}) => task(meta(), ...args),
-	attachMeta: async() => {},
-})
-
-*/
+import {curryApiMetaArg} from "../../curries.js"
+import {NuclearApi, nuclearShape, NuclearMeta} from "./example-common.js"
 
 export async function exampleClient() {
-	const {reactor} = await apiClient<NuclearApi>({
-		url: "http://localhost:8001",
-		shape: nuclearShape
-	})
-	const result = await reactor.generatePower(1, 2)
+
+	// generate a nuclear api client interface
+	// but we curry-in the meta argument
+	const api = curryApiMetaArg<NuclearApi, NuclearMeta>(
+		await apiClient({
+			shape: nuclearShape,
+			url: "http://localhost:8001",
+		}),
+		async() => ({appToken: "123", accessToken: "234"}),
+	)
+
+	// now consumers can call methods without the meta arg!
+	const result = await api.reactor.generatePower(1, 2)
+
 	console.log(result === 3 ? "✔ success" : "✘ failed")
-	return reactor
+	return api
 }
