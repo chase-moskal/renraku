@@ -33,7 +33,7 @@ export const asMethod = <M extends Method>(method: M) => method
 // SHAPES
 //
 
-export type Shape<T = {}> = {
+export type Shape<T extends Topic> = {
 	[P in keyof T]: T[P] extends Method
 		? "method"
 		: never
