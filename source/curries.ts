@@ -37,7 +37,7 @@ export function topicTransform<
 	): {
 		[P in keyof PTopic]: (
 			meta: Meta,
-			...args: Shift<Parameters<PTopic[P]>>,
+			...args: Shift<Parameters<PTopic[P]>>
 		) => ReturnType<PTopic[P]>
 	} {
 	return objectMap(topic, (method) => {
