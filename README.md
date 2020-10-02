@@ -14,12 +14,12 @@
 &nbsp; &nbsp; 🔓 cors rules for public endpoints  
 &nbsp; &nbsp; 🔒 public key whitelist for signed requests  
 
-## *RENRAKU* school on web api best practices
+## RENRAKU'S SCHOOL ON WEB API BEST PRACTICES
 
 - renraku began with the principal: *"a good api library should simply disappear".* api libraries should abstract away the api details to such a degree that calling remote methods looks the same as calling local methods
-- i will try to explain renraku by sharing the lessons i've learned while developing and using renraku privately for years
+- here we explain renraku by sharing the lessons learned while developing and using renraku privately for years
 
-### ⛩️ lesson one: wisdom is knowing the right path to take
+### ⛩️ RENRAKU LESSON ONE — *wisdom is knowing the right path to take*
 
 - traditionally to call an api, you'll often find a nasty old pattern along these lines:
   ```js
@@ -33,10 +33,10 @@
   // natural and enlightened
   const details = await userTopic.getDetails(userId)
   ```
-  of course. renraku's first motivation was to "abstract away" the api library.  
-  but as you'll see, renraku became a set of typescript tools and practices surrounding this idea
+  of course. renraku's first motivation was to "abstract away" the api library like this.  
+  but as you'll see, renraku grew as set of typescript practices and tools sprouting from this idea
 
-### ⛩️ lesson two: life is suffering but ignorance is bliss
+### ⛩️ RENRAKU LESSON TWO — *life is suffering, but ignorance is bliss*
 
 - with renraku, we divide our ***backend*** business logic into "topic" implementation objects.  
   topics can only have async functions as members
@@ -81,9 +81,9 @@
   })
   ```
 - of course, this general decoupling pattern offers flexibility, testability, mockability, and portability, and is wise for most any system
-- and renraku's philosophy relies on it. we use renraku to bridge the gap between backend and frontend systems like these
+- and renraku's philosophy relies on it. next we'll use renraku to bridge the gap between backend and frontend systems like these
 
-### ⛩️ lesson three: api clients should be shapeshifters
+### ⛩️ RENRAKU LESSON THREE — *api clients should be shapeshifters*
 
 - on the ***serverside,*** we use renraku `apiServer` to create a node server and expose topic implementations.  
   security rules like cors can be set for each topic
@@ -160,9 +160,14 @@
   - renraku has handy functions to turn topic objects into api servers or clients
   - decoupled architecture is insanely cool for mocks/tests/development in ways that are beyond your understanding
 
-### ⛩️ lesson four: advanced curries reduce repetition
+### ⛩️ RENRAKU LESSON FOUR — *advanced curries reduce repetition for auth and more*
 
-...coming soon...
+...prototype implementation is ready...  
+...lesson coming soon...  
+
+### ⛩️ RENRAKU LESSON FIVE — *custom http headers and such*
+
+...yet to be implemented...  
 
 -----------------
 
