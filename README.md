@@ -5,21 +5,21 @@
 &nbsp; &nbsp; 🌐 elegantly make or use json rpc api's  
 &nbsp; &nbsp; 📡 isomorphic client works in node and browsers  
 
-🧠 genius-level approach decoupling architecture  
+🧠 genius-level decoupled architecture  
 &nbsp; &nbsp; 🛎️ expose async functions on json rpc endpoints  
-&nbsp; &nbsp; 🎭 shapeshifting api clients match implementations  
+&nbsp; &nbsp; 🎭 shapeshifting api clients impersonate implementations  
 &nbsp; &nbsp; 🛠️ advanced curries for auth and more  
 
 🛡 straightforward security model  
 &nbsp; &nbsp; 🔓 cors rules for public endpoints  
 &nbsp; &nbsp; 🔒 public key whitelist for signed requests  
 
-## *RENRAKU* school on web api practices
+## *RENRAKU* school on web api best practices
 
 - renraku began with the principal: *"a good api library should simply disappear".* api libraries should abstract away the api details to such a degree that calling remote methods looks the same as calling local methods
 - i will try to explain renraku by sharing the lessons i've learned while developing and using renraku privately for years
 
-### ⛩️ lesson one: don't make calls directly.. grow up!
+### ⛩️ lesson one: wisdom is knowing the right path to take
 
 - traditionally to call an api, you'll often find a nasty old pattern along these lines:
   ```js
@@ -29,15 +29,17 @@
    //    [library coupling, gross!]   [string literal, yuck!]
   ```
 - **introducing *RENRAKU!***  
-  renraku's first motivation was to provide nice calling interfaces like this:  
   ```js
-  // beautiful and enlightened 😇
+  // natural and enlightened
   const details = await userTopic.getDetails(userId)
   ```
+  of course. renraku's first motivation was to "abstract away" the api library.  
+  but as you'll see, renraku became a set of typescript tools and practices surrounding this idea
 
-### ⛩️ lesson two: ignorance is bliss
+### ⛩️ lesson two: life is suffering but ignorance is bliss
 
-- let's start by dividing your *backend* api into `Topic` implementations like this one below
+- with renraku, we divide our ***backend*** business logic into "topic" implementation objects.  
+  topics can only have async functions as members
   ```ts
   import {asTopic} from "renraku/dist/interfaces.js"
 
@@ -53,35 +55,46 @@
     },
 
     // another async method
-    async setNickname(nickname: string) {
+    async setNickname(userId: string, nickname: string) {
       return void
     },
   })
 
-  // user topic interface
+  // infer user topic interface
   export type UserTopic = ReturnType<typeof makeUserTopic>
   ```
-- then you should design your *frontend* systems to accept the topic *interfaces*, so they can use the topics but aren't coupled to any specific implementations
+- then we design our ***frontend*** systems to accept the topic *interfaces*
   ```js
   export const makeFrontSystem = ({userTopic}: {userTopic: UserTopic}) => ({
+     //                                          ↑
+     //                          (accepting a topic interface...
+     //                           it might be an implementaton,
+     //                           or an api-client,
+     //                           or just some mocks for testing..
+     //                           it doesn't matter to us here)
+
     async uiAction(userId: string) {
 
-      // call method on user topic
+      // call topic method
       const details = await userTopic.getDetails(userId)
     },
   })
   ```
-- this general decoupling pattern offers general flexibility, testability, mockability, portability
-- renraku's philosophy relies on it. renraku is about generating api client objects that perfectly match the topic interface. that is, the api client objects themselves look and work the same as the actual implementations
+- of course, this general decoupling pattern offers flexibility, testability, mockability, and portability, and is wise for most any system
+- and renraku's philosophy relies on it. we use renraku to bridge the gap between backend and frontend systems like these
 
-### ⛩️ lesson three: api clients should be shape-shifters
+### ⛩️ lesson three: api clients should be shapeshifters
 
-- we use renraku `apiServer` to automatically expose topic implementations, setting some cors rules
+- on the ***serverside,*** we use renraku `apiServer` to create a node server and expose topic implementations.  
+  security rules like cors can be set for each topic
   ```ts
   import {UserTopic} from "./business.js"
   import {apiServer} from "renraku/dist/api-server.js"
 
   export async function startUserServer(userTopic: UserTopic) {
+     //                                  ↑
+     //                      (remember you could pass mocks here!)
+
     const server = await apiServer({
       logger: console,
       exposures: {
@@ -97,7 +110,8 @@
     server.start(8001)
   }
   ```
-- then we can use renraku `apiClient` to generate topic api client objects, which are ***actually impostors*** pretending to be topic implementations, but their methods secretly make api calls!
+- on the ***clientside,*** we use renraku `apiClient` to generate topic api client objects.  
+  for each topic, we generate an "shapeshifter" api client object, which is *actually an impostor* pretending to be a topic implementation.. their methods secretly make api calls, but the frontend is none the wiser!
   ```ts
   import {UserTopic} from "./business.js"
   import {Shape} from "renraku/dist/interfaces.js"
@@ -113,35 +127,38 @@
       shape: {
         userTopic: {
           getDetails: "method",
-          setNickname: "method,"
+          setNickname: "method",
         }
       },
     })
     return api.userTopic
   }
-  ```
-- thus, working with an api client looks the same as working with the actual implementation
-  ```ts
-  // renraku client object
-  const userTopic = await makeUserClient()
 
-  // calling a method looks the same as for real implementation
-  const details = await userTopic.getDetails()
-  ```
-- using typescript interfaces with this mix-and-match attitude buys you an incredible amount of freedom and flexibility
-  ```ts
-  // will we provide the real implementation?
-  const system = clientsideSystem({userTopic: makeUserTopic()})
+  // examples for clarity
+  ;(async() => {
 
-  // or maybe an api client instead?
-  const system = clientsideSystem({userTopic: await makeUserClient()})
+    // create the api client object
+    const userTopic = await makeUserClient()
 
-  // or maybe some ad-hoc testing?
-  const system = clientsideSystem({userTopic: {
-    async getDetails(userId) { throw new Error("TODO") },
-    async setNickname(nickname) { throw new Error("TODO") },
-  }})
+    // call an api method: looks the same as real topic implementation
+    const details = await userTopic.getDetails("u123")
+
+    // now when we go to create our frontend systems,
+    // we have a great deal of flexibility
+
+    // we might: pass in the api client object (frontend will call api)
+    makeFrontSystem({userTopic})
+
+    // or instead: pass in some mocks (frontend will call mocks)
+    makeFrontSystem({userTopic: {
+      async getDetails(userId) { throw new Error("TODO") },
+      async setNickname(userId, nickname) { throw new Error("TODO") },
+    }})
+  })()
   ```
+- so in short
+  - renraku has handy functions to turn topic objects into api servers or clients
+  - decoupled architecture is insanely cool for mocks/tests/development in ways that are beyond your understanding
 
 ### ⛩️ lesson four: advanced curries reduce repetition
 
@@ -149,104 +166,6 @@
 
 -----------------
 
-old readme
-
-## *RENRAKU* exposes async functions as an api
-
-- 🔆 expose some async functions on your server
-- 📡 call them remotely from browser or node, with noice syntax
-- ☎ json rpc under the hood
-- 🛡 simple security model
-  - 🔓 cors rules for public endpoints
-  - 🔒 public key whitelist for signed requests
-
-## *RENRAKU* leads by example
-
-- **node: create an api server,** and listen on port 8001  
-  &nbsp;&nbsp; *[(example-server.ts)](source/internals/examples/example-server.ts)*  
-  ```ts
-  import {apiServer} from "renraku/dist/api-server.js"
-  import {NuclearApi} from "./example-common.js"
-
-  export async function exampleServer() {
-
-    // create the server
-    const server = await apiServer<NuclearApi>({
-      logger: console,
-      exposures: {
-        reactor: {
-          exposed: {
-
-            // an exposed api function
-            async generatePower(a: number, b: number) {
-              return a + b
-            },
-
-            // another api function
-            async radioactiveMeltdown() {
-              throw new Error("meltdown error")
-            }
-          },
-
-          // browser cors permissions
-          cors: {
-            allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-            forbidden: /\:8989$/i,
-          }
-        }
-      }
-    })
-
-    // listen on port 8001
-    server.start(8001)
-  }
-  ```
-  - you just give renraku some async methods to expose
-  - this example shows a public endpoint, with some example cors rules
-
-- **browser or node: create an api client,** and remotely call exposed methods  
-  &nbsp;&nbsp; *[(example-client.ts)](source/internals/examples/example-client.ts)*  
-  ```ts
-  import {apiClient} from "renraku/dist/api-client.js"
-  import {NuclearApi, nuclearShape} from "./example-common.js"
-
-  export async function exampleClient() {
-
-    // create the api client
-    const {reactor} = await apiClient<NuclearApi>({
-      url: "http://localhost:8001",
-      shape: nuclearShape
-    })
-
-    // call an api method
-    const result = await reactor.generatePower(1, 2)
-
-    // log the result
-    console.log(result === 3 ? "✔ success" : "✘ failed")
-    return reactor
-  }
-  ```
-  - shape object describes api surface area, so renraku can build the client
-  - typescript enforces that the shape object matches the interface
-
-## *RENRAKU* believes in testability and ergonomics
-
-- traditionally to call an api, you'll find a nasty pattern:
-  ```js
-  // ugly and bad
-  const details = await api.apiCall("user.getDetails", userId)
-   //                        ↑             ↑
-   //    [library coupling, gross!]   [string literal, yuck!]
-  ```
-- **introducing *RENRAKU!***
-  ```js
-  // beautiful and enlightened
-  const details = await user.getDetails(userId)
-  ```
-- this pattern is superior for decoupling, testability, and developer experience
-
-## *RENRAKU* is still an unstable work-in-progress
-
 <br/>
 
-<em style="display: block; text-align: center">— RENRAKU means 'contact' —</em>
+<em style="display: block; text-align: center">— RENRAKU means "contact" —</em>
