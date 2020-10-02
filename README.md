@@ -111,7 +111,7 @@
   }
   ```
 - on the ***clientside,*** we use renraku `apiClient` to generate topic api client objects.  
-  for each topic, we generate an "shapeshifter" api client object, which is *actually an impostor* pretending to be a topic implementation.. their methods secretly make api calls, but the frontend is none the wiser!
+  for each topic, we generate a "shapeshifter" api client object, which is *actually an impostor* pretending to be a topic implementation.. their methods secretly make api calls, but the frontend is none the wiser!
   ```ts
   import {UserTopic} from "./business.js"
   import {Shape} from "renraku/dist/interfaces.js"
@@ -157,8 +157,8 @@
   })()
   ```
 - so in short
-  - renraku has handy functions to turn topic objects into api servers or clients
-  - decoupled architecture is insanely cool for mocks/tests/development in ways that are beyond your understanding
+  - renraku bridges the gap with handy functions that turn topic objects into api servers or clients
+  - properly decoupled architecture is insanely cool for mocks/tests/development in ways that are yet beyond your current understanding
 
 ### ⛩️ RENRAKU LESSON FOUR — *advanced curries reduce repetition for auth and more*
 
