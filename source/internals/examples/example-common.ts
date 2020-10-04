@@ -1,6 +1,6 @@
 
 import {topicTransform} from "../../curries.js"
-import {asApi, ApiShape} from "../../interfaces.js"
+import {asApi, ApiShape} from "../../types.js"
 
 // auth data that comes with every request
 export interface NuclearMeta {

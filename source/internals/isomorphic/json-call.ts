@@ -1,7 +1,7 @@
 
 import {err} from "../../errors.js"
-import {Credentials} from "../../interfaces.js"
-import {SignatureSign} from "../internal-interfaces.js"
+import {Credentials} from "../../types.js"
+import {SignatureSign} from "../internal-types.js"
 
 export async function jsonCall<T = any>({
 	url,

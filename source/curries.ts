@@ -1,6 +1,6 @@
 
-import {Topic, Api} from "./interfaces.js"
 import {objectMap} from "./internals/object-map.js"
+import {Api, Topic, Shift, CurriedTopicMeta, CurriedApiMeta} from "./types.js"
 
 // curry functions
 //
@@ -8,18 +8,18 @@ import {objectMap} from "./internals/object-map.js"
 export function curryTopicMeta<T extends Topic, Meta>(
 		topic: T,
 		getMeta: () => Promise<Meta>,
-	): CurriedTopicMetaArg<T> {
-	return objectMap<T, CurriedTopicMetaArg<T>>(
+	): CurriedTopicMeta<T> {
+	return objectMap<T, CurriedTopicMeta<T>>(
 		topic,
-		method => curryMethodMetaArg(method, getMeta),
+		method => curryMethodMeta(method, getMeta),
 	)
 }
 
 export function curryApiMeta<A extends Api, Meta>(
 		api: A,
 		getMeta: () => Promise<Meta>
-	): CurriedApiMetaArg<A> {
-	return objectMap<A, CurriedApiMetaArg<A>>(
+	): CurriedApiMeta<A> {
+	return objectMap<A, CurriedApiMeta<A>>(
 		api,
 		topic => curryTopicMeta(topic, getMeta)
 	)
@@ -45,26 +45,10 @@ export function topicTransform<
 	})
 }
 
-// fancy types
-//
-
-type Shift<T extends any[]> =
-	T["length"] extends 0
-		? undefined
-		: (((...b: T) => void) extends (a: any, ...b: infer I) => void ? I : [])
-
-type CurriedTopicMetaArg<T extends Topic> = {
-	[P in keyof T]: (...args: Shift<Parameters<T[P]>>) => ReturnType<T[P]>
-}
-
-type CurriedApiMetaArg<A extends Api> = {
-	[P in keyof A]: CurriedTopicMetaArg<A[P]>
-}
-
 // method curries
 //
 
-function curryMethodMetaArg<Meta, Args extends any[], Ret>(
+function curryMethodMeta<Meta, Args extends any[], Ret>(
 		method: (meta: Meta, ...args: Args) => Promise<Ret>,
 		getMeta: () => Promise<Meta>,
 	) {

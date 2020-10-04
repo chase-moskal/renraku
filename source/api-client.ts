@@ -1,6 +1,6 @@
 
 import {smartImport} from "./internals/smart-import.js"
-import {Api, ApiClient, ClientOptions} from "./interfaces.js"
+import {Api, ApiClient, ClientOptions} from "./types.js"
 
 const promise = smartImport<{apiClient: ApiClient<any>}>("api-client.js")
 

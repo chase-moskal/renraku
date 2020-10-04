@@ -16,7 +16,7 @@ import {
 	Api,
 	Server,
 	ServerOptions,
-} from "./interfaces.js"
+} from "./types.js"
 
 import {apiCall} from "./internals/node/api-call.js"
 

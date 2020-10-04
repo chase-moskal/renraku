@@ -30,6 +30,25 @@ export const asTopic = <T extends Topic>(topic: T) => topic
 export const asMethod = <M extends Method>(method: M) => method
 
 //
+// CURRIES
+//
+
+export type Shift<T extends any[]> = T["length"] extends 0
+	? undefined
+	: (((...b: T) => void) extends (a: any, ...b: infer I) => void ? I : [])
+
+export type CurriedMethodMeta<M extends Method> =
+	(...args: Shift<Parameters<M>>) => ReturnType<M>
+
+export type CurriedTopicMeta<T extends Topic> = {
+	[P in keyof T]: CurriedMethodMeta<T[P]>
+}
+
+export type CurriedApiMeta<A extends Api> = {
+	[P in keyof A]: CurriedTopicMeta<A[P]>
+}
+
+//
 // SHAPES
 //
 

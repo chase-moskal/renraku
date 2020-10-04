@@ -2,7 +2,7 @@
 import {signatureVerify} from "redcrypto/dist/signature-verify.js"
 
 import {err} from "../../errors.js"
-import {WhitelistPermissions} from "../../interfaces.js"
+import {WhitelistPermissions} from "../../types.js"
 
 export async function verifyWhitelist({id, body, whitelist, signature}: {
 	id: string

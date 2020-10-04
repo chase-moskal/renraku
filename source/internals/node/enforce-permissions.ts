@@ -1,8 +1,8 @@
 
 import {err} from "../../errors.js"
 import {verifyCors} from "../../verify-cors.js"
-import {Order} from "../internal-interfaces.js"
-import {UnknownExposure} from "../../interfaces.js"
+import {Order} from "../internal-types.js"
+import {UnknownExposure} from "../../types.js"
 
 import {verifyWhitelist} from "./verify-whitelist.js"
 

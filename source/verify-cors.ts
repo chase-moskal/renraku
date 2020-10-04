@@ -1,5 +1,5 @@
 
-import {CorsPermissions} from "./interfaces.js"
+import {CorsPermissions} from "./types.js"
 
 export const verifyCors = ({origin, cors}: {
 	origin: string

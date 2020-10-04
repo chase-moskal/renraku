@@ -1,8 +1,8 @@
 
 import {err} from "../../errors.js"
-import {Logger} from "../../interfaces.js"
-import {Order} from "../internal-interfaces.js"
-import {ApiToExposures} from "../../interfaces.js"
+import {Logger} from "../../types.js"
+import {Order} from "../internal-types.js"
+import {ApiToExposures} from "../../types.js"
 
 import {enforcePermissions} from "./enforce-permissions.js"
 

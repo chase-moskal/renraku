@@ -1,5 +1,5 @@
 
-import {Logger} from "./interfaces.js"
+import {Logger} from "./types.js"
 
 export class DisabledLogger implements Logger {
 	log() {}
