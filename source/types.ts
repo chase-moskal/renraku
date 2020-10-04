@@ -13,17 +13,9 @@ export interface Logger {
 // API TYPE SIGNATURES
 //
 
+export interface Api { [key: string]: Topic }
+export interface Topic { [key: string]: Method }
 export type Method = (...args: any[]) => Promise<any>
-
-export type Topic = {
-	[key: string]: Method
-}
-
-export type Api = {
-	[key: string]: Topic
-}
-
-export type Constraint<C extends any, T extends C> = T
 
 export const asApi = <A extends Api>(api: A) => api
 export const asTopic = <T extends Topic>(topic: T) => topic
