@@ -6,8 +6,8 @@ import {SignatureSign, Order} from "../internal-types.js"
 import {jsonCall} from "./json-call.js"
 
 export const prepareApiClient = ({fetch}: {
-	fetch: typeof window.fetch
-}) => (
+		fetch: typeof window.fetch
+	}) => (
 	function apiClient<A extends ApiClientside>({
 			url,
 			shape,

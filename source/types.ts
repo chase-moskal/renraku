@@ -25,6 +25,9 @@ export const asMethod = <M extends Method>(method: M) => method
 // CURRIES
 //
 
+export type Await<T> = T extends Promise<infer U> ? U : T
+export type AwaitProps<T> = {[P in keyof T]: Await<T[P]>}
+
 export type Shift<T extends any[]> = T["length"] extends 0
 	? undefined
 	: (((...b: T) => void) extends (a: any, ...b: infer I) => void ? I : [])
@@ -38,6 +41,26 @@ export type CurriedTopicMeta<T extends Topic> = {
 
 export type CurriedApiMeta<A extends Api> = {
 	[P in keyof A]: CurriedTopicMeta<A[P]>
+}
+
+export type CurriedMethodAugmentation<M extends ClientMethod> =
+	(...args: Shift<Parameters<M>>) => Promise<Await<ReturnType<M>>["result"]>
+
+export type CurriedTopicAugmentation<T extends TopicClientside> = {
+	[P in keyof T]: CurriedMethodAugmentation<T[P]>
+}
+
+export type CurriedApiAugmentation<A extends ApiClientside> = {
+	[P in keyof A]: CurriedTopicAugmentation<A[P]>
+}
+
+export type ApiToClientside<A extends Api> = {
+	[P in keyof A]: {
+		[P2 in keyof A[P]]: (
+			request: ClientRequest,
+			...args: Parameters<A[P][P2]>
+		) => Promise<ClientResponse<Await<ReturnType<A[P][P2]>>>>
+	}
 }
 
 export type Augmentation<Context, Ret> = (context: Context) => Promise<(result: Ret) => Promise<ServerResponse<Ret>>>

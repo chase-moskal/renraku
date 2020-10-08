@@ -1,6 +1,6 @@
 
 import {objectMap} from "./internals/object-map.js"
-import {Api, Topic, Shift, CurriedTopicMeta, CurriedApiMeta, TopicServerside, Augmentation} from "./types.js"
+import {Api, Topic, Shift, CurriedTopicMeta, CurriedApiMeta, TopicServerside, Augmentation, ClientRequest, ClientResponse, CurriedTopicAugmentation, CurriedApiAugmentation,} from "./types.js"
 
 // curry functions
 //
@@ -22,6 +22,36 @@ export function curryApiMeta<A extends Api, Meta>(
 	return objectMap<A, CurriedApiMeta<A>>(
 		api,
 		topic => curryTopicMeta(getMeta, topic)
+	)
+}
+
+export function curryTopicAugmentation<T extends Topic>(
+		getRequest: () => Promise<ClientRequest>,
+		processResponse: (response: ClientResponse) => Promise<any>,
+		topic: T,
+	): CurriedTopicAugmentation<T> {
+	return objectMap(
+		topic,
+		method => curryMethodAugmentation(
+			getRequest,
+			processResponse,
+			method,
+		)
+	)
+}
+
+export function curryApiAugmentation<A extends Api>(
+		getRequest: () => Promise<ClientRequest>,
+		processResponse: (response: ClientResponse) => Promise<any>,
+		api: A,
+	): CurriedApiAugmentation<A> {
+	return objectMap(
+		api,
+		topic => curryTopicAugmentation(
+			getRequest,
+			processResponse,
+			topic,
+		)
 	)
 }
 
@@ -87,6 +117,17 @@ function curryMethodMeta<Meta, Args extends any[], Ret>(
 		method: (meta: Meta, ...args: Args) => Promise<Ret>,
 	) {
 	return async(...args: Args) => method(await getMeta(), ...args)
+}
+
+function curryMethodAugmentation<Args extends any[], Ret>(
+		getRequest: () => Promise<ClientRequest>,
+		processResponse: (response: ClientResponse) => Promise<Ret>,
+		method: (request: ClientRequest, ...args: Args) => Promise<ClientResponse>,
+	) {
+	return async(...args: Args) => {
+		const response = await method(await getRequest(), ...args)
+		return await processResponse(response)
+	}
 }
 
 function methodTransform<
