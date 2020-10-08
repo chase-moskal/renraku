@@ -40,6 +40,8 @@ export type CurriedApiMeta<A extends Api> = {
 	[P in keyof A]: CurriedTopicMeta<A[P]>
 }
 
+export type Augmentation<Context, Ret> = (context: Context) => Promise<(result: Ret) => Promise<ServerResponse<Ret>>>
+
 //
 // SHAPES
 //
@@ -58,11 +60,11 @@ export type ApiShape<A extends Api> = {
 // SERVER
 //
 
-export interface Server {
-	koa: Koa
-	start(port: number): void
-	stop(): Promise<void>
-}
+// export interface Server {
+// 	koa: Koa
+// 	start(port: number): void
+// 	stop(): Promise<void>
+// }
 
 export interface CorsPermissions {
 	allowed: RegExp
@@ -73,32 +75,32 @@ export interface WhitelistPermissions {
 	[key: string]: string
 }
 
-export interface BasicExposure<E extends Topic> {
-	exposed: E
-}
+// export interface BasicExposure<E extends Topic> {
+// 	exposed: E
+// }
 
-export interface CorsExposure<E extends Topic> extends BasicExposure<E> {
-	cors: CorsPermissions
-}
+// export interface CorsExposure<E extends Topic> extends BasicExposure<E> {
+// 	cors: CorsPermissions
+// }
 
-export interface WhitelistExposure<E extends Topic> extends BasicExposure<E> {
-	whitelist: WhitelistPermissions
-}
+// export interface WhitelistExposure<E extends Topic> extends BasicExposure<E> {
+// 	whitelist: WhitelistPermissions
+// }
 
-export type Exposure<E extends Topic> = CorsExposure<E> | WhitelistExposure<E>
-export type UnknownExposure<E extends Topic = any> =
-	BasicExposure<E> & Partial<CorsExposure<E>> & Partial<WhitelistExposure<E>>
+// export type Exposure<E extends Topic> = CorsExposure<E> | WhitelistExposure<E>
+// export type UnknownExposure<E extends Topic = any> =
+// 	BasicExposure<E> & Partial<CorsExposure<E>> & Partial<WhitelistExposure<E>>
 
-export type ApiToExposures<A extends Api> = {
-	[P in keyof A]: Exposure<A[P]>
-}
+// export type ApiToExposures<A extends Api> = {
+// 	[P in keyof A]: Exposure<A[P]>
+// }
 
-export interface ServerOptions<A extends Api> {
-	exposures: ApiToExposures<A>
-	koa?: Koa
-	debug?: boolean
-	logger?: Logger
-}
+// export interface ServerOptions<A extends Api> {
+// 	exposures: ApiToExposures<A>
+// 	koa?: Koa
+// 	debug?: boolean
+// 	logger?: Logger
+// }
 
 //
 // CLIENT
@@ -116,3 +118,56 @@ export interface Credentials {
 	id: string
 	privateKey: string
 }
+
+//
+// NEW REGIME
+//
+
+export interface Headers {
+	[key: string]: string
+}
+
+export interface ServerRequest {
+	headers: Headers
+}
+
+export interface ClientRequest {
+	headers?: Headers
+}
+
+export type ServerResponse<R extends any = any> = {
+	header?: Headers
+	result: R
+}
+
+export type ClientResponse<R extends any = any> = {
+	header: Headers
+	result: R
+}
+
+export type ServerMethod = (request: ServerRequest, ...args: any[]) =>
+	Promise<ServerResponse>
+
+export type ClientMethod = (request: ClientRequest, ...args: any[]) =>
+	Promise<ClientResponse>
+
+export interface TopicServerside extends Topic {[key: string]: ServerMethod}
+export interface TopicClientside extends Topic {[key: string]: ClientMethod}
+
+export interface ApiServerside extends Api {[key: string]: TopicServerside}
+export interface ApiClientside extends Api {[key: string]: TopicClientside}
+
+//
+
+export interface ApiServerOptions<A extends ApiServerside> {
+	expose: A
+	debug?: boolean
+	logger?: Logger
+}
+
+export interface ApiClientOptions<A extends ApiClientside> {
+	url: string
+	shape: ApiShape<A>
+}
+
+//

@@ -1,19 +1,17 @@
 
 import {err} from "../../errors.js"
-import {Api, ClientOptions, Topic} from "../../types.js"
+import {ApiClientside, ClientOptions, Topic, ClientRequest, ClientResponse} from "../../types.js"
 import {SignatureSign, Order} from "../internal-types.js"
 
 import {jsonCall} from "./json-call.js"
 
-export const prepareApiClient = ({fetch, signatureSign}: {
+export const prepareApiClient = ({fetch}: {
 	fetch: typeof window.fetch
-	signatureSign?: SignatureSign
-}) =>
-	function apiClient<A extends Api>({
-		url,
-		shape,
-		credentials,
-	}: ClientOptions<A>): A {
+}) => (
+	function apiClient<A extends ApiClientside>({
+			url,
+			shape,
+		}: ClientOptions<A>): A {
 		const client: any = {}
 
 		for (const topic of Object.keys(shape)) {
@@ -23,15 +21,15 @@ export const prepareApiClient = ({fetch, signatureSign}: {
 			for (const [key, value] of Object.entries((<any>shape)[topic])) {
 				if (value === "method") {
 					const func = key
-					client[topic][func] = async function(...params: any[]): Promise<any> {
-						return jsonCall({
-							url,
-							fetch,
-							credentials,
-							signatureSign,
-							data: <Order>{topic, func, params},
-						})
-					}
+					client[topic][func] = async(
+						{headers}: ClientRequest,
+						...params: any[]
+					): Promise<ClientResponse> => jsonCall({
+						url,
+						fetch,
+						headers,
+						data: <Order>{topic, func, params},
+					})
 				}
 				else throw err(400, `unknown shape item "${value}"`)
 			}
@@ -39,3 +37,4 @@ export const prepareApiClient = ({fetch, signatureSign}: {
 
 		return <A>client
 	}
+)

@@ -1,47 +1,27 @@
 
 import {err} from "../../errors.js"
-import {Credentials} from "../../types.js"
-import {SignatureSign} from "../internal-types.js"
+import {Headers} from "../../types.js"
 
-export async function jsonCall<T = any>({
+export async function jsonCall<Data, Ret>({
 	url,
 	data,
 	fetch,
-	credentials,
-	signatureSign,
+	headers,
 }: {
-	data: any
+	data: Data
 	url: string
+	headers: Headers
 	fetch: typeof window.fetch
-	credentials?: Credentials
-	signatureSign?: SignatureSign
-}): Promise<T> {
-
-	const body = JSON.stringify(data)
-
-	const headers: {[key: string]: string} = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-	}
-
-	if (credentials) {
-		if (signatureSign) {
-			const signature = signatureSign({
-				body,
-				privateKey: credentials.privateKey
-			})
-			headers["x-id"] = credentials.id
-			headers["x-signature"] = signature
-		}
-		else {
-			throw err(-1, "json-call with credentials requires signature-sign")
-		}
-	}
+}): Promise<Ret> {
 
 	const response = await fetch(url, {
-		body,
-		headers,
+		body: JSON.stringify(data),
 		method: "POST",
+		headers: {
+			"Accept": "application/json",
+			"Content-Type": "application/json",
+			...headers,
+		},
 	})
 
 	if (response.ok) {

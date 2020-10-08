@@ -1,36 +1,30 @@
 
 import {err} from "../../errors.js"
-import {Logger} from "../../types.js"
 import {Order} from "../internal-types.js"
-import {ApiToExposures} from "../../types.js"
+import {ApiServerside, Logger, Headers} from "../../types.js"
 
-import {enforcePermissions} from "./enforce-permissions.js"
-
-export async function apiCall({
-	id,
-	debug,
-	origin,
-	logger,
-	signature,
-	exposures,
-	body = "",
-}: {
-	id: string
-	body: string
-	debug: boolean
-	origin: string
-	logger: Logger
-	signature: string
-	exposures: ApiToExposures<any>
-}) {
+export async function apiCall<A extends ApiServerside>({
+		id,
+		debug,
+		logger,
+		expose,
+		headers,
+		body = "",
+	}: {
+		expose: A
+		id: string
+		body: string
+		debug: boolean
+		logger: Logger
+		headers: Headers
+	}) {
 
 	// parse and validate an incoming "order"
 	const order: Order = JSON.parse(body.trim())
-	const {func, topic, params} = order
-	if (!topic) throw err(400, `request 'topic' string required`)
-	if (!func) throw err(400, `request 'func' string required`)
-	if (!params || !Array.isArray(params)) throw err(400, `request 'params' `
-		+ `array required`)
+	if (!order.topic) throw err(400, `request 'topic' string required`)
+	if (!order.func) throw err(400, `request 'func' string required`)
+	if (!order.params || !Array.isArray(order.params))
+		throw err(400, `request 'params' array required`)
 
 	// log the event
 	let result: any
@@ -38,25 +32,24 @@ export async function apiCall({
 
 	try {
 
-		// enforce cors or certificate whitelist
-		const execute = enforcePermissions({
-			id,
-			body,
-			order,
-			origin,
-			signature,
-			exposures,
-		})
+		// fetch the topic
+		const topic = expose[order.topic]
+		if (!topic) throw err(400, `unknown topic "${topic}"`)
 
-		// execute the call
+		// fetch the method function
+		const method = topic[order.func]
+		if (!method) throw err(400, `unknown topic method "${order.topic}.${order.func}"`)
+		const execute = () => method.apply(topic, order.params)
+
+		// execute the method function
 		result = await execute()
 	}
 	catch (err) {
 		error = err
 	}
 	finally {
-		logger.log(`🔔 ${topic}.${func}`)
-		if (debug) logger.debug("arguments:", params)
+		logger.log(`🔔 ${order.topic}.${order.func}`)
+		if (debug) logger.debug("arguments:", order.params)
 		if (debug) logger.debug("returns:", result)
 		if (error) throw error
 	}

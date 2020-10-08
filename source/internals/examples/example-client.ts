@@ -8,11 +8,11 @@ export async function exampleClient() {
 	// generate a nuclear api client interface
 	// but we curry-in the meta argument
 	const api = curryApiMeta<NuclearApi, NuclearMeta>(
+		async() => ({accessToken: "a123"}),
 		await apiClient({
 			shape: nuclearShape,
 			url: "http://localhost:8001",
 		}),
-		async() => ({accessToken: "a123"}),
 	)
 
 	// now consumers can call methods without the meta arg!
