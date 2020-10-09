@@ -1,6 +1,70 @@
 
 import {objectMap} from "./internals/object-map.js"
-import {Api, Topic, Shift, CurriedTopicMeta, CurriedApiMeta, TopicServerside, Augmentation, ClientRequest, ClientResponse, CurriedTopicAugmentation, CurriedApiAugmentation,} from "./types.js"
+import {Api, Topic, Shift, CurriedTopicMeta, CurriedApiMeta, TopicServerside, Augmentation, ClientRequest, ClientResponse, CurriedTopicAugmentation, CurriedApiAugmentation} from "./types.js"
+
+// BASE
+//
+
+function curryMethodMeta<Meta, Args extends any[], Ret>(
+		getMeta: () => Promise<Meta>,
+		method: (meta: Meta, ...args: Args) => Promise<Ret>,
+	) {
+	return async(...args: Args) => method(await getMeta(), ...args)
+}
+
+function curryMethodAugmentation<Args extends any[], Ret>(
+		getRequest: () => Promise<ClientRequest>,
+		processResponse: (response: ClientResponse) => Promise<Ret>,
+		method: (request: ClientRequest, ...args: Args) => Promise<ClientResponse>,
+	) {
+	return async(...args: Args) => {
+		const response = await method(await getRequest(), ...args)
+		return await processResponse(response)
+	}
+}
+
+function methodTransform<
+		Meta,
+		Payload,
+		Transformer extends (meta: Meta) => Promise<Payload>,
+		Method extends (payload: Payload, ...args: Args) => Promise<Ret>,
+		Args extends any[],
+		Ret extends any,
+	>(
+		transformer: Transformer,
+		method: Method,
+	) {
+	return async(meta: Meta, ...args: Args) => {
+		const payload = await transformer(meta)
+		return method(payload, ...args)
+	}
+}
+
+function methodAugment<
+		Context,
+		Aug extends Augmentation<Context, Ret>,
+		Method extends (...args: Args) => Promise<Ret>,
+		Args extends any[],
+		Ret extends any,
+	>(
+		augmentation: Aug,
+		method: Method,
+	) {
+	return async(context: Context, ...args: Args) => {
+		await augmentation(context)
+		return method(...args)
+	}
+}
+
+
+// SERVER
+//
+
+// CLIENT
+//
+
+
+
 
 // curry functions
 //
@@ -111,57 +175,6 @@ export function topicTransform<
 
 // method curries
 //
-
-function curryMethodMeta<Meta, Args extends any[], Ret>(
-		getMeta: () => Promise<Meta>,
-		method: (meta: Meta, ...args: Args) => Promise<Ret>,
-	) {
-	return async(...args: Args) => method(await getMeta(), ...args)
-}
-
-function curryMethodAugmentation<Args extends any[], Ret>(
-		getRequest: () => Promise<ClientRequest>,
-		processResponse: (response: ClientResponse) => Promise<Ret>,
-		method: (request: ClientRequest, ...args: Args) => Promise<ClientResponse>,
-	) {
-	return async(...args: Args) => {
-		const response = await method(await getRequest(), ...args)
-		return await processResponse(response)
-	}
-}
-
-function methodTransform<
-		Meta,
-		Payload,
-		Transformer extends (meta: Meta) => Promise<Payload>,
-		Method extends (payload: Payload, ...args: Args) => Promise<Ret>,
-		Args extends any[],
-		Ret extends any,
-	>(
-		transformer: Transformer,
-		method: Method,
-	) {
-	return async(meta: Meta, ...args: Args) => {
-		const payload = await transformer(meta)
-		return method(payload, ...args)
-	}
-}
-
-function methodAugment<
-		Context,
-		Aug extends Augmentation<Context, Ret>,
-		Method extends (...args: Args) => Promise<Ret>,
-		Args extends any[],
-		Ret extends any,
-	>(
-		augmentation: Aug,
-		method: Method,
-	) {
-	return async(context: Context, ...args: Args) => {
-		await augmentation(context)
-		return method(...args)
-	}
-}
 
 // // hypothetical augmentations
 // //

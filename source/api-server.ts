@@ -13,7 +13,7 @@ export async function apiServer<A extends ApiServerside>({
 	}
 }
 
-const noopAugmentation = async(context: ServerRequest) =>
+const noopAugmentation = async(request: ServerRequest) =>
 	async(result: any) => ({result})
 
 export function simpleTopic<T extends Topic>(topic: T) {

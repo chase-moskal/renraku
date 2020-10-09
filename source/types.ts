@@ -1,6 +1,4 @@
 
-import * as Koa from "koa"
-
 export interface Logger {
 	log: typeof console.log
 	warn: typeof console.warn
