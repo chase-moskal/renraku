@@ -1,6 +1,6 @@
 
 import {objectMap} from "./internals/object-map.js"
-import {Api, Topic, Shift, AddMeta, AddMetaTopic, AddMetaApi, ServerTopic, Augmentation, ClientContext, ClientResponse, ClientizeTopic, ClientizeApi, ServerContext, Method, ProcessPayloadTopic, ServerizeTopic, ServerizeApi} from "./types.js"
+import {Api, Topic, Shift, AddMeta, AddMetaTopic, AddMetaApi, ServerTopic, Augmentation, ClientContext, ClientResponse, DeclientizeTopic, DeclientizeApi, ServerContext, Method, ProcessPayloadTopic, ServerizeTopic, ServerizeApi, MetaMethod} from "./types.js"
 
 // COMMON
 //
@@ -37,9 +37,14 @@ export function processPayloadTopic<
 // CLIENTSIDE
 //
 
-export function addMeta<Meta, M extends (meta: Meta, ...args: Args) => Promise<any>, Args extends any[]>(
+export function addMeta<
+		Meta,
+		Meth extends (meta: Meta, ...args: any[]) => Promise<Ret>,
+		Args extends any[],
+		Ret,
+	>(
 		getMeta: () => Promise<Meta>,
-		method: M,
+		method: Meth,
 	) {
 	return async(...args: Args) => method(await getMeta(), ...args)
 }
@@ -64,7 +69,7 @@ export function addMetaApi<A extends Api, Meta>(
 	)
 }
 
-export function clientize<Args extends any[]>(
+export function declientize<Args extends any[]>(
 		getRequest: () => Promise<ClientContext>,
 		processResponse: (response: ClientResponse) => Promise<any>,
 		method: (request: ClientContext, ...args: Args) => Promise<ClientResponse>,
@@ -75,14 +80,14 @@ export function clientize<Args extends any[]>(
 	}
 }
 
-export function clientizeTopic<T extends Topic>(
+export function declientizeTopic<T extends Topic>(
 		getRequest: () => Promise<ClientContext>,
 		processResponse: (response: ClientResponse) => Promise<any>,
 		topic: T,
-	): ClientizeTopic<T> {
+	): DeclientizeTopic<T> {
 	return objectMap(
 		topic,
-		method => clientize(
+		method => declientize(
 			getRequest,
 			processResponse,
 			method,
@@ -90,14 +95,14 @@ export function clientizeTopic<T extends Topic>(
 	)
 }
 
-export function clientizeApi<A extends Api>(
+export function declientizeApi<A extends Api>(
 		getRequest: () => Promise<ClientContext>,
 		processResponse: (response: ClientResponse) => Promise<any>,
 		api: A,
-	): ClientizeApi<A> {
+	): DeclientizeApi<A> {
 	return objectMap(
 		api,
-		topic => clientizeTopic(
+		topic => declientizeTopic(
 			getRequest,
 			processResponse,
 			topic,
@@ -109,29 +114,25 @@ export function clientizeApi<A extends Api>(
 //
 
 export function serverize<
-		Request extends ServerContext,
+		Context extends ServerContext,
 		Args extends any[],
 		Ret,
 	>(
 		augmentation: Augmentation<Ret>,
 		method: (...args: Args) => Promise<Ret>,
 	) {
-	return async(request: Request, ...args: Args) => {
-		const toResponse = await augmentation(request)
+	return async(context: Context, ...args: Args) => {
+		const toResponse = await augmentation(context)
 		const result = await method(...args)
 		return toResponse(result)
 	}
 }
 
 export function serverizeTopic<
-		Top extends ServerTopic,
-		Ret,
+		Top extends Topic,
 	>(
-		augmentation: Augmentation<Ret>,
-		topic: {
-			[P in keyof Top]:
-				(...args: Shift<Parameters<Top[P]>>) => Ret
-		},
+		augmentation: Augmentation,
+		topic: Topic,
 	): ServerizeTopic<Top> {
 	return objectMap(
 		topic,
@@ -141,8 +142,7 @@ export function serverizeTopic<
 
 export function serverizeApi<
 		A extends Api,
-		Aug extends Augmentation<Ret>,
-		Ret,
+		Aug extends Augmentation,
 	>(
 		augmentation: Aug,
 		api: A,

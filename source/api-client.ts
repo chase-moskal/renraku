@@ -1,6 +1,6 @@
 
 import {smartImport} from "./internals/smart-import.js"
-import {clientizeTopic, clientizeApi} from "./curries.js"
+import {declientizeTopic, declientizeApi} from "./curries.js"
 import {ClientApi, ApiClient, ApiClientOptions, Topic, Api, ServerResponse} from "./types.js"
 
 const promise = smartImport<{apiClient: ApiClient<any>}>("api-client.js")
@@ -15,9 +15,9 @@ const getRequest = async() => ({})
 const processResponse = async(response: ServerResponse<any>) => response.result
 
 export function simpleClientTopic<T extends Topic>(topic: T) {
-	return clientizeTopic(getRequest, processResponse, topic)
+	return declientizeTopic(getRequest, processResponse, topic)
 }
 
 export function simpleClientApi<A extends Api>(api: A) {
-	return clientizeApi(getRequest, processResponse, api)
+	return declientizeApi(getRequest, processResponse, api)
 }

@@ -1,4 +1,3 @@
-import { serverizeTopic } from "./curries"
 
 export interface Logger {
 	log: typeof console.log
@@ -33,7 +32,10 @@ export type Shift<T extends any[]> = T["length"] extends 0
 
 // meta
 
-export type AddMeta<M extends Method> =
+export type MetaMethod<Meta> = (meta: Meta, ...args: any[]) => Promise<any>
+export type PayloadMethod<Payload> = (meta: Payload, ...args: any[]) => Promise<any>
+
+export type AddMeta<M extends MetaMethod<any>> =
 	(...args: Shift<Parameters<M>>) => ReturnType<M>
 
 export type AddMetaTopic<T extends Topic> = {
@@ -57,19 +59,21 @@ export type ProcessPayloadApi<Meta, A extends Api> = {
 
 // augmentation
 
-export type Clientize<M extends ClientMethod> =
+export type Declientize<M extends ClientMethod> =
 	(...args: Shift<Parameters<M>>) => Promise<Await<ReturnType<M>>["result"]>
 
-export type ClientizeTopic<T extends ClientTopic> = {
-	[P in keyof T]: Clientize<T[P]>
+export type DeclientizeTopic<T extends ClientTopic> = {
+	[P in keyof T]: Declientize<T[P]>
 }
 
-export type ClientizeApi<A extends ClientApi> = {
-	[P in keyof A]: ClientizeTopic<A[P]>
+export type DeclientizeApi<A extends ClientApi> = {
+	[P in keyof A]: DeclientizeTopic<A[P]>
 }
 
-export type Serverize<M extends ServerMethod> =
-	(...args: Shift<Parameters<M>>) => Promise<Await<ReturnType<M>>["result"]>
+export type Serverize<M extends (...args: any[]) => Promise<any>> = (
+	context: ServerContext,
+	...args: Parameters<M>
+) => Promise<ServerResponse<Await<ReturnType<M>>>>
 
 export type ServerizeTopic<T extends ServerTopic> = {
 	[P in keyof T]: Serverize<T[P]>
@@ -79,7 +83,7 @@ export type ServerizeApi<A extends ServerApi> = {
 	[P in keyof A]: ServerizeTopic<A[P]>
 }
 
-export type ApiToClientside<A extends Api> = {
+export type Clientize<A extends Api> = {
 	[P in keyof A]: {
 		[P2 in keyof A[P]]: (
 			context: ClientContext,
@@ -88,7 +92,7 @@ export type ApiToClientside<A extends Api> = {
 	}
 }
 
-export type Augmentation<Ret> = (context: ServerContext) => Promise<
+export type Augmentation<Ret = any> = (context: ServerContext) => Promise<
 	(result: Ret) => Promise<ServerResponse<Ret>>
 >
 
