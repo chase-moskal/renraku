@@ -1,23 +1,24 @@
 
 import {apiServer, simpleServerApi} from "../../api-server.js"
-import {uncurryApiAugmentation, uncurryMethodAugmentation} from "../../curries.js"
+import {serverizeApi, serverize} from "../../curries.js"
 
 import {makeNuclearApi} from "./example-common.js"
 
 export async function exampleServer() {
 	const api = makeNuclearApi()
+	api.reactor.generatePower
 
 	const {generatePower} = api.reactor
-	const generatePower2 = uncurryMethodAugmentation(
+	const generatePower2 = serverize(
 		async() => async(result) => ({result}),
 		api.reactor.generatePower,
 	)
 
-	const expose = uncurryApiAugmentation(
+	const expose = serverizeApi(
 		async() => async(result) => ({result}),
 		api,
 	)
-	// expose.reactor.generatePower
+	expose.reactor.generatePower
 
 	const server = await apiServer({expose})
 	server.start(8001)

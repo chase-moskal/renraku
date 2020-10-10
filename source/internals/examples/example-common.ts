@@ -1,6 +1,6 @@
 
 import {asApi, ApiShape} from "../../types.js"
-import {uncurryTopicMeta} from "../../curries.js"
+import {processPayloadTopic} from "../../curries.js"
 
 export interface NuclearMeta {
 	accessToken: string
@@ -16,7 +16,7 @@ async function verifyTokens(meta: NuclearMeta): Promise<NuclearMetaPayload> {
 }
 
 export const makeNuclearApi = () => asApi({
-	reactor: uncurryTopicMeta(verifyTokens, {
+	reactor: processPayloadTopic(verifyTokens, {
 		async generatePower(payload, a: number, b: number) {
 			console.log("user", payload.userId)
 			return a + b

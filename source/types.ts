@@ -1,3 +1,4 @@
+import { serverizeTopic } from "./curries"
 
 export interface Logger {
 	log: typeof console.log
@@ -32,51 +33,62 @@ export type Shift<T extends any[]> = T["length"] extends 0
 
 // meta
 
-export type CurriedMethodMeta<M extends Method> =
+export type AddMeta<M extends Method> =
 	(...args: Shift<Parameters<M>>) => ReturnType<M>
 
-export type CurriedTopicMeta<T extends Topic> = {
-	[P in keyof T]: CurriedMethodMeta<T[P]>
+export type AddMetaTopic<T extends Topic> = {
+	[P in keyof T]: AddMeta<T[P]>
 }
 
-export type CurriedApiMeta<A extends Api> = {
-	[P in keyof A]: CurriedTopicMeta<A[P]>
+export type AddMetaApi<A extends Api> = {
+	[P in keyof A]: AddMetaTopic<A[P]>
 }
 
-export type UncurriedMethodMeta<Meta, M extends Method> =
-	(meta: Meta, ...args: Parameters<M>) => ReturnType<M>
+export type ProcessPayload<Meta, M extends Method> =
+	(meta: Meta, ...args: Shift<Parameters<M>>) => ReturnType<M>
 
-export type UncurriedTopicMeta<Meta, T extends Topic> = {
-	[P in keyof T]: UncurriedMethodMeta<Meta, T[P]>
+export type ProcessPayloadTopic<Meta, T extends Topic> = {
+	[P in keyof T]: ProcessPayload<Meta, T[P]>
 }
 
-export type UncurriedApiMeta<Meta, A extends Api> = {
-	[P in keyof A]: UncurriedTopicMeta<Meta, A[P]>
+export type ProcessPayloadApi<Meta, A extends Api> = {
+	[P in keyof A]: ProcessPayloadTopic<Meta, A[P]>
 }
 
 // augmentation
 
-export type CurriedMethodAugmentation<M extends ClientMethod> =
+export type Clientize<M extends ClientMethod> =
 	(...args: Shift<Parameters<M>>) => Promise<Await<ReturnType<M>>["result"]>
 
-export type CurriedTopicAugmentation<T extends TopicClientside> = {
-	[P in keyof T]: CurriedMethodAugmentation<T[P]>
+export type ClientizeTopic<T extends ClientTopic> = {
+	[P in keyof T]: Clientize<T[P]>
 }
 
-export type CurriedApiAugmentation<A extends ApiClientside> = {
-	[P in keyof A]: CurriedTopicAugmentation<A[P]>
+export type ClientizeApi<A extends ClientApi> = {
+	[P in keyof A]: ClientizeTopic<A[P]>
+}
+
+export type Serverize<M extends ServerMethod> =
+	(...args: Shift<Parameters<M>>) => Promise<Await<ReturnType<M>>["result"]>
+
+export type ServerizeTopic<T extends ServerTopic> = {
+	[P in keyof T]: Serverize<T[P]>
+}
+
+export type ServerizeApi<A extends ServerApi> = {
+	[P in keyof A]: ServerizeTopic<A[P]>
 }
 
 export type ApiToClientside<A extends Api> = {
 	[P in keyof A]: {
 		[P2 in keyof A[P]]: (
-			request: ClientRequest,
+			context: ClientContext,
 			...args: Parameters<A[P][P2]>
 		) => Promise<ClientResponse<Await<ReturnType<A[P][P2]>>>>
 	}
 }
 
-export type Augmentation<Ret> = (request: any) => Promise<
+export type Augmentation<Ret> = (context: ServerContext) => Promise<
 	(result: Ret) => Promise<ServerResponse<Ret>>
 >
 
@@ -165,47 +177,51 @@ export interface Headers {
 	[key: string]: string
 }
 
-export interface ServerRequest {
+export interface ServerContext {
 	headers: Headers
 }
 
-export interface ClientRequest {
+export interface ClientContext {
 	headers?: Headers
 }
 
-export type ServerResponse<R extends any = any> = {
+export type ServerResponse<R = any> = {
 	header?: Headers
 	result: R
 }
 
-export type ClientResponse<R extends any = any> = {
+export type ClientResponse<R = any> = {
 	header: Headers
 	result: R
 }
 
-export type ServerMethod = (request: ServerRequest, ...args: any[]) =>
-	Promise<ServerResponse>
+//
 
-export type ClientMethod = (request: ClientRequest, ...args: any[]) =>
-	Promise<ClientResponse>
+export type ServerMethod = (
+	context: ServerContext,
+	...args: any[]
+) => Promise<ServerResponse>
 
-export interface TopicServerside extends Topic {[key: string]: ServerMethod}
-export interface TopicClientside extends Topic {[key: string]: ClientMethod}
+export type ClientMethod = (
+	context: ClientContext,
+	...args: any[]
+) => Promise<ClientResponse>
 
-export interface ApiServerside extends Api {[key: string]: TopicServerside}
-export interface ApiClientside extends Api {[key: string]: TopicClientside}
+export interface ServerTopic extends Topic {[key: string]: ServerMethod}
+export interface ClientTopic extends Topic {[key: string]: ClientMethod}
+
+export interface ServerApi extends Api {[key: string]: ServerTopic}
+export interface ClientApi extends Api {[key: string]: ClientTopic}
 
 //
 
-export interface ApiServerOptions<A extends ApiServerside> {
+export interface ApiServerOptions<A extends ServerApi> {
 	expose: A
 	debug?: boolean
 	logger?: Logger
 }
 
-export interface ApiClientOptions<A extends ApiClientside> {
+export interface ApiClientOptions<A extends Api> {
 	url: string
 	shape: ApiShape<A>
 }
-
-//

@@ -1,9 +1,9 @@
 
 import {DisabledLogger} from "./logging.js"
-import {uncurryApiAugmentation, uncurryTopicAugmentation} from "./curries.js"
-import {Api, ApiServerOptions, ApiServerside, ServerRequest, Topic} from "./types.js"
+import {serverizeApi, serverizeTopic} from "./curries.js"
+import {Api, ApiServerOptions, ServerApi, ServerContext, Topic} from "./types.js"
 
-export async function apiServer<A extends ApiServerside>({
+export async function apiServer<A extends ServerApi>({
 		expose,
 		debug = false,
 		logger = new DisabledLogger,
@@ -13,15 +13,15 @@ export async function apiServer<A extends ApiServerside>({
 	}
 }
 
-const noopAugmentation = async(request: ServerRequest) =>
+const noopAugmentation = async(request: ServerContext) =>
 	async(result: any) => ({result})
 
 export function simpleServerTopic<T extends Topic>(topic: T) {
-	return uncurryTopicAugmentation(noopAugmentation, topic)
+	return serverizeTopic(noopAugmentation, topic)
 }
 
 export function simpleServerApi<A extends Api>(api: A) {
-	return uncurryApiAugmentation(noopAugmentation, api)
+	return serverizeApi(noopAugmentation, api)
 }
 
 // // TODO cjs

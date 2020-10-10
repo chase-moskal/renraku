@@ -1,9 +1,9 @@
 
 import {err} from "../../errors.js"
 import {Order} from "../internal-types.js"
-import {ApiServerside, Logger, Headers} from "../../types.js"
+import {ServerApi, Logger, Headers} from "../../types.js"
 
-export async function apiCall<A extends ApiServerside>({
+export async function apiCall<A extends ServerApi>({
 		id,
 		debug,
 		logger,

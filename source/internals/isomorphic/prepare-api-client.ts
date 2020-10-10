@@ -1,6 +1,6 @@
 
 import {err} from "../../errors.js"
-import {ApiClientside, ClientOptions, Topic, ClientRequest, ClientResponse} from "../../types.js"
+import {ClientApi, ClientOptions, Topic, ClientContext, ClientResponse} from "../../types.js"
 import {SignatureSign, Order} from "../internal-types.js"
 
 import {jsonCall} from "./json-call.js"
@@ -8,7 +8,7 @@ import {jsonCall} from "./json-call.js"
 export const prepareApiClient = ({fetch}: {
 		fetch: typeof window.fetch
 	}) => (
-	function apiClient<A extends ApiClientside>({
+	function apiClient<A extends ClientApi>({
 			url,
 			shape,
 		}: ClientOptions<A>): A {
@@ -22,7 +22,7 @@ export const prepareApiClient = ({fetch}: {
 				if (value === "method") {
 					const func = key
 					client[topic][func] = async(
-						{headers}: ClientRequest,
+						{headers}: ClientContext,
 						...params: any[]
 					): Promise<ClientResponse> => jsonCall({
 						url,

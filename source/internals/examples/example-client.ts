@@ -1,5 +1,5 @@
 
-import {curryApiMeta} from "../../curries.js"
+import {addMetaApi} from "../../curries.js"
 import {ApiToClientside} from "../../types.js"
 import {apiClient, simpleClientApi} from "../../api-client.js"
 
@@ -7,7 +7,7 @@ import {NuclearApi, nuclearShape, NuclearMeta} from "./example-common.js"
 
 export async function exampleClient() {
 
-	const client = curryApiMeta<NuclearApi, NuclearMeta>(
+	const client = addMetaApi<NuclearApi, NuclearMeta>(
 		async() => ({accessToken: "a123"}),
 		simpleClientApi(
 			await apiClient<ApiToClientside<NuclearApi>>({
