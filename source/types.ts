@@ -76,7 +76,9 @@ export type ApiToClientside<A extends Api> = {
 	}
 }
 
-export type Augmentation<Context, Ret> = (context: Context) => Promise<(result: Ret) => Promise<ServerResponse<Ret>>>
+export type Augmentation<Ret> = (request: any) => Promise<
+	(result: Ret) => Promise<ServerResponse<Ret>>
+>
 
 //
 // SHAPES

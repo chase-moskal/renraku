@@ -32,9 +32,9 @@ export function curryApiMeta<A extends Api, Meta>(
 	)
 }
 
-export function curryMethodAugmentation<Args extends any[], Ret>(
+export function curryMethodAugmentation<Args extends any[]>(
 		getRequest: () => Promise<ClientRequest>,
-		processResponse: (response: ClientResponse) => Promise<Ret>,
+		processResponse: (response: ClientResponse) => Promise<any>,
 		method: (request: ClientRequest, ...args: Args) => Promise<ClientResponse>,
 	) {
 	return async(...args: Args) => {
@@ -113,13 +113,12 @@ export function uncurryTopicMeta<
 export function uncurryMethodAugmentation<
 		Request extends ServerRequest,
 		Args extends any[],
-		Ret extends any,
 	>(
-		augmentation: Augmentation<Request, Ret>,
-		method: (...args: Args) => Promise<Ret>,
+		augmentation: Augmentation<Request>,
+		method: (...args: Args) => Promise<any>,
 	) {
 	return async(request: Request, ...args: Args) => {
-		await augmentation(request)
+		const wha = await augmentation(request)
 		return method(...args)
 	}
 }
@@ -127,12 +126,11 @@ export function uncurryMethodAugmentation<
 export function uncurryTopicAugmentation<
 		Req extends ServerRequest,
 		Top extends TopicServerside,
-		Ret,
 	>(
-		augmentation: Augmentation<Req, Ret>,
+		augmentation: Augmentation<Req>,
 		topic: {
 			[P in keyof Top]:
-				(...args: Shift<Parameters<Top[P]>>) => Ret
+				(...args: Shift<Parameters<Top[P]>>) => any
 		},
 	): {
 		[P in keyof Top]:
@@ -147,7 +145,7 @@ export function uncurryTopicAugmentation<
 
 export function uncurryApiAugmentation<
 		A extends Api,
-		Aug extends Augmentation<ServerRequest, any>,
+		Aug extends Augmentation<ServerRequest>,
 	>(
 		augmentation: Aug,
 		api: A,
