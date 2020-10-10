@@ -1,73 +1,16 @@
 
 import {objectMap} from "./internals/object-map.js"
-import {Api, Topic, Shift, CurriedTopicMeta, CurriedApiMeta, TopicServerside, Augmentation, ClientRequest, ClientResponse, CurriedTopicAugmentation, CurriedApiAugmentation} from "./types.js"
+import {Api, Topic, Shift, CurriedMethodMeta, CurriedTopicMeta, CurriedApiMeta, TopicServerside, Augmentation, ClientRequest, ClientResponse, CurriedTopicAugmentation, CurriedApiAugmentation, ServerRequest, Method} from "./types.js"
 
-// BASE
+// CLIENTSIDE
 //
 
-function curryMethodMeta<Meta, Args extends any[], Ret>(
+export function curryMethodMeta<Meta, M extends (meta: Meta, ...args: Args) => Promise<any>, Args extends any[]>(
 		getMeta: () => Promise<Meta>,
-		method: (meta: Meta, ...args: Args) => Promise<Ret>,
+		method: M,
 	) {
 	return async(...args: Args) => method(await getMeta(), ...args)
 }
-
-function curryMethodAugmentation<Args extends any[], Ret>(
-		getRequest: () => Promise<ClientRequest>,
-		processResponse: (response: ClientResponse) => Promise<Ret>,
-		method: (request: ClientRequest, ...args: Args) => Promise<ClientResponse>,
-	) {
-	return async(...args: Args) => {
-		const response = await method(await getRequest(), ...args)
-		return await processResponse(response)
-	}
-}
-
-function methodTransform<
-		Meta,
-		Payload,
-		Transformer extends (meta: Meta) => Promise<Payload>,
-		Method extends (payload: Payload, ...args: Args) => Promise<Ret>,
-		Args extends any[],
-		Ret extends any,
-	>(
-		transformer: Transformer,
-		method: Method,
-	) {
-	return async(meta: Meta, ...args: Args) => {
-		const payload = await transformer(meta)
-		return method(payload, ...args)
-	}
-}
-
-function methodAugment<
-		Context,
-		Aug extends Augmentation<Context, Ret>,
-		Method extends (...args: Args) => Promise<Ret>,
-		Args extends any[],
-		Ret extends any,
-	>(
-		augmentation: Aug,
-		method: Method,
-	) {
-	return async(context: Context, ...args: Args) => {
-		await augmentation(context)
-		return method(...args)
-	}
-}
-
-
-// SERVER
-//
-
-// CLIENT
-//
-
-
-
-
-// curry functions
-//
 
 export function curryTopicMeta<T extends Topic, Meta>(
 		getMeta: () => Promise<Meta>,
@@ -85,8 +28,19 @@ export function curryApiMeta<A extends Api, Meta>(
 	): CurriedApiMeta<A> {
 	return objectMap<A, CurriedApiMeta<A>>(
 		api,
-		topic => curryTopicMeta(getMeta, topic)
+		topic => curryTopicMeta(getMeta, topic),
 	)
+}
+
+export function curryMethodAugmentation<Args extends any[], Ret>(
+		getRequest: () => Promise<ClientRequest>,
+		processResponse: (response: ClientResponse) => Promise<Ret>,
+		method: (request: ClientRequest, ...args: Args) => Promise<ClientResponse>,
+	) {
+	return async(...args: Args) => {
+		const response = await method(await getRequest(), ...args)
+		return await processResponse(response)
+	}
 }
 
 export function curryTopicAugmentation<T extends Topic>(
@@ -119,58 +73,86 @@ export function curryApiAugmentation<A extends Api>(
 	)
 }
 
-export function augmentTopic<
-		Context,
-		XTopic extends TopicServerside,
-		Ret,
-		Aug extends Augmentation<Context, Ret>,
-	>(
-		augmentation: Aug,
-		topic: {
-			[P in keyof XTopic]:
-				(...args: Shift<Parameters<XTopic[P]>>) => Ret
-		},
-	): {
-		[P in keyof XTopic]:
-			(context: Context, ...args: Shift<Parameters<XTopic[P]>>) =>
-				ReturnType<XTopic[P]>
-	} {
-	return objectMap(
-		topic,
-		method => methodAugment(augmentation, method),
-	)
-}
+// SERVERSIDE
+//
 
-export function augmentApi<
-		A extends Api,
-		Aug extends Augmentation<Context, Ret>,
-		Context,
-		Ret
-	>(
-		augmentation: Aug,
-		api: A,
-	) {
-	return objectMap(api, topic => augmentTopic(augmentation, topic))
-}
-
-export function topicTransform<
+export function uncurryMethodMeta<
 		Meta,
 		Payload,
-		PTopic extends {
+		Args extends any[],
+	>(
+		transformer: (meta: Meta) => Promise<Payload>,
+		method: (payload: Payload, ...args: Args) => Promise<any>,
+	) {
+	return async(meta: Meta, ...args: Args) => {
+		const payload = await transformer(meta)
+		return method(payload, ...args)
+	}
+}
+
+export function uncurryTopicMeta<
+		Meta,
+		Payload,
+		Top extends {
 			[key: string]: (payload: Payload, ...args: any[]) => Promise<any>
 		},
 	>(
 		transformer: (meta: Meta) => Promise<Payload>,
-		topic: PTopic,
+		topic: Top,
 	): {
-		[P in keyof PTopic]: (
+		[P in keyof Top]: (
 			meta: Meta,
-			...args: Shift<Parameters<PTopic[P]>>
-		) => ReturnType<PTopic[P]>
+			...args: Shift<Parameters<Top[P]>>
+		) => ReturnType<Top[P]>
 	} {
 	return objectMap(topic, method => {
-		return methodTransform(transformer, method)
+		return uncurryMethodMeta(transformer, method)
 	})
+}
+
+export function uncurryMethodAugmentation<
+		Request extends ServerRequest,
+		Args extends any[],
+		Ret extends any,
+	>(
+		augmentation: Augmentation<Request, Ret>,
+		method: (...args: Args) => Promise<Ret>,
+	) {
+	return async(request: Request, ...args: Args) => {
+		await augmentation(request)
+		return method(...args)
+	}
+}
+
+export function uncurryTopicAugmentation<
+		Req extends ServerRequest,
+		Top extends TopicServerside,
+		Ret,
+	>(
+		augmentation: Augmentation<Req, Ret>,
+		topic: {
+			[P in keyof Top]:
+				(...args: Shift<Parameters<Top[P]>>) => Ret
+		},
+	): {
+		[P in keyof Top]:
+			(request: Req, ...args: Shift<Parameters<Top[P]>>) =>
+				ReturnType<Top[P]>
+	} {
+	return objectMap(
+		topic,
+		method => uncurryMethodAugmentation(augmentation, method),
+	)
+}
+
+export function uncurryApiAugmentation<
+		A extends Api,
+		Aug extends Augmentation<ServerRequest, any>,
+	>(
+		augmentation: Aug,
+		api: A,
+	) {
+	return objectMap(api, topic => uncurryTopicAugmentation(augmentation, topic))
 }
 
 // method curries

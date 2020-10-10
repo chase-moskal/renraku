@@ -30,6 +30,8 @@ export type Shift<T extends any[]> = T["length"] extends 0
 	? undefined
 	: (((...b: T) => void) extends (a: any, ...b: infer I) => void ? I : [])
 
+// meta
+
 export type CurriedMethodMeta<M extends Method> =
 	(...args: Shift<Parameters<M>>) => ReturnType<M>
 
@@ -40,6 +42,19 @@ export type CurriedTopicMeta<T extends Topic> = {
 export type CurriedApiMeta<A extends Api> = {
 	[P in keyof A]: CurriedTopicMeta<A[P]>
 }
+
+export type UncurriedMethodMeta<Meta, M extends Method> =
+	(meta: Meta, ...args: Parameters<M>) => ReturnType<M>
+
+export type UncurriedTopicMeta<Meta, T extends Topic> = {
+	[P in keyof T]: UncurriedMethodMeta<Meta, T[P]>
+}
+
+export type UncurriedApiMeta<Meta, A extends Api> = {
+	[P in keyof A]: UncurriedTopicMeta<Meta, A[P]>
+}
+
+// augmentation
 
 export type CurriedMethodAugmentation<M extends ClientMethod> =
 	(...args: Shift<Parameters<M>>) => Promise<Await<ReturnType<M>>["result"]>

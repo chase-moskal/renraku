@@ -1,6 +1,6 @@
 
 import {DisabledLogger} from "./logging.js"
-import {augmentApi, augmentTopic} from "./curries.js"
+import {uncurryApiAugmentation, uncurryTopicAugmentation} from "./curries.js"
 import {Api, ApiServerOptions, ApiServerside, ServerRequest, Topic} from "./types.js"
 
 export async function apiServer<A extends ApiServerside>({
@@ -16,15 +16,12 @@ export async function apiServer<A extends ApiServerside>({
 const noopAugmentation = async(request: ServerRequest) =>
 	async(result: any) => ({result})
 
-export function simpleTopic<T extends Topic>(topic: T) {
-	return augmentTopic(
-		noopAugmentation,
-		topic,
-	)
+export function simpleServerTopic<T extends Topic>(topic: T) {
+	return uncurryTopicAugmentation(noopAugmentation, topic)
 }
 
-export function simpleApi<A extends Api>(api: A) {
-	return augmentApi(noopAugmentation, api)
+export function simpleServerApi<A extends Api>(api: A) {
+	return uncurryApiAugmentation(noopAugmentation, api)
 }
 
 // // TODO cjs
