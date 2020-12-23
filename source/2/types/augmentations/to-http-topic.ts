@@ -1,6 +1,6 @@
 
-import {Topic} from "../primitive/topic.js"
-import {Procedure} from "../primitive/procedure.js"
+import {Topic} from "../primitives/topic.js"
+import {Procedure} from "../primitives/procedure.js"
 import {ToHttpProcedure} from "./to-http-procedure.js"
 
 export type ToHttpTopic<xAuth extends any, xTopic extends Topic<any>> = {

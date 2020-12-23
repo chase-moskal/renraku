@@ -1,7 +1,7 @@
 
-import {asTopic} from "./identity/as-topic.js"
-import {toHttpTopic} from "./augment/to-http-topic.js"
-import {jsonResponse} from "./response/json-response.js"
+import {asTopic} from "./identities/as-topic.js"
+import {toHttpTopic} from "./augmentations/to-http-topic.js"
+import {jsonResponse} from "./responses/json-response.js"
 
 type MyAuth = {token: string}
 type MyMeta = {access: {user: {}}}

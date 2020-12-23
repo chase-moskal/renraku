@@ -1,9 +1,9 @@
 
-import {objectMap} from "../tool/object-map.js"
-import {Topic} from "../types/primitive/topic.js"
-import {Procedure} from "../types/primitive/procedure.js"
-import {ToHttpTopic} from "../types/augment/to-http-topic.js"
+import {objectMap} from "../tools/object-map.js"
+import {Topic} from "../types/primitives/topic.js"
+import {Procedure} from "../types/primitives/procedure.js"
 import {HttpProcedure} from "../types/http/http-procedure.js"
+import {ToHttpTopic} from "../types/augmentations/to-http-topic.js"
 
 export function toHttpTopic<xAuth, xMeta>() {
 	return function<xTopic extends Topic<xMeta>>({topic, augmentor}: {

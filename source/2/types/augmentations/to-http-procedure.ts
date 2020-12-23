@@ -1,7 +1,7 @@
 
-import {DropFirst} from "../tool/drop-first.js"
-import {Procedure} from "../primitive/procedure.js"
+import {DropFirst} from "../tools/drop-first.js"
 import {HttpRequest} from "../http/http-request.js"
+import {Procedure} from "../primitives/procedure.js"
 import {HttpResponse} from "../http/http-response.js"
 
 export type ToHttpProcedure<xAuth, xProcedure extends Procedure<any, any[], any>> = (
