@@ -1,5 +1,5 @@
 
-export type Method<
+export type Procedure<
 		xMeta extends any,
 		xArgs extends any[],
 		xResult extends any,

@@ -1,6 +1,6 @@
 
-import {Method} from "./method.js"
+import {Procedure} from "./procedure.js"
 
 export type Topic<xMeta> = {
-	[key: string]: Topic<xMeta> | Method<xMeta, any[], any>
+	[key: string]: Topic<xMeta> | Procedure<xMeta, any[], any>
 }
