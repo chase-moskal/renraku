@@ -11,6 +11,7 @@ export const jsonRpcResponder: Responder<HttpResponse> = {
 	resultResponse: (requestId, result) => ({
 		contentType,
 		status: 200,
+		headers: {},
 		body: JSON.stringify({
 			jsonrpc,
 			id: requestId,
@@ -21,6 +22,7 @@ export const jsonRpcResponder: Responder<HttpResponse> = {
 	errorResponse: (requestId, error) => ({
 		contentType,
 		status: error.code,
+		headers: {},
 		body: JSON.stringify({
 			jsonrpc,
 			id: requestId,

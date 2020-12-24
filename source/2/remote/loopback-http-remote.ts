@@ -7,22 +7,23 @@ import {ToShape} from "../types/primitives/to-shape.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {HttpResponse} from "../types/http/http-response.js"
 import {httpJsonRpcRequest} from "../jsonrpc/http-json-rpc-request.js"
+import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 
 export function loopbackHttpRemote<xAuth, xTopic extends Topic<any>>({
-		link,
+		path,
 		shape,
-		origin,
+		headers,
 		api,
 		getAuth,
 	}: {
-		link: string
-		origin: string
+		path: string
 		shape: ToShape<xTopic>
+		headers: HttpRequestHeaders
 		api: Api<HttpRequest, HttpResponse>
 		getAuth: GetAuth<xAuth>
 	}) {
 	return makeRemote({
-		link,
+		link: origin + path,
 		shape,
 		getAuth,
 		requester: async({
@@ -30,10 +31,11 @@ export function loopbackHttpRemote<xAuth, xTopic extends Topic<any>>({
 				auth,
 				specifier,
 			}) => api(httpJsonRpcRequest<xAuth>({
+			path,
+			headers,
+			specifier,
 			auth,
 			args,
-			origin,
-			specifier,
 		})),
 	})
 }

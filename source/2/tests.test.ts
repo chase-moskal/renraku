@@ -12,6 +12,7 @@ import {jsonRpcResponder} from "./jsonrpc/json-rpc-responder.js"
 import {loopbackHttpRemote} from "./remote/loopback-http-remote.js"
 import {httpJsonRpcRequest} from "./jsonrpc/http-json-rpc-request.js"
 
+const path = "/"
 const originGood = "http://localhost:5000"
 
 export default <Suite>{
@@ -51,18 +52,19 @@ export default <Suite>{
 
 		// manually execute api
 		const directResult = await api(httpJsonRpcRequest<MyAuth>({
+			path,
+			headers: {origin: originGood},
+			specifier: "math.sum",
 			auth: {token: "a123"},
 			args: [2, 3],
-			specifier: "math.sum",
-			origin: originGood,
 		}))
 		assert(directResult, "direct result should be returned")
 
 		// remote execution
 		const remote = loopbackHttpRemote<MyAuth, MyTopic>({
-			link: "",
-			origin: "",
+			path,
 			shape: myShape,
+			headers: {origin: originGood},
 			api,
 			getAuth: async() => ({token: "a123"}),
 		})
