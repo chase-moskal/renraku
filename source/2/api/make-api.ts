@@ -2,12 +2,12 @@
 import {ApiError} from "./api-error.js"
 import {obtain} from "../tools/obtain.js"
 import {Topic} from "../types/primitives/topic.js"
+import {JsonRpcId} from "../types/jsonrpc/json-rpc-id.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {Procedure} from "../types/primitives/procedure.js"
 import {HttpResponse} from "../types/http/http-response.js"
-import {HttpResponder} from "../types/http/http-responder.js"
-import {respondJsonError} from "../responses/respond-json-error.js"
 import {RequestParser} from "../types/api/request-parser.js"
+import {HttpResponder} from "../types/http/http-responder.js"
 import {RequestAuthorizer} from "../types/api/request-authorizer.js"
 
 export function makeApi<xAuth, xMeta>({topic, parse, authorize, responder}: {
@@ -17,8 +17,10 @@ export function makeApi<xAuth, xMeta>({topic, parse, authorize, responder}: {
 		authorize: RequestAuthorizer<xAuth, xMeta>
 	}) {
 	return async function executeProcedure(request: HttpRequest): Promise<HttpResponse> {
+		let errorRequestId: JsonRpcId = undefined
 		try {
 			const {requestId, specifier, auth, args} = parse(request)
+			errorRequestId = requestId
 			const meta = await authorize(request, auth)
 			const procedure: Procedure<any, any[], any> = obtain(specifier, topic)
 			const result = await procedure(meta, ...args)
@@ -26,7 +28,7 @@ export function makeApi<xAuth, xMeta>({topic, parse, authorize, responder}: {
 		}
 		catch (error) {
 			if (error instanceof ApiError) {
-				return respondJsonError(error.code, error.message)
+				return responder.errorResponse(errorRequestId, error)
 			}
 			else {
 				throw new ApiError(500, "error")

@@ -6,5 +6,10 @@ export function parseJsonRpc(request: HttpRequest) {
 	const {id, method, params}: JsonRpcRequest = JSON.parse(request.body)
 	const specifier = method
 	const [auth, ...args] = params
-	return {requestId: id, specifier, auth, args}
+	return {
+		requestId: id,
+		specifier,
+		auth,
+		args,
+	}
 }

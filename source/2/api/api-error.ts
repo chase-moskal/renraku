@@ -7,7 +7,3 @@ export class ApiError extends Error {
 		this.code = code
 	}
 }
-
-export function apiError(code: number, message: string) {
-	return new ApiError(code, message)
-}

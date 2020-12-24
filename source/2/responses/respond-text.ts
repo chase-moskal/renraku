@@ -1,10 +1,10 @@
 
-import {HttpResponse} from "../types/http/http-response.js"
+// import {HttpResponse} from "../types/http/http-response.js"
 
-export function respondText(text: string): HttpResponse {
-	return {
-		body: text,
-		status: 200,
-		contentType: "text/plain",
-	}
-}
+// export function respondText(text: string): HttpResponse {
+// 	return {
+// 		body: text,
+// 		status: 200,
+// 		contentType: "text/plain",
+// 	}
+// }
