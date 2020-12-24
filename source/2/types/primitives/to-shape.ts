@@ -1,6 +1,6 @@
 
-import {Topic} from "../primitives/topic.js"
-import {Procedure} from "../primitives/procedure.js"
+import {Topic} from "./topic.js"
+import {Procedure} from "./procedure.js"
 
 export type ToShape<xTopic extends Topic<any>> = {
 	[P in keyof xTopic]: xTopic[P] extends Topic<any>

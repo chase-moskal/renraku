@@ -4,7 +4,7 @@ import {Suite, assert} from "cynic"
 import {makeApi} from "./api/make-api.js"
 import {asTopic} from "./identities/as-topic.js"
 import {parseJsonRpc} from "./jsonrpc/parse-json-rpc.js"
-import {ToShape} from "./types/augmentations/to-shape.js"
+import {ToShape} from "./types/primitives/to-shape.js"
 import {jsonRpcResponder} from "./jsonrpc/json-rpc-responder.js"
 import {JsonRpcRequest} from "./types/jsonrpc/json-rpc-request.js"
 

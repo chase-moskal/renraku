@@ -1,7 +1,7 @@
 
 export function objectMap<Input extends {}, Output extends {}>(
 		input: Input,
-		mapper: (value: any, key: string) => any
+		mapper: (value: any, key: string) => any,
 	): Output {
 
 	const output: any = {}
