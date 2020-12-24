@@ -3,20 +3,19 @@ import {ApiError} from "./api-error.js"
 import {obtain} from "../tools/obtain.js"
 import {Topic} from "../types/primitives/topic.js"
 import {JsonRpcId} from "../types/jsonrpc/json-rpc-id.js"
-import {HttpRequest} from "../types/http/http-request.js"
 import {Procedure} from "../types/primitives/procedure.js"
 import {HttpResponse} from "../types/http/http-response.js"
 import {RequestParser} from "../types/api/request-parser.js"
 import {HttpResponder} from "../types/http/http-responder.js"
 import {RequestAuthorizer} from "../types/api/request-authorizer.js"
 
-export function makeApi<xAuth, xMeta>({topic, parse, authorize, responder}: {
+export function makeApi<xRequest, xAuth, xMeta>({topic, parse, authorize, responder}: {
 		topic: Topic<any>
 		responder: HttpResponder
-		parse: RequestParser<xAuth>
-		authorize: RequestAuthorizer<xAuth, xMeta>
+		parse: RequestParser<xRequest, xAuth>
+		authorize: RequestAuthorizer<xRequest, xAuth, xMeta>
 	}) {
-	return async function executeProcedure(request: HttpRequest): Promise<HttpResponse> {
+	return async function executeProcedure(request: xRequest): Promise<HttpResponse> {
 		let errorRequestId: JsonRpcId = undefined
 		try {
 			const {requestId, specifier, auth, args} = parse(request)

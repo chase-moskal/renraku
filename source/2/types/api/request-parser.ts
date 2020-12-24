@@ -1,8 +1,7 @@
 
 import {JsonRpcId} from "../jsonrpc/json-rpc-id.js"
-import {HttpRequest} from "../http/http-request.js"
 
-export type RequestParser<xAuth> = (request: HttpRequest) => {
+export type RequestParser<xRequest, xAuth> = (request: xRequest) => {
 	requestId: JsonRpcId,
 	specifier: string,
 	auth: xAuth,

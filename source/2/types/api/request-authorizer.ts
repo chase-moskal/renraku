@@ -1,7 +1,5 @@
 
-import {HttpRequest} from "../http/http-request.js"
-
-export type RequestAuthorizer<xAuth, xMeta> = (
-	request: HttpRequest,
+export type RequestAuthorizer<xRequest, xAuth, xMeta> = (
+	request: xRequest,
 	auth: xAuth,
 ) => Promise<xMeta>
