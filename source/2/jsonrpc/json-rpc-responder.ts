@@ -1,11 +1,13 @@
 
-import {HttpResponder} from "../types/http/http-responder.js"
+import {Responder} from "../types/api/responder.js"
+import {HttpResponse} from "../types/http/http-response.js"
 
 const jsonrpc = "2.0"
 const errorCode = -32000
 const contentType = "application/json"
 
-export const jsonRpcResponder = (): HttpResponder => ({
+export const jsonRpcResponder: Responder<HttpResponse> = {
+
 	resultResponse: (requestId, result) => ({
 		contentType,
 		status: 200,
@@ -15,6 +17,7 @@ export const jsonRpcResponder = (): HttpResponder => ({
 			result,
 		}),
 	}),
+
 	errorResponse: (requestId, error) => ({
 		contentType,
 		status: error.code,
@@ -27,4 +30,4 @@ export const jsonRpcResponder = (): HttpResponder => ({
 			},
 		}),
 	}),
-})
+}
