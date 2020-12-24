@@ -1,9 +1,9 @@
 
 import {HttpResponse} from "../types/http/http-response.js"
 
-export function errorResponse(code: number, error: string): HttpResponse {
+export function respondTextError(code: number, message: string): HttpResponse {
 	return {
-		body: error,
+		body: message,
 		status: code,
 		contentType: "text/plain",
 	}

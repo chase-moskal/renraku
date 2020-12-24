@@ -8,7 +8,7 @@ import {ToHttpTopic} from "../types/augmentations/to-http-topic.js"
 export function toHttpTopic<xAuth, xMeta>() {
 	return function<xTopic extends Topic<xMeta>>({topic, augmentor}: {
 			topic: xTopic,
-			augmentor: (method: Procedure<xMeta, any[], any>) => HttpProcedure<xAuth>,
+			augmentor: (method: Procedure<xMeta, any[], any>) => Promise<HttpProcedure<xAuth>>,
 		}): ToHttpTopic<xAuth, xTopic> {
 
 		return objectMap(topic, (value, key) => {

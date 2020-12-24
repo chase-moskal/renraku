@@ -1,7 +1,7 @@
 
 import {HttpResponse} from "../types/http/http-response.js"
 
-export function textResponse(text: string): HttpResponse {
+export function respondText(text: string): HttpResponse {
 	return {
 		body: text,
 		status: 200,
