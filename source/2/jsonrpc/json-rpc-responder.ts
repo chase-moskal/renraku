@@ -1,18 +1,23 @@
 
 import {Responder} from "../types/api/responder.js"
 import {HttpResponse} from "../types/http/http-response.js"
+import {JsonResponseError} from "../types/jsonrpc/json-response-error.js"
+import {JsonResponseResult} from "../types/jsonrpc/json-response-result.js"
+
+import {contentTypeJson} from "./content-type-json.js"
 
 const jsonrpc = "2.0"
 const errorCode = -32000
-const contentType = "application/json"
 
 export const jsonRpcResponder: Responder<HttpResponse> = {
 
 	resultResponse: (requestId, result) => ({
-		contentType,
+		contentType: contentTypeJson,
 		status: 200,
-		headers: {},
-		body: JSON.stringify({
+		headers: {
+			"Content-Type": contentTypeJson,
+		},
+		body: JSON.stringify(<JsonResponseResult>{
 			jsonrpc,
 			id: requestId,
 			result,
@@ -20,10 +25,12 @@ export const jsonRpcResponder: Responder<HttpResponse> = {
 	}),
 
 	errorResponse: (requestId, error) => ({
-		contentType,
+		contentType: contentTypeJson,
 		status: error.code,
-		headers: {},
-		body: JSON.stringify({
+		headers: {
+			"Content-Type": contentTypeJson,
+		},
+		body: JSON.stringify(<JsonResponseError>{
 			jsonrpc,
 			id: requestId,
 			error: {

@@ -9,21 +9,21 @@ import {HttpResponse} from "../types/http/http-response.js"
 import {httpJsonRpcRequest} from "../jsonrpc/http-json-rpc-request.js"
 import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 
-export function loopbackHttpRemote<xAuth, xTopic extends Topic<any>>({
-		path,
+export function loopbackJsonRemote<xAuth, xTopic extends Topic<any>>({
+		link,
 		shape,
 		headers,
 		api,
 		getAuth,
 	}: {
-		path: string
+		link: string
 		shape: ToShape<xTopic>
 		headers: HttpRequestHeaders
 		api: Api<HttpRequest, HttpResponse>
 		getAuth: GetAuth<xAuth>
 	}) {
 	return makeRemote({
-		link: origin + path,
+		link,
 		shape,
 		getAuth,
 		requester: async({
@@ -31,7 +31,7 @@ export function loopbackHttpRemote<xAuth, xTopic extends Topic<any>>({
 				auth,
 				specifier,
 			}) => api(httpJsonRpcRequest<xAuth>({
-			path,
+			link,
 			headers,
 			specifier,
 			auth,

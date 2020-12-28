@@ -1,9 +1,8 @@
 
-import {HttpResponseHeaders} from "./http-request-response.js"
+import {HttpResponseHeaders} from "./http-response-headers.js"
 
 export type HttpResponse = {
 	body: string
 	status: number
-	contentType: string
 	headers: HttpResponseHeaders
 }

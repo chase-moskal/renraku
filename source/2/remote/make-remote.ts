@@ -21,7 +21,9 @@ export function makeRemote<xAuth, xTopic extends Topic<any>>({
 	}): ToRemote<xTopic> {
 
 	return objectMap(shape, (value, key) => {
-		const subSpecifier = specifier + "." + key
+		const subSpecifier = specifier
+			? specifier + "." + key
+			: key
 
 		if (value === true) {
 			return async(...args: any[]) => {

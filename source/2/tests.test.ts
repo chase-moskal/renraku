@@ -6,14 +6,15 @@ import {ApiError} from "./api/api-error.js"
 import {asTopic} from "./identities/as-topic.js"
 import {ToShape} from "./types/primitives/to-shape.js"
 import {HttpRequest} from "./types/http/http-request.js"
-import {parseJsonRpc} from "./jsonrpc/parse-json-rpc.js"
+import {parseJsonRequest} from "./jsonrpc/parse-json-request.js"
 import {HttpResponse} from "./types/http/http-response.js"
 import {jsonRpcResponder} from "./jsonrpc/json-rpc-responder.js"
-import {loopbackHttpRemote} from "./remote/loopback-http-remote.js"
+import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 import {httpJsonRpcRequest} from "./jsonrpc/http-json-rpc-request.js"
+import { contentTypeJson } from "./jsonrpc/content-type-json.js"
 
-const path = "/"
-const originGood = "http://localhost:5000"
+const goodLink = "http://localhost:5000/"
+const {origin: goodOrigin, pathname: goodPath} = new URL(goodLink)
 
 export default <Suite>{
 	"make an api and execute a procedure": async() => {
@@ -41,10 +42,10 @@ export default <Suite>{
 		// serverside api
 		const api = makeApi<HttpRequest, HttpResponse, MyAuth, MyMeta>({
 			expose: makeMyTopic(),
-			parse: parseJsonRpc,
+			parse: parseJsonRequest,
 			authorize: async(request, auth) => {
-				apiAssertion(request.headers.origin !== originGood, `forbidden origin "${request.headers.origin}"`)
-				apiAssertion(!auth.token, `invalid token`)
+				apiAssertion(request.headers.origin == goodOrigin, `forbidden origin "${request.headers.origin}"`)
+				apiAssertion(!!auth.token, `invalid token`)
 				return {access: {user: {}}}
 			},
 			responder: jsonRpcResponder,
@@ -52,19 +53,23 @@ export default <Suite>{
 
 		// manually execute api
 		const directResult = await api(httpJsonRpcRequest<MyAuth>({
-			path,
-			headers: {origin: originGood},
+			link: goodLink,
+			headers: {"Content-Type": contentTypeJson},
 			specifier: "math.sum",
 			auth: {token: "a123"},
 			args: [2, 3],
 		}))
 		assert(directResult, "direct result should be returned")
 
+		debugger
+
 		// remote execution
-		const remote = loopbackHttpRemote<MyAuth, MyTopic>({
-			path,
+		const remote = loopbackJsonRemote<MyAuth, MyTopic>({
+			link: goodLink,
 			shape: myShape,
-			headers: {origin: originGood},
+			headers: {
+				"Origin": goodOrigin,
+			},
 			api,
 			getAuth: async() => ({token: "a123"}),
 		})
