@@ -15,6 +15,7 @@ export function makeApi<xRequest, xResponse, xAuth, xMeta>({expose, responder, p
 		parse: RequestParser<xRequest, xAuth>
 		authorize: RequestAuthorizer<xRequest, xAuth, xMeta>
 	}): Api<xRequest, xResponse> {
+
 	return async function api(request: xRequest): Promise<xResponse> {
 		let errorRequestId: JsonRpcId = undefined
 		try {

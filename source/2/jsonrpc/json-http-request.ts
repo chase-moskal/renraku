@@ -1,11 +1,12 @@
 
+import {contentTypeJson} from "./content-type-json.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {JsonRequest} from "../types/jsonrpc/json-request.js"
 import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 
-export function httpJsonRpcRequest<xAuth>({link, headers, specifier, auth, args}: {
+export function jsonHttpRequest<xAuth>({link, headers, specifier, auth, args}: {
 		link: string
-		headers: HttpRequestHeaders
+		headers: Partial<HttpRequestHeaders>
 		specifier: string
 		auth: xAuth
 		args: any[]
@@ -17,7 +18,8 @@ export function httpJsonRpcRequest<xAuth>({link, headers, specifier, auth, args}
 		method: "post",
 		path: pathname,
 		headers: {
-			origin,
+			"Origin": origin,
+			"Content-Type": contentTypeJson,
 			...headers,
 		},
 		body: JSON.stringify(<JsonRequest>{

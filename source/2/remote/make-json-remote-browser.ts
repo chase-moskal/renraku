@@ -3,11 +3,13 @@ import {makeRemote} from "./make-remote.js"
 import {Topic} from "../types/primitives/topic.js"
 import {GetAuth} from "../types/remote/get-auth.js"
 import {ToShape} from "../types/primitives/to-shape.js"
-import {makeFetchJsonRequester} from "./requesters/make-fetch-json-requester.js"
+import {makeJsonRequester} from "./requesters/make-fetch-json-requester.js"
+import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 
-export function makeJsonRemoteBrowser<xAuth, xTopic extends Topic<any>>({link, shape, getAuth}: {
+export function makeJsonRemoteBrowser<xAuth, xTopic extends Topic<any>>({link, shape, headers, getAuth}: {
 		link: string
 		shape: ToShape<xTopic>
+		headers: Partial<HttpRequestHeaders>
 		getAuth: GetAuth<xAuth>
 	}) {
 
@@ -15,6 +17,9 @@ export function makeJsonRemoteBrowser<xAuth, xTopic extends Topic<any>>({link, s
 		link,
 		shape,
 		getAuth,
-		requester: makeFetchJsonRequester({fetch: window.fetch}),
+		requester: makeJsonRequester({
+			headers,
+			fetch: window.fetch,
+		}),
 	})
 }
