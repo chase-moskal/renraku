@@ -1,4 +1,4 @@
 
 *.pem
-/dist*
+/x*
 /node_modules

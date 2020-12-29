@@ -5,7 +5,8 @@
 			"type": "node",
 			"request": "launch",
 			"name": "debug",
-			"program": "${workspaceFolder}/debug",
+			"program": "${workspaceFolder}/node_modules/cynic/x/cli.js",
+			"args": ["node x/tests.test.js"],
 			"stopOnEntry": true
 		}
 	]
