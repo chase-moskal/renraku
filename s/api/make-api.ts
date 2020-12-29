@@ -10,7 +10,7 @@ import {RequestParser} from "../types/api/request-parser.js"
 import {RequestAuthorizer} from "../types/api/request-authorizer.js"
 
 export function makeApi<xRequest, xResponse, xAuth, xMeta>({expose, responder, parse, authorize}: {
-		expose: Topic<any>
+		expose: Topic<xMeta>
 		responder: Responder<xResponse>
 		parse: RequestParser<xRequest, xAuth>
 		authorize: RequestAuthorizer<xRequest, xAuth, xMeta>

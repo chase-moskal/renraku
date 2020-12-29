@@ -1,176 +1,128 @@
 
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
-🔆 typescript api library of the future  
-&nbsp; &nbsp; 🌐 elegantly make or use json rpc api's  
-&nbsp; &nbsp; 📡 isomorphic client works in node and browsers  
+🔆 library for making elegant apis to power web apps  
+&nbsp; &nbsp; &nbsp; 📡 typescript and node oriented  
+&nbsp; &nbsp; &nbsp; 🌐 json rpc compliant for interop  
 
-🧠 genius-level decoupled architecture  
-&nbsp; &nbsp; 🛎️ expose async functions on json rpc endpoints  
-&nbsp; &nbsp; 🎭 shapeshifting api clients impersonate implementations  
-&nbsp; &nbsp; 🛠️ advanced curries for auth and more  
+🧠 futuristic decoupled approach  
+&nbsp; &nbsp; &nbsp; 🛎️ expose simple groups of async functions as api topics  
+&nbsp; &nbsp; &nbsp; 🎭 shapeshifting api client objects, called "remotes", impersonate your exposed apis  
+&nbsp; &nbsp; &nbsp; 🛠️ feature completeness and capability over simplicity  
 
-🛡 straightforward security model  
-&nbsp; &nbsp; 🔓 cors rules for public endpoints  
-&nbsp; &nbsp; 🔒 public key whitelist for signed requests  
+🛡 auth processing and security policies  
+&nbsp; &nbsp; &nbsp; 🔓 c public apis  
+&nbsp; &nbsp; &nbsp; 🔒 easy to customize auth processing  
 
-## RENRAKU'S SCHOOL ON WEB API BEST PRACTICES
+🚧 **TODO**  
+&nbsp; &nbsp; &nbsp; ⚠️ multiple apis per server, or alt auth for subtopics  
+&nbsp; &nbsp; &nbsp; ⚠️ simple node http server handles cors preflights  
+&nbsp; &nbsp; &nbsp; ⚠️ prefab auth policy for simple cors origin whitelisting  
+&nbsp; &nbsp; &nbsp; ⚠️ koa middleware  
+&nbsp; &nbsp; &nbsp; ⚠️ express middleware  
+&nbsp; &nbsp; &nbsp; ⚠️ working fullstack example  
+&nbsp; &nbsp; &nbsp; ⚠️ complete tutorial: auth section, and promote decoupled architecture  
 
-- renraku began with the principal: *"a good api library should simply disappear".* api libraries should abstract away the api details to such a degree that calling remote methods looks the same as calling local methods
-- here we explain renraku by sharing the lessons learned while developing and using renraku privately for years
+## ⛩️ RENRAKU LESSON ONE — MAKE A PUBLIC API, AND CALL IT
 
-### ⛩️ RENRAKU LESSON ONE — *wisdom is knowing the right path to take*
+renraku tries to be as simple as possible. but no simpler.  
+it's designed with auth in mind, but let's ignore that for now to keep our first examples simpler
 
-- traditionally to call an api, you'll often find a nasty old pattern along these lines:
-  ```js
-  // ugly and bad: don't make direct api calls like this
-  const details = await api.apiCall("userTopic.getDetails", userId)
-   //                        ↑             ↑
-   //    [library coupling, gross!]   [string literal, yuck!]
-  ```
-- **introducing *RENRAKU!***  
-  ```js
-  // natural and enlightened
-  const details = await userTopic.getDetails(userId)
-  ```
-  of course. renraku's first motivation was to "abstract away" the api library like this.  
-  but as you'll see, renraku grew as set of typescript practices and tools sprouting from this idea
+&nbsp; &nbsp; **node api server**
 
-### ⛩️ RENRAKU LESSON TWO — *life is suffering, but ignorance is bliss*
-
-- with renraku, we divide our ***backend*** business logic into "topic" implementation objects.  
-  topics can only have async functions as members
+- first, we formalize our api's business logic into "topics"  
+  &nbsp; &nbsp; *~ make-math-topic.ts ~*
   ```ts
-  import {asTopic} from "renraku/dist/interfaces.js"
+  import {asTopic} from "renraku/x/identities/as-topic.js"
 
-  // "user" topic implementation.
-  // let's pretend this has important business logic
-  export const makeUserTopic = () => asTopic({
-   //                                  ↑
-   //    (asTopic merely ensures the methods are async)
+   // formalized api topic allows us to leverage typescipt magic
+   //          ↓                     ↓
+  export const makeMathTopic = () => asTopic<{}>()({
+   //                                        ↑  ↑
+   // skipping auth rules for now, don't worry about it
 
-    // topics can only have async methods
-    async getDetails(userId: string) {
-      return {time: Date.now()}
-    },
+     // you can group functions together arbitrarily, recursively
+     //  ↓
+    arithmetic: {
 
-    // another async method
-    async setNickname(userId: string, nickname: string) {
-      return void
-    },
-  })
+       // async functions will be exposed on the api
+       //   ↓
+      async sum(meta, x: number, y: number) {
+       //       ↑
+       // meta is reserved for auth stuff, ignore this for now
 
-  // infer user topic interface
-  export type UserTopic = ReturnType<typeof makeUserTopic>
-  ```
-- then we design our ***frontend*** systems to accept the topic *interfaces*
-  ```js
-  export const makeFrontSystem = ({userTopic}: {userTopic: UserTopic}) => ({
-     //                                          ↑
-     //                          (accepting a topic interface...
-     //                           it might be an implementaton,
-     //                           or an api-client,
-     //                           or just some mocks for testing..
-     //                           it doesn't matter to us here)
-
-    async uiAction(userId: string) {
-
-      // call topic method
-      const details = await userTopic.getDetails(userId)
-    },
-  })
-  ```
-- of course, this general decoupling pattern offers flexibility, testability, mockability, and portability, and is wise for most any system
-- and renraku's philosophy relies on it. next we'll use renraku to bridge the gap between backend and frontend systems like these
-
-### ⛩️ RENRAKU LESSON THREE — *api clients should be shapeshifters*
-
-- on the ***serverside,*** we use renraku `apiServer` to create a node server and expose topic implementations.  
-  security rules like cors can be set for each topic
-  ```ts
-  import {UserTopic} from "./business.js"
-  import {apiServer} from "renraku/dist/api-server.js"
-
-  export async function startUserServer(userTopic: UserTopic) {
-     //                                  ↑
-     //                      (remember you could pass mocks here!)
-
-    const server = await apiServer({
-      logger: console,
-      exposures: {
-        userTopic: {
-          exposed: userTopic,
-          cors: {
-            allowed: /^http\:\/\/localhost\:8\d{3}$/i,
-            forbidden: /\:8989$/i,
-          }
-        }
+        return x + y
       }
-    })
-    server.start(8001)
-  }
+    }
+  })
+
+   // provide easy access to the topic type
+  export type MathTopic = ReturnType<typeof makeMathTopic>
   ```
-- on the ***clientside,*** we use renraku `apiClient` to generate topic api client objects.  
-  for each topic, we generate a "shapeshifter" api client object, which is *actually an impostor* pretending to be a topic implementation.. their methods secretly make api calls, but the frontend is none the wiser!
+
+- second, let's spool up a node server to expose the api  
+  &nbsp; &nbsp; *~ node-server.ts ~*  
   ```ts
-  import {UserTopic} from "./business.js"
-  import {Shape} from "renraku/dist/interfaces.js"
-  import {apiClient} from "renraku/dist/api-client.js"
+  import {makeJsonApi} from "renraku/x/api/make-json-api.js"
+  import {makeHttpServerForApi} from "renraku/x/api/make-http-server-for-api.js"
+  import {makeMathTopic} from "./make-math-topic.js"
 
-  // generate a renraku api client
-  export async function makeUserClient() {
-    const api = await apiClient<{userTopic: UserTopic}>({
-      url: "http://localhost:8001",
+   // generate an api function which exposes our api topic
+  const api = makeJsonApi({
+    expose: makeMathTopic()
+  })
 
-      // you must describe the runtime shape
-      // so we enforce this with typescript to make it easy
-      shape: {
-        userTopic: {
-          getDetails: "method",
-          setNickname: "method",
-        }
-      },
-    })
-    return api.userTopic
-  }
-
-  // examples for clarity
-  ;(async() => {
-
-    // create the api client object
-    const userTopic = await makeUserClient()
-
-    // call an api method: looks the same as real topic implementation
-    const details = await userTopic.getDetails("u123")
-
-    // now when we go to create our frontend systems,
-    // we have a great deal of flexibility
-
-    // we might: pass in the api client object (frontend will call api)
-    makeFrontSystem({userTopic})
-
-    // or instead: pass in some mocks (frontend will call mocks)
-    makeFrontSystem({userTopic: {
-      async getDetails(userId) { throw new Error("TODO") },
-      async setNickname(userId, nickname) { throw new Error("TODO") },
-    }})
-  })()
+   // wrap our api in a standard node http server, and start listening
+  makeHttpServerForApi(api).listen(5000)
   ```
-- so in short
-  - renraku bridges the gap with handy functions that turn topic objects into api servers or clients
-  - properly decoupled architecture is insanely cool for mocks/tests/development in ways that are yet beyond your current understanding
 
-### ⛩️ RENRAKU LESSON FOUR — *advanced curries reduce repetition for auth and more*
+&nbsp; &nbsp; **browser api remote**
 
-...prototype implementation is ready...  
-...lesson coming soon...  
+- third, we generate an api client object we call a "remote"  
+  &nbsp; &nbsp; *~ make-math-remote.ts ~*
+  ```ts
+  import {makeJsonRemoteForBrowser} from "renraku/x/remote/make-json-remote-for-browser.js"
+  import {makeMathTopic, MathTopic} from "./make-math-topic.js"
 
-### ⛩️ RENRAKU LESSON FIVE — *custom http headers and such*
+  export const makeMathRemote = () => makeJsonRemoteForBrowser<{}, MathTopic>({
 
-...yet to be implemented...  
+     // we provide the url to our node api server
+    link: "http://localhost:5000/",
 
------------------
+     // we have to describe the 'shape' of the topic.
+     // typescript enforces that this matches exactly
+    shape: {arithmetic: {sum: true}},
 
-<br/>
+     // here's where you'd supply custom headers
+     // to send with each request
+    headers: {},
 
-<em style="display: block; text-align: center">— RENRAKU means "contact" —</em>
+     // auth processing that we're ignoring for now
+    getAuth: async() => ({}),
+  })
+  ```
+
+- now, you can grab a remote on the frontend, and call your functions fluently  
+  &nbsp; &nbsp; *~ my-frontend-system.ts ~*
+  ```ts
+  import {makeMathRemote} from "./make-math-remote.js"
+
+  async function main() {
+
+     // make the math remote and grab the arithmetic subtopic
+    const {arithmetic} = makeMathRemote()
+
+     // perform api calls fluently
+    const result1 = await arithmetic.sum(1, 1)
+    const result2 = await arithmetic.sum(2, 3)
+
+    console.log(result1) //> 2
+    console.log(result2) //> 5
+  }
+  ```
+
+## ⛩️ RENRAKU LESSON TWO — API WITH AUTHENTICATION AND AUTHORIZATION
+
+*todo: coming soon*
+
+&nbsp; &nbsp; &nbsp; &nbsp; *— RENRAKU means "contact" —*
