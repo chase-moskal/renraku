@@ -3,7 +3,7 @@ import {Requester} from "../../types/remote/requester.js"
 import {jsonHttpRequest} from "../../jsonrpc/json-http-request.js"
 import {parseJsonResponse} from "../../jsonrpc/parse-json-response.js"
 import {HttpResponseHeaders} from "../../types/http/http-response-headers.js"
-import {HttpRequestHeaders} from "source/2/types/http/http-request-headers.js"
+import {HttpRequestHeaders} from "source/types/http/http-request-headers.js"
 
 export function makeJsonRequester<xAuth>({fetch, headers}: {
 		fetch: typeof window.fetch

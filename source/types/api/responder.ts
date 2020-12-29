@@ -1,5 +1,6 @@
-import { ApiError } from "source/2/api/api-error";
-import { JsonRpcId } from "../jsonrpc/json-rpc-id";
+
+import {ApiError} from "../../api/api-error.js"
+import {JsonRpcId} from "../jsonrpc/json-rpc-id.js"
 
 export interface Responder<xResponse> {
 	resultResponse(requestId: JsonRpcId, result: any): xResponse

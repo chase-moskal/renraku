@@ -1,7 +1,7 @@
 
-import {Topic} from "../../types/primitives/topic.js"
-import {DropFirst} from "../../types/tools/drop-first.js"
-import {Procedure} from "../../types/primitives/procedure.js"
+import {Topic} from "./topic.js"
+import {DropFirst} from "../tools/drop-first.js"
+import {Procedure} from "./procedure.js"
 
 export type ToRemote<xTopic extends Topic<any>> = {
 	[P in keyof xTopic]: xTopic[P] extends Topic<any>
