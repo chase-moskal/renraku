@@ -8,14 +8,16 @@
 🧠 futuristic decoupled approach  
 &nbsp; &nbsp; &nbsp; 🛎️ expose simple groups of async functions as api topics  
 &nbsp; &nbsp; &nbsp; 🎭 shapeshifting api client objects, called "remotes", impersonate your exposed apis  
-&nbsp; &nbsp; &nbsp; 🛠️ feature completeness and capability over simplicity  
+&nbsp; &nbsp; &nbsp; 🛠️ originally designed to be simple, now designed to be capable and complete  
 
 🛡 auth processing and security policies  
-&nbsp; &nbsp; &nbsp; 🔓 c public apis  
-&nbsp; &nbsp; &nbsp; 🔒 easy to customize auth processing  
+&nbsp; &nbsp; &nbsp; 🔓 cors for public apis  
+&nbsp; &nbsp; &nbsp; 🔒 easily customize auth processing  
 
 🚧 **TODO**  
 &nbsp; &nbsp; &nbsp; ⚠️ multiple apis per server, or alt auth for subtopics  
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? server can host multiple apis  
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? policies are defined by recursive structure  
 &nbsp; &nbsp; &nbsp; ⚠️ simple node http server handles cors preflights  
 &nbsp; &nbsp; &nbsp; ⚠️ prefab auth policy for simple cors origin whitelisting  
 &nbsp; &nbsp; &nbsp; ⚠️ koa middleware  
@@ -28,7 +30,7 @@
 renraku tries to be as simple as possible. but no simpler.  
 it's designed with auth in mind, but let's ignore that for now to keep our first examples simpler
 
-&nbsp; &nbsp; **node api server**
+&nbsp; **node api server**
 
 - first, we formalize our api's business logic into "topics"  
   &nbsp; &nbsp; *~ make-math-topic.ts ~*
@@ -76,7 +78,7 @@ it's designed with auth in mind, but let's ignore that for now to keep our first
   makeHttpServerForApi(api).listen(5000)
   ```
 
-&nbsp; &nbsp; **browser api remote**
+&nbsp; **browser api remote**
 
 - third, we generate an api client object we call a "remote"  
   &nbsp; &nbsp; *~ make-math-remote.ts ~*
@@ -121,7 +123,58 @@ it's designed with auth in mind, but let's ignore that for now to keep our first
   }
   ```
 
+📖 **terminology review**
+- `topic` — business logic functions. organized into objects, recursive
+- `api` — a function which executes the business logic in a topic
+- `server` — an http server which executes api functions
+- `shape` — json data structure that describes a topic's surface area
+- `remote` — a clientside proxy that mimics the shape of a topic, makes http calls
+
 ## ⛩️ RENRAKU LESSON TWO — API WITH AUTHENTICATION AND AUTHORIZATION
+
+now we're going to improve the first examples by adding auth
+
+we'll also add some more functions to show off some more capabilities
+
+- so let's make a better version of our topic  
+  &nbsp; &nbsp; *~ make-math-topic.ts ~*
+  ```ts
+  import {asTopic} from "renraku/x/identities/as-topic.js"
+
+  export const makeMathTopic2 = () => asTopic({
+    expose: {
+      arithmetic: {
+        [policy]: {
+          parseRequest: async() => {},
+          processAuth: async() => {},
+        },
+        async sum(meta, x: number, y: number) {
+          return x + y
+        },
+      },
+    },
+  })
+
+  export const makeMathTopic = () => asTopic<{}>()({
+    arithmetic: {
+
+      async sum(meta, x: number, y: number) {
+        return x + y
+      },
+
+      async average(meta, ...points: number[]) {
+        if (points.length === 0) throw new ApiError("cannot average nothing")
+        let total = 0
+        for (const point of points) total += point
+        return total / points.length
+      },
+    }
+  })
+
+   // provide easy access to the topic type
+  export type MathTopic = ReturnType<typeof makeMathTopic>
+  ```
+
 
 *todo: coming soon*
 

@@ -1,7 +1,7 @@
 
 import {Suite, assert} from "cynic"
 
-import {makeApi} from "./api/make-api.js"
+import {makeApi, makeApi2, PolicyOptions, ToPolicy, asPolicy} from "./api/make-api.js"
 import {ApiError} from "./api/api-error.js"
 import {asTopic} from "./identities/as-topic.js"
 import {ToShape} from "./types/primitives/to-shape.js"
@@ -11,6 +11,7 @@ import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import {parseJsonRequest} from "./jsonrpc/parse-json-request.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 import {makeJsonHttpResponder} from "./jsonrpc/json-http-responder.js"
+import {JsonRpcId} from "./types/jsonrpc/json-rpc-id.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
@@ -25,17 +26,85 @@ export default <Suite>{
 		}
 
 		// topic
-		const makeMyTopic = () => asTopic<MyMeta>()({
-			math: {
+		const makeMyTopic = () => ({
+			math: asTopic<MyMeta>()({
 				async sum(meta, x: number, y: number) {
 					return x + y
 				}
-			}
+			}),
+			other: asTopic<MyMeta>()({
+				async lol(meta) {}
+			})
 		})
+
+		const top2 = makeMyTopic()
+		top2.other.lol(undefined)
+
+		const policy: PolicyOptions<HttpRequest, HttpResponse, MyAuth, MyMeta> = {
+			parseRequest: async request => undefined,
+			processAuth: async auth => ({access: {user: {}}}),
+			responder: {
+				resultResponse: (requestId, result) => ({
+					body: "",
+					status: 123,
+					headers: {"Content-Type": "application/json"},
+				}),
+				errorResponse: (requestId, error) => ({
+					body: "",
+					status: 123,
+					headers: {"Content-Type": "application/json"},
+				}),
+			},
+		}
+
+
+		const api2 = makeApi2<HttpRequest, HttpResponse>()({
+			topic: makeMyTopic(),
+			policy: {
+				parseRequest: async request => undefined,
+				processAuth: async(auth: MyAuth) => (undefined),
+				responder: {
+					resultResponse: (requestId, result) => ({
+						body: "",
+						status: 123,
+						headers: {"Content-Type": "application/json"},
+					}),
+					errorResponse: (requestId, error) => ({
+						body: "",
+						status: 123,
+						headers: {"Content-Type": "application/json"},
+					}),
+				},
+			},
+		})
+
+		// const api2 = makeApi2<HttpRequest, HttpResponse>()({
+		// 	expose: makeMyTopic(),
+		// 	policy: {
+		// 		math: policy,
+		// 		other: ({
+		// 			parseRequest: async request => undefined,
+		// 			processAuth: async auth => (undefined),
+		// 			responder: {
+		// 				resultResponse: (requestId, result) => ({
+		// 					body: "",
+		// 					status: 123,
+		// 					headers: {"Content-Type": "application/json"},
+		// 				}),
+		// 				errorResponse: (requestId, error) => ({
+		// 					body: "",
+		// 					status: 123,
+		// 					headers: {"Content-Type": "application/json"},
+		// 				}),
+		// 			},
+		// 		}),
+		// 	},
+		// })
 
 		// shape
 		const myShape: ToShape<MyTopic> = {
 			math: {sum: true},
+			other: {lol: true},
 		}
 
 		// serverside api

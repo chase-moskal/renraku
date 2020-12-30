@@ -36,3 +36,57 @@ export function makeApi<xRequest, xResponse, xAuth, xMeta>({expose, responder, p
 		}
 	}
 }
+
+export type RemoteProcedureCall<xAuth> = {
+	requestId: JsonRpcId,
+	specifier: string,
+	auth: xAuth,
+	args: any[],
+}
+
+export type PolicyOptions<xRequest, xResponse, xAuth, xMeta> = {
+	responder: Responder<xResponse>
+	parseRequest: (request: xRequest) => Promise<RemoteProcedureCall<xAuth>>
+	processAuth: (auth: xAuth) => Promise<xMeta>
+}
+
+export type ToPolicy<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xMeta>> =
+	PolicyOptions<xRequest, xResponse, xAuth, xMeta>
+	| {
+		[P in keyof xTopic]: xTopic[P] extends Topic<xMeta>
+			? PolicyOptions<xRequest, xResponse, xAuth, xMeta>
+			: xTopic[P] extends {[key: string]: ToPolicy<xRequest, xResponse, xAuth, xMeta, Topic<xMeta>>}
+				? {[key: string]: ToPolicy<xRequest, xResponse, xAuth, xMeta, Topic<xMeta>>}
+				: never
+	}
+
+export type Policy<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xMeta>> =
+	PolicyOptions<xRequest, xResponse, xAuth, xMeta> | ToPolicy<xRequest, xResponse, xAuth, xMeta, xTopic>
+
+export function asPolicy<xAuth, xMeta>() {
+	return function<xRequest, xResponse, xTopic extends Topic<any>>(
+			policy: Policy<xRequest, xResponse, xAuth, xMeta, xTopic>
+		) {
+		return policy
+	}
+}
+
+export type ToPolicy2<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xMeta>> = {
+	[P in keyof xTopic]: xTopic[P] extends Topic<xMeta>
+		? PolicyOptions<xRequest, xResponse, xAuth, xMeta>
+		: xTopic[P] extends {[key: string]: ToPolicy<xRequest, xResponse, xAuth, xMeta, Topic<xMeta>>}
+			? {[key: string]: ToPolicy<xRequest, xResponse, xAuth, xMeta, Topic<xMeta>>}
+			: never
+}
+
+export type Context<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xMeta>> =
+	[P in keyof xTopic]: xTopic[P] extends 
+	{[key: string]: Context<xRequest, xResponse, any, any, xTopic>}
+	| {
+		topic: xTopic
+		policy: PolicyOptions<xRequest, xResponse, xAuth, xMeta>
+	}
+
+export function makeApi2<xRequest, xResponse>() {
+	return function<xAuth, xMeta, xTopic extends Topic<xMeta>>(expose: Context<xRequest, xResponse, xAuth, xMeta, xTopic>) {}
+}
