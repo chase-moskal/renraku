@@ -125,7 +125,7 @@ export function prepareApi<xRequest, xResponse>(comms: Comms<xRequest, xResponse
 					}
 				}
 				else if (value !== undefined && value !== null && typeof value === "object") {
-					return recurse(value, policy)
+					return recurse(policy, value)
 				}
 				else {
 					throw new Error(`unknown value for "${key}"`)
@@ -147,6 +147,16 @@ const context = {
 		alpha2: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
 	},
 }
+
+export type ApiGroups = {
+	[key: string]: ApiContext<any, any, any, any> | ApiGroups
+}
+
+export function produceRemote<xGroups extends ApiGroups>(groups: xGroups) {
+	return groups
+}
+
+const remote = produceRemote(context)
 
 
 
