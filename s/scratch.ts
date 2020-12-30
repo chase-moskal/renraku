@@ -8,6 +8,8 @@ import {HttpRequest} from "./types/http/http-request.js"
 import {Procedure} from "./types/primitives/procedure.js"
 import {HttpResponse} from "./types/http/http-response.js"
 import { objectMap } from "./tools/object-map.js"
+import { DropFirst } from "./types/tools/drop-first.js"
+import { Await } from "./types/tools/await.js"
 
 export type AlphaAuth = {token: string}
 export type AlphaMeta = {access: boolean}
@@ -99,15 +101,25 @@ export type Policy2<xAuth, xMeta> = {
 
 export const _butter = Symbol()
 
-export type ButteredProcedure<xAuth, xMeta> = {
+export type ButteredProcedure<xAuth, xMeta, xArgs extends any[], xResult> = {
 	[_butter]: true
 	policy: Policy2<xAuth, xMeta>
-	func: Procedure<xMeta, any[], any>
+	func: Procedure<xMeta, xArgs, xResult>
+}
+
+function isFunction(value: any) {
+	return typeof value === "function"
+}
+
+function isObject(value: any) {
+	return value !== undefined
+		&& value !== null
+		&& typeof value === "object"
 }
 
 export type ApiContext<xAuth, xMeta, xTopic extends Topic<xMeta>, xPolicy extends Policy2<xAuth, xMeta>> = {
 	[P in keyof xTopic]: xTopic[P] extends Procedure<xMeta, any[], any>
-		? ButteredProcedure<xAuth, xMeta>
+		? ButteredProcedure<xAuth, xMeta, DropFirst<Parameters<xTopic[P]>>, Await<ReturnType<xTopic[P]>>>
 		: xTopic[P] extends Topic<xMeta>
 			? ApiContext<xAuth, xMeta, xTopic[P], xPolicy>
 			: never
@@ -115,21 +127,18 @@ export type ApiContext<xAuth, xMeta, xTopic extends Topic<xMeta>, xPolicy extend
 
 export function prepareApi<xRequest, xResponse>(comms: Comms<xRequest, xResponse>) {
 	return function<xAuth, xMeta>() {
-		return function recurse<xPolicy extends Policy2<xAuth, xMeta>, xTopic extends Topic<xMeta>>(policy: xPolicy, topic: xTopic): ApiContext<xAuth, xMeta, xTopic, xPolicy> {
+		return function recurse<xPolicy extends Policy2<xAuth, xMeta>, xTopic extends Topic<xMeta>>(
+				policy: xPolicy,
+				topic: xTopic,
+			): ApiContext<xAuth, xMeta, xTopic, xPolicy> {
 			return objectMap(topic, (value, key) => {
-				if (typeof value === "function") {
-					return <ButteredProcedure<xAuth, xMeta>>{
-						policy,
-						func: value,
-						[_butter]: true,
-					}
+				if (isFunction(value)) return <ButteredProcedure<xAuth, xMeta, any, any>>{
+					policy,
+					func: value,
+					[_butter]: true,
 				}
-				else if (value !== undefined && value !== null && typeof value === "object") {
-					return recurse(policy, value)
-				}
-				else {
-					throw new Error(`unknown value for "${key}"`)
-				}
+				else if (isObject(value)) return recurse(policy, value)
+				else throw new Error(`unknown value for "${key}"`)
 			})
 		}
 	}
@@ -140,23 +149,108 @@ const prepareJsonApi = prepareApi<HttpRequest, HttpResponse>({
 	parseRequest: async request => undefined,
 })
 
-const context = {
+const createContext = () => ({
 	alpha: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
 	bravo: prepareJsonApi<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
 	group: {
 		alpha2: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
 	},
+})
+
+function isButtered(value: any) {
+	return isObject(value) && !!value[_butter]
 }
+
+export type ContextToShape<xContext extends ApiContext<any, any, any, any>> = {
+	[P in keyof xContext]: xContext[P] extends ButteredProcedure<any, any, any[], any>
+		? true
+		: xContext[P] extends ApiContext<any, any, any, any>
+			? ContextToShape<xContext[P]>
+			: never
+}
+
+const shape: ContextToShape<ReturnType<typeof createContext>> = {
+	alpha: {
+		sum: true,
+	},
+	bravo: {
+		divide: true,
+	},
+	group: {
+		alpha2: {
+			sum: true,
+		},
+	}
+}
+
+export function generateRemote<xContext extends ApiContext<any, any, any, any>>(context: xContext) {
+
+}
+
+/* TODO implement this ganster-shit
+
+const alphaAuthPolicy = {getAuth: async() => ({token: "t123"})}
+const bravoAuthPolicy = {getAuth: async() => ({abc: "abc123"})}
+
+const remote = generateRemote<ReturnType<typeof createContext>>({
+	shape: {
+		alpha: {
+			[_gravy]: alphaAuthPolicy,
+			sum: true,
+		},
+		bravo: {
+			[_gravy]: bravoAuthPolicy,
+			divide: true,
+		},
+		group: {
+			alpha2: {
+				[_gravy]: alphaAuthPolicy,
+				sum: true,
+			},
+		},
+	},
+})
+
+*/
+
+
+
+
+//
+// hmmm... not so sure about this stuff below
+//
 
 export type ApiGroups = {
-	[key: string]: ApiContext<any, any, any, any> | ApiGroups
+	[key: string]: ButteredProcedure<any, any, any[], any> | ApiGroups
 }
 
-export function produceRemote<xGroups extends ApiGroups>(groups: xGroups) {
-	return groups
+export type Remotify<xGroups extends ApiGroups> = {
+	[P in keyof xGroups]: xGroups[P] extends ButteredProcedure<any, any, any[], any>
+		? (...args: DropFirst<Parameters<xGroups[P]["func"]>>) => ReturnType<xGroups[P]["func"]>
+		: xGroups[P] extends ApiGroups
+			? Remotify<xGroups[P]>
+			: never
 }
 
-const remote = produceRemote(context)
+export function produceRemote<xGroups extends ApiGroups>(groups: xGroups): Remotify<xGroups> {
+	return objectMap(groups, (value, key) => {
+		if (isButtered(value)) {
+			const {policy, func} = <ButteredProcedure<any, any, any, any>>value
+			return (...args: any[]) => {
+				// TODO perform request to api source
+				// apply the policy
+			}
+		}
+		else if (isObject(value)) {
+			return produceRemote(value)
+		}
+		else throw new Error(`unknown group value for "${key}"`)
+	})
+}
+
+const remote = produceRemote(createContext())
+
+remote.alpha.sum
 
 
 
