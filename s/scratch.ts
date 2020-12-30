@@ -7,6 +7,7 @@ import {Topic} from "./types/primitives/topic.js"
 import {HttpRequest} from "./types/http/http-request.js"
 import {Procedure} from "./types/primitives/procedure.js"
 import {HttpResponse} from "./types/http/http-response.js"
+import { objectMap } from "./tools/object-map.js"
 
 export type AlphaAuth = {token: string}
 export type AlphaMeta = {access: boolean}
@@ -96,23 +97,58 @@ export type Policy2<xAuth, xMeta> = {
 	processAuth: (auth: xAuth) => Promise<xMeta>
 }
 
-export function makeContext3<xRequest, xResponse>(comms: Comms<xRequest, xResponse>) {
-	return function<xAuth>() {
-		return function<xMeta, xTopic extends Topic<xMeta>>(topic: xTopic, policy: Policy2<xAuth, xMeta>) {
+export const _butter = Symbol()
 
+export type ButteredProcedure<xAuth, xMeta> = {
+	[_butter]: true
+	policy: Policy2<xAuth, xMeta>
+	func: Procedure<xMeta, any[], any>
+}
+
+export type ApiContext<xAuth, xMeta, xTopic extends Topic<xMeta>, xPolicy extends Policy2<xAuth, xMeta>> = {
+	[P in keyof xTopic]: xTopic[P] extends Procedure<xMeta, any[], any>
+		? ButteredProcedure<xAuth, xMeta>
+		: xTopic[P] extends Topic<xMeta>
+			? ApiContext<xAuth, xMeta, xTopic[P], xPolicy>
+			: never
+}
+
+export function prepareApi<xRequest, xResponse>(comms: Comms<xRequest, xResponse>) {
+	return function<xAuth, xMeta>() {
+		return function recurse<xPolicy extends Policy2<xAuth, xMeta>, xTopic extends Topic<xMeta>>(policy: xPolicy, topic: xTopic): ApiContext<xAuth, xMeta, xTopic, xPolicy> {
+			return objectMap(topic, (value, key) => {
+				if (typeof value === "function") {
+					return <ButteredProcedure<xAuth, xMeta>>{
+						policy,
+						func: value,
+						[_butter]: true,
+					}
+				}
+				else if (value !== undefined && value !== null && typeof value === "object") {
+					return recurse(value, policy)
+				}
+				else {
+					throw new Error(`unknown value for "${key}"`)
+				}
+			})
 		}
 	}
 }
 
-const lol = makeContext3<HttpRequest, HttpResponse>({
+const prepareJsonApi = prepareApi<HttpRequest, HttpResponse>({
 	responder,
 	parseRequest: async request => undefined,
 })
 
 const context = {
-	alpha: lol<AlphaAuth>()(alpha, alphaPolicy),
-	bravo: lol<BravoAuth>()(bravo, bravoPolicy),
+	alpha: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
+	bravo: prepareJsonApi<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
+	group: {
+		alpha2: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
+	},
 }
+
+
 
 
 

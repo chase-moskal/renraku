@@ -79,14 +79,29 @@ export type ToPolicy2<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xM
 			: never
 }
 
-export type Context<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xMeta>> =
-	[P in keyof xTopic]: xTopic[P] extends 
-	{[key: string]: Context<xRequest, xResponse, any, any, xTopic>}
-	| {
-		topic: xTopic
-		policy: PolicyOptions<xRequest, xResponse, xAuth, xMeta>
-	}
+// export type Context<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xMeta>> =
+// 	[P in keyof xTopic]: xTopic[P] extends 
+// 	{[key: string]: Context<xRequest, xResponse, any, any, xTopic>}
+// 	| {
+// 		topic: xTopic
+// 		policy: PolicyOptions<xRequest, xResponse, xAuth, xMeta>
+// 	}
+
+export type Context<xRequest, xResponse, xAuth, xMeta, xTopic extends Topic<xMeta>> = {
+	topic: xTopic
+	policy: PolicyOptions<xRequest, xResponse, xAuth, xMeta>
+}
+
+export type ToContext<xRequest, xResponse, xTopic extends Topic<any>> = {
+	[P in keyof xTopic]: xTopic[P] extends Procedure<any, any[], any>
+		? never
+		: Context<xRequest, xResponse, any, any, any>
+}
 
 export function makeApi2<xRequest, xResponse>() {
-	return function<xAuth, xMeta, xTopic extends Topic<xMeta>>(expose: Context<xRequest, xResponse, xAuth, xMeta, xTopic>) {}
+	return function<xTopic extends Topic<any>>(
+			expose: ToContext<xRequest, xResponse, xTopic>
+		) {
+		return expose
+	}
 }
