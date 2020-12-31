@@ -101,9 +101,9 @@ export type Policy2<xAuth, xMeta> = {
 
 export const _butter = Symbol()
 
-export type ButteredProcedure<xAuth, xMeta, xArgs extends any[], xResult> = {
+export type ButteredProcedure<xAuth, xMeta, xArgs extends any[], xResult, xPolicy extends Policy2<xAuth, xMeta>> = {
 	[_butter]: true
-	policy: Policy2<xAuth, xMeta>
+	policy: xPolicy
 	func: Procedure<xMeta, xArgs, xResult>
 }
 
@@ -117,13 +117,15 @@ function isObject(value: any) {
 		&& typeof value === "object"
 }
 
+export const _context = Symbol()
+
 export type ApiContext<xAuth, xMeta, xTopic extends Topic<xMeta>, xPolicy extends Policy2<xAuth, xMeta>> = {
 	[P in keyof xTopic]: xTopic[P] extends Procedure<xMeta, any[], any>
-		? ButteredProcedure<xAuth, xMeta, DropFirst<Parameters<xTopic[P]>>, Await<ReturnType<xTopic[P]>>>
+		? ButteredProcedure<xAuth, xMeta, DropFirst<Parameters<xTopic[P]>>, Await<ReturnType<xTopic[P]>>, xPolicy>
 		: xTopic[P] extends Topic<xMeta>
 			? ApiContext<xAuth, xMeta, xTopic[P], xPolicy>
 			: never
-}
+} & {[_context]: true}
 
 export function prepareApi<xRequest, xResponse>(comms: Comms<xRequest, xResponse>) {
 	return function<xAuth, xMeta>() {
@@ -132,12 +134,15 @@ export function prepareApi<xRequest, xResponse>(comms: Comms<xRequest, xResponse
 				topic: xTopic,
 			): ApiContext<xAuth, xMeta, xTopic, xPolicy> {
 			return objectMap(topic, (value, key) => {
-				if (isFunction(value)) return <ButteredProcedure<xAuth, xMeta, any, any>>{
+				if (isFunction(value)) return <ButteredProcedure<xAuth, xMeta, any, any, xPolicy>>{
+					[_butter]: true,
 					policy,
 					func: value,
-					[_butter]: true,
 				}
-				else if (isObject(value)) return recurse(policy, value)
+				else if (isObject(value)) return <ApiContext<xAuth, xMeta, xTopic, xPolicy>>{
+					[_context]: true,
+					...recurse(policy, value)
+				}
 				else throw new Error(`unknown value for "${key}"`)
 			})
 		}
@@ -157,34 +162,10 @@ const createContext = () => ({
 	},
 })
 
+createContext().group.alpha2[_context]
+
 function isButtered(value: any) {
 	return isObject(value) && !!value[_butter]
-}
-
-export type ContextToShape<xContext extends ApiContext<any, any, any, any>> = {
-	[P in keyof xContext]: xContext[P] extends ButteredProcedure<any, any, any[], any>
-		? true
-		: xContext[P] extends ApiContext<any, any, any, any>
-			? ContextToShape<xContext[P]>
-			: never
-}
-
-const shape: ContextToShape<ReturnType<typeof createContext>> = {
-	alpha: {
-		sum: true,
-	},
-	bravo: {
-		divide: true,
-	},
-	group: {
-		alpha2: {
-			sum: true,
-		},
-	}
-}
-
-export function generateRemote<xContext extends ApiContext<any, any, any, any>>(context: xContext) {
-
 }
 
 /* TODO implement this ganster-shit
@@ -216,41 +197,75 @@ const remote = generateRemote<ReturnType<typeof createContext>>({
 
 
 
-//
-// hmmm... not so sure about this stuff below
-//
+// export type ContextToShape<xContext extends ApiContext<any, any, any, any>> = {
+// 	[P in keyof xContext]: xContext[P] extends ButteredProcedure<any, any, any[], any, xPolicy>
+// 		? true
+// 		: xContext[P] extends ApiContext<any, any, any, any>
+// 			? ContextToShape<xContext[P]>
+// 			: never
+// }
 
-export type ApiGroups = {
-	[key: string]: ButteredProcedure<any, any, any[], any> | ApiGroups
-}
+// const shape: ContextToShape<ReturnType<typeof createContext>> = {
+// 	alpha: {
+// 		sum: true,
+// 	},
+// 	bravo: {
+// 		divide: true,
+// 	},
+// 	group: {
+// 		alpha2: {
+// 			sum: true,
+// 		},
+// 	}
+// }
 
-export type Remotify<xGroups extends ApiGroups> = {
-	[P in keyof xGroups]: xGroups[P] extends ButteredProcedure<any, any, any[], any>
-		? (...args: DropFirst<Parameters<xGroups[P]["func"]>>) => ReturnType<xGroups[P]["func"]>
-		: xGroups[P] extends ApiGroups
-			? Remotify<xGroups[P]>
-			: never
-}
+// export function generateRemote<xContext extends ApiContext<any, any, any, any>>(context: xContext) {
 
-export function produceRemote<xGroups extends ApiGroups>(groups: xGroups): Remotify<xGroups> {
-	return objectMap(groups, (value, key) => {
-		if (isButtered(value)) {
-			const {policy, func} = <ButteredProcedure<any, any, any, any>>value
-			return (...args: any[]) => {
-				// TODO perform request to api source
-				// apply the policy
-			}
-		}
-		else if (isObject(value)) {
-			return produceRemote(value)
-		}
-		else throw new Error(`unknown group value for "${key}"`)
-	})
-}
+// }
 
-const remote = produceRemote(createContext())
 
-remote.alpha.sum
+
+
+
+
+
+
+
+// //
+// // hmmm... not so sure about this stuff below
+// //
+
+// export type ApiGroups = {
+// 	[key: string]: ButteredProcedure<any, any, any[], any> | ApiGroups
+// }
+
+// export type Remotify<xGroups extends ApiGroups> = {
+// 	[P in keyof xGroups]: xGroups[P] extends ButteredProcedure<any, any, any[], any>
+// 		? (...args: DropFirst<Parameters<xGroups[P]["func"]>>) => ReturnType<xGroups[P]["func"]>
+// 		: xGroups[P] extends ApiGroups
+// 			? Remotify<xGroups[P]>
+// 			: never
+// }
+
+// export function produceRemote<xGroups extends ApiGroups>(groups: xGroups): Remotify<xGroups> {
+// 	return objectMap(groups, (value, key) => {
+// 		if (isButtered(value)) {
+// 			const {policy, func} = <ButteredProcedure<any, any, any, any>>value
+// 			return (...args: any[]) => {
+// 				// TODO perform request to api source
+// 				// apply the policy
+// 			}
+// 		}
+// 		else if (isObject(value)) {
+// 			return produceRemote(value)
+// 		}
+// 		else throw new Error(`unknown group value for "${key}"`)
+// 	})
+// }
+
+// const remote = produceRemote(createContext())
+
+// remote.alpha.sum
 
 
 
@@ -285,37 +300,37 @@ remote.alpha.sum
 
 
 
-export type MakeContext<xRequest, xResponse> =
-	<xAuth, xMeta>() =>
-		<xPolicy extends Policy<xRequest, xResponse, xAuth, xMeta>>(policy: xPolicy) =>
-			<xTopic extends Topic<xMeta>>(topic: Topic<xMeta>) =>
-				ToContext<xMeta, xTopic, xPolicy>
+// export type MakeContext<xRequest, xResponse> =
+// 	<xAuth, xMeta>() =>
+// 		<xPolicy extends Policy<xRequest, xResponse, xAuth, xMeta>>(policy: xPolicy) =>
+// 			<xTopic extends Topic<xMeta>>(topic: Topic<xMeta>) =>
+// 				ToContext<xMeta, xTopic, xPolicy>
 
-export type Contextualize<xRequest, xResponse> =
-	(context: MakeContext<xRequest, xResponse>) => ToContext<any, any, any>
+// export type Contextualize<xRequest, xResponse> =
+// 	(context: MakeContext<xRequest, xResponse>) => ToContext<any, any, any>
 
-export function makeContext2<xRequest, xResponse>(contextualize: Contextualize<xRequest, xResponse>) {
-	return contextualize(() => policy => topic => {
-		return undefined
-	})
-}
+// export function makeContext2<xRequest, xResponse>(contextualize: Contextualize<xRequest, xResponse>) {
+// 	return contextualize(() => policy => topic => {
+// 		return undefined
+// 	})
+// }
 
-const supercontext = makeContext2<HttpRequest, HttpResponse>(context => ({
-	alpha: context<AlphaAuth, AlphaMeta>()(alphaPolicy)({
-		async echo({access}, data: any) {
-			return data
-		},
-		async sum({access}, x: number, y: number) {
-			return x + y
-		},
-		async divide({access}, x: number, y: number) {
-			if (y === 0) throw new Error("cannot divide by 0")
-			return x / y
-		}
-	})
-}))
+// const supercontext = makeContext2<HttpRequest, HttpResponse>(context => ({
+// 	alpha: context<AlphaAuth, AlphaMeta>()(alphaPolicy)({
+// 		async echo({access}, data: any) {
+// 			return data
+// 		},
+// 		async sum({access}, x: number, y: number) {
+// 			return x + y
+// 		},
+// 		async divide({access}, x: number, y: number) {
+// 			if (y === 0) throw new Error("cannot divide by 0")
+// 			return x / y
+// 		}
+// 	})
+// }))
 
-supercontext.alpha.sum.procedure({access: true}, 1, 2)
+// supercontext.alpha.sum.procedure({access: true}, 1, 2)
 
 
 
