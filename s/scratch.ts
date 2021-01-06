@@ -17,6 +17,7 @@ import {HttpRequest} from "./types/http/http-request.js"
 import {Procedure} from "./types/primitives/procedure.js"
 import {HttpResponse} from "./types/http/http-response.js"
 import {RemoteProcedureCall} from "./types/api/remote-procedure-call.js"
+import { parseJsonRequest } from "./jsonrpc/parse-json-request.js"
 
 //
 // API CONTEXT
@@ -99,49 +100,10 @@ export const jsonResponder: Responder<HttpResponse> = {
 	}),
 }
 
-// TODO write standard json parser
-export const parseJsonRequest: ParseRequest<HttpRequest, any> = async request => undefined
-
 export const prepareJsonApi = prepareApi<HttpRequest, HttpResponse>({
 	responder: jsonResponder,
 	parseRequest: parseJsonRequest,
 })
-
-type AlphaAuth = {token: string}
-type AlphaMeta = {access: boolean}
-
-type BravoAuth = {abc: string}
-type BravoMeta = {tables: boolean}
-
-const alpha = asTopic<AlphaMeta>()({
-	async sum(meta, x: number, y: number) {
-		return x + y
-	},
-})
-
-const bravo = asTopic<BravoMeta>()({
-	async divide(meta, x: number, y: number) {
-		return x / y
-	},
-})
-
-const alphaPolicy: Policy2<AlphaAuth, AlphaMeta> = {
-	processAuth: async auth => undefined
-}
-
-const bravoPolicy: Policy2<BravoAuth, BravoMeta> = {
-	processAuth: async auth => undefined
-}
-
-const createContext = () => ({
-	alpha: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
-	bravo: prepareJsonApi<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
-	group: {
-		alpha2: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
-	},
-})
-
-type MyContext = ReturnType<typeof createContext>
 
 //
 // SHAPES
@@ -173,31 +135,6 @@ export type ToShape<xGroupings extends ApiGroupings> = {
 				}
 				: ToShape<xGroupings[P]>
 			: never
-}
-
-const alphaGravy: Gravy<AlphaAuth> = {
-	getAuth: async() => ({token: "t123"})
-}
-
-const bravoGravy: Gravy<BravoAuth> = {
-	getAuth: async() => ({abc: "abc"})
-}
-
-const myShape: ToShape<MyContext> = {
-	alpha: {
-		[_gravy]: alphaGravy,
-		sum: true,
-	},
-	bravo: {
-		[_gravy]: bravoGravy,
-		divide: true,
-	},
-	group: {
-		alpha2: {
-			[_gravy]: alphaGravy,
-			sum: true,
-		}
-	},
 }
 
 //
@@ -253,18 +190,6 @@ export function generateRemote<xGroupings extends ApiGroupings>({link, shape, re
 		}
 	})
 }
-
-const myRemote = generateRemote({
-	link: "",
-	shape: myShape,
-	requester: async(options) => {}
-})
-
-;(async() => {
-	const r1 = await myRemote.alpha.sum(1, 2)
-	const r2 = await myRemote.group.alpha2.sum(2, 3)
-	console.log(r1, r2)
-})()
 
 //
 // SERVER
@@ -328,306 +253,85 @@ export function loopbackJsonRemote2<xGroupings extends ApiGroupings>({link, shap
 }
 
 
+////////////////////////////////////////////////////////////////////////
+// EXAMPLES
+////////////////////////////////////////////////////////////////////////
+
+
+type AlphaAuth = {token: string}
+type AlphaMeta = {access: boolean}
+
+type BravoAuth = {abc: string}
+type BravoMeta = {tables: boolean}
+
+const alpha = asTopic<AlphaMeta>()({
+	async sum(meta, x: number, y: number) {
+		return x + y
+	},
+})
+
+const bravo = asTopic<BravoMeta>()({
+	async divide(meta, x: number, y: number) {
+		return x / y
+	},
+})
+
+const alphaPolicy: Policy2<AlphaAuth, AlphaMeta> = {
+	processAuth: async auth => undefined
+}
+
+const bravoPolicy: Policy2<BravoAuth, BravoMeta> = {
+	processAuth: async auth => undefined
+}
+
+const createContext = () => ({
+	alpha: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
+	bravo: prepareJsonApi<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
+	group: {
+		alpha2: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
+	},
+})
+
+type MyContext = ReturnType<typeof createContext>
+
+
+
+const alphaGravy: Gravy<AlphaAuth> = {
+	getAuth: async() => ({token: "t123"})
+}
+
+const bravoGravy: Gravy<BravoAuth> = {
+	getAuth: async() => ({abc: "abc"})
+}
+
+const myShape: ToShape<MyContext> = {
+	alpha: {
+		[_gravy]: alphaGravy,
+		sum: true,
+	},
+	bravo: {
+		[_gravy]: bravoGravy,
+		divide: true,
+	},
+	group: {
+		alpha2: {
+			[_gravy]: alphaGravy,
+			sum: true,
+		}
+	},
+}
+
+
+
+const myRemote = generateRemote({
+	link: "",
+	shape: myShape,
+	requester: async(options) => {}
+})
+
+;(async() => {
+	const r1 = await myRemote.alpha.sum(1, 2)
+	const r2 = await myRemote.group.alpha2.sum(2, 3)
+	console.log(r1, r2)
+})()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// export type ToRemote<xContext extends ApiShape> = {
-// 	[P in keyof xContext]: xContext[P] extends ApiContext<any, any, any, any>
-// 		? {
-// 			[P2 in keyof xContext[P]]: xContext[P][P2] extends ButteredProcedure<any, any, any[], any, any>
-// 				? xContext[P][P2]
-// 				: never
-// 		}
-// 		: never
-// }
-
-// export function generateRemote<xContext extends ApiShape>({link, shape}: {
-// 		link: string
-// 		shape: xContext
-// 	}): ToRemote<xContext> {
-// 	return objectMap(shape, (value, key) => {
-
-// 	})
-// }
-
-// const alphaAuthPolicy = {getAuth: async() => ({token: "t123"})}
-// const bravoAuthPolicy = {getAuth: async() => ({abc: "abc123"})}
-
-// const remote = generateRemote<MyContext>({
-// 	link,
-// 	shape,
-// })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-// =====================================================================
-// :::::: THE GRAVEYARD ::::::::::::::::::::::::::::::::::::::::::::::::
-// =====================================================================
-//
-
-// export type Policy<xRequest, xResponse, xAuth, xMeta> = {
-// 	responder: Responder<xResponse>
-// 	parseRequest: (request: xRequest) => Promise<RemoteProcedureCall<xAuth>>
-// 	processAuth: (auth: xAuth) => Promise<xMeta>
-// }
-
-// export type ContextStructure = {
-// 	policy: Policy<any, any, any, any>
-// 	procedure: Topic<any>
-// } | {[key: string]: ContextStructure}
-
-// export type ToContext<xMeta, xTopic extends Topic<xMeta>, xPolicy extends Policy<any, any, any, any>> = {
-// 	[P in keyof xTopic]: xTopic[P] extends Procedure<xMeta, any[], any>
-// 		? {
-// 			policy: xPolicy
-// 			procedure: xTopic[P]
-// 		}
-// 		: xTopic[P] extends Topic<xMeta>
-// 			? ToContext<xMeta, xTopic[P], xPolicy>
-// 			: never
-// }
-
-// export function makeContext<xAuth, xMeta>() {
-// 	return function<xRequest, xResponse, xPolicy extends Policy<xRequest, xResponse, xAuth, xMeta>>(policy: xPolicy) {
-// 		return function<xTopic extends Topic<xMeta>>(expose: xTopic): ToContext<xMeta, xTopic, xPolicy> {
-// 			throw new Error("TODO implement")
-// 			return undefined
-// 		}
-// 	}
-// }
-
-
-
-// const remote = generateRemote<ReturnType<typeof createContext>>({
-// 	shape: {
-// 		alpha: {
-// 			[_gravy]: alphaAuthPolicy,
-// 			sum: true,
-// 		},
-// 		bravo: {
-// 			[_gravy]: bravoAuthPolicy,
-// 			divide: true,
-// 		},
-// 		group: {
-// 			alpha2: {
-// 				[_gravy]: alphaAuthPolicy,
-// 				sum: true,
-// 			},
-// 		},
-// 	},
-// })
-
-
-
-
-// export type ContextToShape<xContext extends ApiContext<any, any, any, any>> = {
-// 	[P in keyof xContext]: xContext[P] extends ButteredProcedure<any, any, any[], any, xPolicy>
-// 		? true
-// 		: xContext[P] extends ApiContext<any, any, any, any>
-// 			? ContextToShape<xContext[P]>
-// 			: never
-// }
-
-// const shape: ContextToShape<ReturnType<typeof createContext>> = {
-// 	alpha: {
-// 		sum: true,
-// 	},
-// 	bravo: {
-// 		divide: true,
-// 	},
-// 	group: {
-// 		alpha2: {
-// 			sum: true,
-// 		},
-// 	}
-// }
-
-// export function generateRemote<xContext extends ApiContext<any, any, any, any>>(context: xContext) {
-
-// }
-
-
-
-
-
-
-
-
-
-// //
-// // hmmm... not so sure about this stuff below
-// //
-
-// export type ApiGroups = {
-// 	[key: string]: ButteredProcedure<any, any, any[], any> | ApiGroups
-// }
-
-// export type Remotify<xGroups extends ApiGroups> = {
-// 	[P in keyof xGroups]: xGroups[P] extends ButteredProcedure<any, any, any[], any>
-// 		? (...args: DropFirst<Parameters<xGroups[P]["func"]>>) => ReturnType<xGroups[P]["func"]>
-// 		: xGroups[P] extends ApiGroups
-// 			? Remotify<xGroups[P]>
-// 			: never
-// }
-
-// export function produceRemote<xGroups extends ApiGroups>(groups: xGroups): Remotify<xGroups> {
-// 	return objectMap(groups, (value, key) => {
-// 		if (isButtered(value)) {
-// 			const {policy, func} = <ButteredProcedure<any, any, any, any>>value
-// 			return (...args: any[]) => {
-// 				// TODO perform request to api source
-// 				// apply the policy
-// 			}
-// 		}
-// 		else if (isObject(value)) {
-// 			return produceRemote(value)
-// 		}
-// 		else throw new Error(`unknown group value for "${key}"`)
-// 	})
-// }
-
-// const remote = produceRemote(createContext())
-
-// remote.alpha.sum
-
-
-
-
-
-
-// const alpha = makeContext<AlphaAuth, AlphaMeta>()(alphaPolicy)({
-// 	async echo({access}, data: any) {
-// 		return data
-// 	},
-// 	async sum({access}, x: number, y: number) {
-// 		return x + y
-// 	},
-// 	async divide({access}, x: number, y: number) {
-// 		if (y === 0) throw new Error("cannot divide by 0")
-// 		return x / y
-// 	}
-// })
-
-// const bravo = makeContext<BravoAuth, BravoMeta>()(bravoPolicy)({
-// 	async sayHi({tables}, nameToGreet: string) {
-// 		return `Hi, ${nameToGreet}!`
-// 	},
-// })
-
-// alpha.sum.procedure({access: true}, 1, 2)
-// bravo.sayHi.procedure({tables: true}, "Chase")
-
-
-
-
-
-
-
-// export type MakeContext<xRequest, xResponse> =
-// 	<xAuth, xMeta>() =>
-// 		<xPolicy extends Policy<xRequest, xResponse, xAuth, xMeta>>(policy: xPolicy) =>
-// 			<xTopic extends Topic<xMeta>>(topic: Topic<xMeta>) =>
-// 				ToContext<xMeta, xTopic, xPolicy>
-
-// export type Contextualize<xRequest, xResponse> =
-// 	(context: MakeContext<xRequest, xResponse>) => ToContext<any, any, any>
-
-// export function makeContext2<xRequest, xResponse>(contextualize: Contextualize<xRequest, xResponse>) {
-// 	return contextualize(() => policy => topic => {
-// 		return undefined
-// 	})
-// }
-
-// const supercontext = makeContext2<HttpRequest, HttpResponse>(context => ({
-// 	alpha: context<AlphaAuth, AlphaMeta>()(alphaPolicy)({
-// 		async echo({access}, data: any) {
-// 			return data
-// 		},
-// 		async sum({access}, x: number, y: number) {
-// 			return x + y
-// 		},
-// 		async divide({access}, x: number, y: number) {
-// 			if (y === 0) throw new Error("cannot divide by 0")
-// 			return x / y
-// 		}
-// 	})
-// }))
-
-// supercontext.alpha.sum.procedure({access: true}, 1, 2)
-
-
-
-
-
-
-
-
-
-
-// export const alternative = asTopic<BravoMeta>()({
-// 	async sayHi({tables}, nameToGreet: string) {
-// 		return `Hi, ${nameToGreet}!`
-// 	},
-// })
-
-// export const supertopic = () => ({
-// 	math,
-// 	alternative,
-// })
-
-// export type Supertopic = ReturnType<typeof supertopic>
-
-// const api = makeApi2<HttpRequest, HttpResponse>()<Supertopic>({
-// 	expose: {
-// 		math: {
-// 			topic: math,
-// 			policy: {
-// 				parseRequest: async(request) => {},
-// 				processAuth: async(request, auth) => {},
-// 				responders: {
-// 					resultResponse: (requestId, result) => ({
-// 						body: "",
-// 						status: 123,
-// 						headers: {"Content-Type": "application/json"},
-// 					}),
-// 					errorResponse: (requestId, error) => ({
-// 						body: "",
-// 						status: 123,
-// 						headers: {"Content-Type": "application/json"},
-// 					}),
-// 				},
-// 			},
-// 		}
-// 	},
-// })
