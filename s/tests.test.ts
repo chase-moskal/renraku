@@ -1,19 +1,21 @@
 
 import {Suite, assert} from "cynic"
 
-// import {makeApi, makeApi2, PolicyOptions, ToPolicy, asPolicy} from "./api/make-api.js"
-import {ApiError} from "./api/api-error.js"
-import {asTopic} from "./identities/as-topic.js"
-// import {ToShape} from "./types/primitives/to-shape.js"
-import {HttpRequest} from "./types/http/http-request.js"
-import {HttpResponse} from "./types/http/http-response.js"
-import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
-import {parseJsonRequest} from "./jsonrpc/parse-json-request.js"
-// import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
-import {makeJsonHttpResponder} from "./jsonrpc/json-http-responder.js"
-// import {JsonRpcId} from "./types/jsonrpc/json-rpc-id.js"
+// // import {makeApi, makeApi2, PolicyOptions, ToPolicy, asPolicy} from "./api/make-api.js"
+// import {ApiError} from "./api/api-error.js"
+// // import {ToShape} from "./types/primitives/to-shape.js"
+// import {HttpRequest} from "./types/http/http-request.js"
+// import {HttpResponse} from "./types/http/http-response.js"
+// import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
+// // import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
+// import {makeJsonHttpResponder} from "./jsonrpc/json-http-responder.js"
+// // import {JsonRpcId} from "./types/jsonrpc/json-rpc-id.js"
 
-import { Gravy, jsonResponder, loopbackJsonRemote2, makeServelet, Policy2, prepareJsonApi, ToShape, _gravy } from "./scratch.js"
+import {asTopic} from "./identities/as-topic.js"
+import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
+import { makeJsonHttpResponder } from "./jsonrpc/json-http-responder.js"
+import {parseJsonRequest} from "./jsonrpc/parse-json-request.js"
+import { Gravy, loopbackJsonRemote2, makeServelet, Policy2, prepareJsonApi, ToShape, _gravy } from "./scratch.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
@@ -87,9 +89,19 @@ export default <Suite>{
 
 		const servelet = makeServelet({
 			expose: createContext(),
-			responder: jsonResponder,
+			responder: makeJsonHttpResponder({headers: {}}),
 			parseRequest: parseJsonRequest,
 		})
+
+		const r0 = await servelet(jsonHttpRequest({
+			link: goodLink,
+			auth: <AlphaAuth>{token: "t123"},
+			headers: {},
+			specifier: "alpha.sum",
+			args: [1, 2],
+		}))
+
+		assert(r0.status === 200, "direct servelet request status not 200")
 
 		const myRemote = loopbackJsonRemote2({
 			link: goodLink,

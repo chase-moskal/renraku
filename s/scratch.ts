@@ -18,6 +18,7 @@ import {Procedure} from "./types/primitives/procedure.js"
 import {HttpResponse} from "./types/http/http-response.js"
 import {RemoteProcedureCall} from "./types/api/remote-procedure-call.js"
 import { parseJsonRequest } from "./jsonrpc/parse-json-request.js"
+import { makeJsonHttpResponder } from "./jsonrpc/json-http-responder.js"
 
 //
 // API CONTEXT
@@ -87,21 +88,8 @@ export function prepareApi<xRequest, xResponse>(comms: Comms<xRequest, xResponse
 	}
 }
 
-export const jsonResponder: Responder<HttpResponse> = {
-	resultResponse: (requestId, result) => ({
-		body: "",
-		status: 123,
-		headers: {"Content-Type": "application/json"},
-	}),
-	errorResponse: (requestId, error) => ({
-		body: "",
-		status: 123,
-		headers: {"Content-Type": "application/json"},
-	}),
-}
-
 export const prepareJsonApi = prepareApi<HttpRequest, HttpResponse>({
-	responder: jsonResponder,
+	responder: makeJsonHttpResponder({headers: {}}),
 	parseRequest: parseJsonRequest,
 })
 
@@ -162,31 +150,44 @@ export function isShapeContext(shapeContext: ShapeContext<any>) {
 	return isObject(shapeContext) && !!shapeContext[_gravy]
 }
 
-export function generateRemote<xGroupings extends ApiGroupings>({link, shape, requester}: {
+export function generateRemote<xGroupings extends ApiGroupings>({link, shape, specpath = [], requester}: {
 		link: string
 		shape: ToShape<xGroupings>
+		specpath?: string[]
 		requester: Requester<any>
 	}): ToRemote<xGroupings> {
-	return objectMap(shape, value => {
+	return objectMap(shape, (value, key) => {
 		if (isShapeContext(value)) {
 			const {getAuth}: Gravy<any> = value[_gravy]
-			function recurseOverContext(shapeContext: ShapeContext<any>): any {
-				return objectMap(shapeContext, value2 => {
+			function recurseOverContext(shapeContext: ShapeContext<any>, subpath: string[] = []): any {
+				return objectMap(shapeContext, (value2, key2) => {
 					if (value2 === true) {
 						return async(...args: any[]) => {
+							const specifier = [...specpath, ...subpath, key, key2].join(".")
 							const auth = await getAuth()
-							console.log("REMOTE CALL", {auth, args})
+							const result = await requester({
+								link,
+								args,
+								auth,
+								specifier,
+							})
+							return result
 						}
 					}
 					else if (isObject(value2)) {
-						return recurseOverContext(value2)
+						return recurseOverContext(value2, [...subpath, key2])
 					}
 				})
 			}
 			return recurseOverContext(value)
 		}
 		else if (isObject(value)) {
-			return generateRemote({link, shape: value, requester})
+			return generateRemote({
+				link,
+				shape: value,
+				specpath: [...specpath, key],
+				requester,
+			})
 		}
 	})
 }
@@ -251,87 +252,3 @@ export function loopbackJsonRemote2<xGroupings extends ApiGroupings>({link, shap
 		},
 	})
 }
-
-
-////////////////////////////////////////////////////////////////////////
-// EXAMPLES
-////////////////////////////////////////////////////////////////////////
-
-
-type AlphaAuth = {token: string}
-type AlphaMeta = {access: boolean}
-
-type BravoAuth = {abc: string}
-type BravoMeta = {tables: boolean}
-
-const alpha = asTopic<AlphaMeta>()({
-	async sum(meta, x: number, y: number) {
-		return x + y
-	},
-})
-
-const bravo = asTopic<BravoMeta>()({
-	async divide(meta, x: number, y: number) {
-		return x / y
-	},
-})
-
-const alphaPolicy: Policy2<AlphaAuth, AlphaMeta> = {
-	processAuth: async auth => undefined
-}
-
-const bravoPolicy: Policy2<BravoAuth, BravoMeta> = {
-	processAuth: async auth => undefined
-}
-
-const createContext = () => ({
-	alpha: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
-	bravo: prepareJsonApi<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
-	group: {
-		alpha2: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
-	},
-})
-
-type MyContext = ReturnType<typeof createContext>
-
-
-
-const alphaGravy: Gravy<AlphaAuth> = {
-	getAuth: async() => ({token: "t123"})
-}
-
-const bravoGravy: Gravy<BravoAuth> = {
-	getAuth: async() => ({abc: "abc"})
-}
-
-const myShape: ToShape<MyContext> = {
-	alpha: {
-		[_gravy]: alphaGravy,
-		sum: true,
-	},
-	bravo: {
-		[_gravy]: bravoGravy,
-		divide: true,
-	},
-	group: {
-		alpha2: {
-			[_gravy]: alphaGravy,
-			sum: true,
-		}
-	},
-}
-
-
-
-const myRemote = generateRemote({
-	link: "",
-	shape: myShape,
-	requester: async(options) => {}
-})
-
-;(async() => {
-	const r1 = await myRemote.alpha.sum(1, 2)
-	const r2 = await myRemote.group.alpha2.sum(2, 3)
-	console.log(r1, r2)
-})()
-
