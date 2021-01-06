@@ -1,15 +1,22 @@
 
+import {obtain} from "./tools/obtain.js"
+import {ApiError} from "./api/api-error.js"
 import {objectMap} from "./tools/object-map.js"
 import {asTopic} from "./identities/as-topic.js"
 import {RemoteProcedureCall} from "./api/make-api.js"
+import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
+import {parseJsonResponse} from "./jsonrpc/parse-json-response.js"
 
 import {Await} from "./types/tools/await.js"
+import {Api} from "./types/primitives/api.js"
 import {Topic} from "./types/primitives/topic.js"
 import {Responder} from "./types/api/responder.js"
 import {DropFirst} from "./types/tools/drop-first.js"
+import {Requester} from "./types/remote/requester.js"
 import {HttpRequest} from "./types/http/http-request.js"
 import {Procedure} from "./types/primitives/procedure.js"
 import {HttpResponse} from "./types/http/http-response.js"
+import {JsonRpcId} from "./types/jsonrpc/json-rpc-id.js"
 
 //
 // API CONTEXT
@@ -176,7 +183,7 @@ const bravoGravy: Gravy<BravoAuth> = {
 	getAuth: async() => ({abc: "abc"})
 }
 
-const shape: ToShape<MyContext> = {
+const myShape: ToShape<MyContext> = {
 	alpha: {
 		[_gravy]: alphaGravy,
 		sum: true,
@@ -205,8 +212,143 @@ export type ToRemote<xGroupings extends ApiGroupings> = {
 			: never
 }
 
-const remote: ToRemote<MyContext> = <any>{}
-remote.alpha.sum
+export interface ShapeContext<xAuth> {
+	[_gravy]: Gravy<xAuth>
+	[key: string]: true | ShapeContext<xAuth>
+}
+
+export type ShapeGrouping<xAuth> = {
+	[key: string]: ShapeContext<xAuth>
+}
+
+export function isShapeContext(shapeContext: ShapeContext<any>) {
+	return isObject(shapeContext) && !!shapeContext[_gravy]
+}
+
+export function generateRemote<xGroupings extends ApiGroupings>({link, shape, requester}: {
+		link: string
+		shape: ToShape<xGroupings>
+		requester: Requester<any>
+	}): ToRemote<xGroupings> {
+	return objectMap(shape, value => {
+		if (isShapeContext(value)) {
+			const {getAuth}: Gravy<any> = value[_gravy]
+			function recurseOverContext(shapeContext: ShapeContext<any>): any {
+				return objectMap(shapeContext, value2 => {
+					if (value2 === true) {
+						return async(...args: any[]) => {
+							const auth = await getAuth()
+							console.log("REMOTE CALL", {auth, args})
+						}
+					}
+					else if (isObject(value2)) {
+						return recurseOverContext(value2)
+					}
+				})
+			}
+			return recurseOverContext(value)
+		}
+		else if (isObject(value)) {
+			return generateRemote({link, shape: value, requester})
+		}
+	})
+}
+
+const myRemote = generateRemote({
+	link: "",
+	shape: myShape,
+	requester: async(options) => {}
+})
+
+;(async() => {
+	const r1 = await myRemote.alpha.sum(1, 2)
+	const r2 = await myRemote.group.alpha2.sum(2, 3)
+	console.log(r1, r2)
+})()
+
+//
+// SERVER
+//
+
+function isApiError(error: Error) {
+	return typeof error === "number"
+}
+
+export function makeServelet<xRequest, xResponse, xGroupings extends ApiGroupings>({
+		expose,
+		responder,
+		parseRequest,
+	}: {
+		expose: xGroupings
+		responder: Responder<xResponse>
+		parseRequest: ParseRequest<xRequest, any>
+	}): Api<xRequest, xResponse> {
+
+	return async function execute(request: xRequest): Promise<xResponse> {
+		let errorRequestId: JsonRpcId
+		try {
+			const {requestId, specifier, auth, args} = await parseRequest(request)
+			errorRequestId = requestId
+			const {func, policy}: ButteredProcedure<any, any, any[], any, Policy2<any, any>> = obtain(specifier, expose)
+			const meta = await policy.processAuth(auth)
+			const result = await func(meta, ...args)
+			return responder.resultResponse(requestId, result)
+		}
+		catch (error) {
+			if (isApiError(error)) {
+				return responder.errorResponse(errorRequestId, error)
+			}
+			else {
+				throw new ApiError(500, "error")
+			}
+		}
+	}
+}
+
+export function loopbackJsonRemote2<xGroupings extends ApiGroupings>({link, shape, servelet}: {
+		link: string
+		shape: ToShape<xGroupings>
+		servelet: Api<HttpRequest, HttpResponse>
+	}) {
+	return generateRemote({
+		link,
+		shape,
+		requester: async({args, link, auth, specifier}) => {
+			const request = jsonHttpRequest({
+				link,
+				args,
+				auth,
+				specifier,
+				headers: {},
+			})
+			const response = await servelet(request)
+			return parseJsonResponse(response)
+		},
+	})
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // export type ToRemote<xContext extends ApiShape> = {
 // 	[P in keyof xContext]: xContext[P] extends ApiContext<any, any, any, any>
