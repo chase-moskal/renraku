@@ -3,20 +3,20 @@ import {obtain} from "./tools/obtain.js"
 import {ApiError} from "./api/api-error.js"
 import {objectMap} from "./tools/object-map.js"
 import {asTopic} from "./identities/as-topic.js"
-import {RemoteProcedureCall} from "./api/make-api.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import {parseJsonResponse} from "./jsonrpc/parse-json-response.js"
 
 import {Await} from "./types/tools/await.js"
-import {Api} from "./types/primitives/api.js"
 import {Topic} from "./types/primitives/topic.js"
 import {Responder} from "./types/api/responder.js"
 import {DropFirst} from "./types/tools/drop-first.js"
 import {Requester} from "./types/remote/requester.js"
+import {Servelet} from "./types/primitives/servelet.js"
+import {JsonRpcId} from "./types/jsonrpc/json-rpc-id.js"
 import {HttpRequest} from "./types/http/http-request.js"
 import {Procedure} from "./types/primitives/procedure.js"
 import {HttpResponse} from "./types/http/http-response.js"
-import {JsonRpcId} from "./types/jsonrpc/json-rpc-id.js"
+import {RemoteProcedureCall} from "./types/api/remote-procedure-call.js"
 
 //
 // API CONTEXT
@@ -282,7 +282,7 @@ export function makeServelet<xRequest, xResponse, xGroupings extends ApiGrouping
 		expose: xGroupings
 		responder: Responder<xResponse>
 		parseRequest: ParseRequest<xRequest, any>
-	}): Api<xRequest, xResponse> {
+	}): Servelet<xRequest, xResponse> {
 
 	return async function execute(request: xRequest): Promise<xResponse> {
 		let errorRequestId: JsonRpcId
@@ -308,7 +308,7 @@ export function makeServelet<xRequest, xResponse, xGroupings extends ApiGrouping
 export function loopbackJsonRemote2<xGroupings extends ApiGroupings>({link, shape, servelet}: {
 		link: string
 		shape: ToShape<xGroupings>
-		servelet: Api<HttpRequest, HttpResponse>
+		servelet: Servelet<HttpRequest, HttpResponse>
 	}) {
 	return generateRemote({
 		link,
