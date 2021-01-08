@@ -18,8 +18,7 @@
 		"start-http": "serve -l 8000",
 		"start": "run-p start-api start-http",
 		"generate-keys": "./node_modules/redcrypto/generate-keys",
-		"test": "exit 0",
-		"test-2": "cynic node x/tests.test.js",
+		"test": "cynic node x/tests.test.js",
 		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/tests.test.js"
 	},
 	"keywords": [

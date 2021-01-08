@@ -8,7 +8,7 @@ import {makeJsonServelet} from "./servelet/make-json-servelet.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 
 import {Gravy} from "./types/remote/gravy.js"
-import {ToShape} from "./types/shape/to-shape.js"
+import {ToShape} from "./types/remote/to-shape.js"
 import {Policy} from "./types/primitives/policy.js"
 import {gravySymbol} from "./types/symbols/gravy-symbol.js"
 

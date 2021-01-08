@@ -5,11 +5,11 @@ import {Requester} from "../types/remote/requester.js"
 import {isShapeContext} from "../identities/is-shape-context.js"
 
 import {Gravy} from "../types/remote/gravy.js"
-import {ToShape} from "../types/shape/to-shape.js"
+import {ToShape} from "../types/remote/to-shape.js"
 import {ToRemote} from "../types/remote/to-remote.js"
 import {ApiGroupings} from "../types/api/api-groupings.js"
-import {ShapeContext} from "../types/shape/shape-context.js"
 import {gravySymbol} from "../types/symbols/gravy-symbol.js"
+import {ShapeContext} from "../types/remote/shape-context.js"
 
 export function generateRemote<xGroupings extends ApiGroupings>({
 		link,

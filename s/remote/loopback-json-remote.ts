@@ -3,7 +3,7 @@ import {generateRemote} from "./generate-remote.js"
 import {jsonHttpRequest} from "../jsonrpc/json-http-request.js"
 import {parseJsonResponse} from "../jsonrpc/parse-json-response.js"
 
-import {ToShape} from "../types/shape/to-shape.js"
+import {ToShape} from "../types/remote/to-shape.js"
 import {Servelet} from "../types/primitives/servelet.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {HttpResponse} from "../types/http/http-response.js"
