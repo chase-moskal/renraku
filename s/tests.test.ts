@@ -15,6 +15,23 @@ import {_gravy} from "./types/symbols/gravy-symbol.js"
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
 
+/*
+
+terms
+- procedure
+- topic
+- api context
+- api group
+- policy
+- servelet
+- butter -- descriptor / procedure descriptor
+- gravy -- augmentation
+- remote
+- shape
+- shape context
+
+*/
+
 export default <Suite>{
 	"make a servelet and execute a loopback procedure": async() => {
 		type AlphaAuth = {token: string}

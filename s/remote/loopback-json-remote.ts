@@ -10,14 +10,15 @@ import {HttpResponse} from "../types/http/http-response.js"
 import {ApiGroupings} from "../types/api/api-groupings.js"
 
 export function loopbackJsonRemote<xGroupings extends ApiGroupings>({ link, shape, servelet }: {
-	link: string
-	shape: ToShape<xGroupings>
-	servelet: Servelet<HttpRequest, HttpResponse>
-}) {
+		link: string
+		shape: ToShape<xGroupings>
+		servelet: Servelet<HttpRequest, HttpResponse>
+	}) {
+
 	return generateRemote({
 		link,
 		shape,
-		requester: async ({ args, link, auth, specifier }) => {
+		requester: async({args, link, auth, specifier}) => {
 			const request = jsonHttpRequest({
 				link,
 				args,
