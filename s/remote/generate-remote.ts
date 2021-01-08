@@ -4,10 +4,10 @@ import {isObject} from "../identities/is-object.js"
 import {isShapeContext} from "../identities/is-shape-context.js"
 
 import {Augment} from "../types/remote/augment.js"
+import {ApiGroup} from "../types/api/api-group.js"
 import {ToShape} from "../types/remote/to-shape.js"
 import {ToRemote} from "../types/remote/to-remote.js"
 import {Requester} from "../types/remote/requester.js"
-import {ApiGroup} from "../types/api/api-group.js"
 import {_augment} from "../types/symbols/augment-symbol.js"
 import {ShapeContext} from "../types/remote/shape-context.js"
 
