@@ -1,8 +1,8 @@
 
-import {Gravy} from "../remote/gravy.js"
-import {_gravy} from "../symbols/gravy-symbol.js"
+import {Augment} from "./augment.js"
+import {_augment} from "../symbols/augment-symbol.js"
 
 export interface ShapeContext<xAuth> {
-	[_gravy]: Gravy<xAuth>
+	[_augment]: Augment<xAuth>
 	[key: string]: true | ShapeContext<xAuth>
 }

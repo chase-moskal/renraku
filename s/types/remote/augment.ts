@@ -1,4 +1,4 @@
 
-export type Gravy<xAuth> = {
+export type Augment<xAuth> = {
 	getAuth: () => Promise<xAuth>
 }

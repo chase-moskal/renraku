@@ -7,11 +7,11 @@ import {ToShape} from "../types/remote/to-shape.js"
 import {Servelet} from "../types/primitives/servelet.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {HttpResponse} from "../types/http/http-response.js"
-import {ApiGroupings} from "../types/api/api-groupings.js"
+import {ApiGroup} from "../types/api/api-group.js"
 
-export function loopbackJsonRemote<xGroupings extends ApiGroupings>({ link, shape, servelet }: {
+export function loopbackJsonRemote<xApiGroup extends ApiGroup>({ link, shape, servelet }: {
 		link: string
-		shape: ToShape<xGroupings>
+		shape: ToShape<xApiGroup>
 		servelet: Servelet<HttpRequest, HttpResponse>
 	}) {
 

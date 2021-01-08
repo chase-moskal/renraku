@@ -1,9 +1,9 @@
 
 import {ToShape} from "../types/remote/to-shape.js"
-import {ApiGroupings} from "../types/api/api-groupings.js"
+import {ApiGroup} from "../types/api/api-group.js"
 
-export function asShape<xGroupings extends ApiGroupings>(
-		shape: ToShape<xGroupings>
+export function asShape<xApiGroup extends ApiGroup>(
+		shape: ToShape<xApiGroup>
 	) {
 
 	return shape

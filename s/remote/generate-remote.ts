@@ -3,29 +3,29 @@ import {objectMap} from "../tools/object-map.js"
 import {isObject} from "../identities/is-object.js"
 import {isShapeContext} from "../identities/is-shape-context.js"
 
-import {Gravy} from "../types/remote/gravy.js"
+import {Augment} from "../types/remote/augment.js"
 import {ToShape} from "../types/remote/to-shape.js"
 import {ToRemote} from "../types/remote/to-remote.js"
 import {Requester} from "../types/remote/requester.js"
-import {ApiGroupings} from "../types/api/api-groupings.js"
-import {_gravy} from "../types/symbols/gravy-symbol.js"
+import {ApiGroup} from "../types/api/api-group.js"
+import {_augment} from "../types/symbols/augment-symbol.js"
 import {ShapeContext} from "../types/remote/shape-context.js"
 
-export function generateRemote<xGroupings extends ApiGroupings>({
+export function generateRemote<xApiGroup extends ApiGroup>({
 		link,
 		shape,
 		specpath = [],
 		requester
 	}: {
 		link: string
-		shape: ToShape<xGroupings>
+		shape: ToShape<xApiGroup>
 		specpath?: string[]
 		requester: Requester<any>
-	}): ToRemote<xGroupings> {
+	}): ToRemote<xApiGroup> {
 
 	return objectMap(shape, (value, key) => {
 		if (isShapeContext(value)) {
-			const { getAuth }: Gravy<any> = value[_gravy]
+			const { getAuth }: Augment<any> = value[_augment]
 			function recurseOverContext(shapeContext: ShapeContext<any>, subpath: string[] = []): any {
 				return objectMap(shapeContext, (value2, key2) => {
 					if (value2 === true) {

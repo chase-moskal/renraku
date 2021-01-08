@@ -8,9 +8,9 @@ import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import {makeJsonServelet} from "./servelet/make-json-servelet.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 
-import {Gravy} from "./types/remote/gravy.js"
+import {Augment} from "./types/remote/augment.js"
 import {Policy} from "./types/primitives/policy.js"
-import {_gravy} from "./types/symbols/gravy-symbol.js"
+import {_augment} from "./types/symbols/augment-symbol.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
@@ -72,26 +72,26 @@ export default <Suite>{
 
 		////////
 
-		const alphaGravy: Gravy<AlphaAuth> = {
+		const alphaAugment: Augment<AlphaAuth> = {
 			getAuth: async() => ({token: "t123"})
 		}
 
-		const bravoGravy: Gravy<BravoAuth> = {
+		const bravoAugment: Augment<BravoAuth> = {
 			getAuth: async() => ({abc: "abc"})
 		}
 
 		const myShape = asShape<MyContext>({
 			alpha: {
-				[_gravy]: alphaGravy,
+				[_augment]: alphaAugment,
 				sum: true,
 			},
 			bravo: {
-				[_gravy]: bravoGravy,
+				[_augment]: bravoAugment,
 				divide: true,
 			},
 			group: {
 				alpha2: {
-					[_gravy]: alphaGravy,
+					[_augment]: alphaAugment,
 					sum: true,
 				}
 			},

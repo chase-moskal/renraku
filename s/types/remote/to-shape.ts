@@ -1,22 +1,22 @@
 
-import {Gravy} from "../remote/gravy.js"
+import {Augment} from "./augment.js"
 import {ToApiContext} from "../api/to-api-context.js"
-import {ApiGroupings} from "../api/api-groupings.js"
-import {_gravy} from "../symbols/gravy-symbol.js"
+import {ApiGroup} from "../api/api-group.js"
+import {_augment} from "../symbols/augment-symbol.js"
 import {_context} from "../symbols/context-symbol.js"
 import {ProcedureDescriptor} from "../api/procedure-descriptor.js"
 import {OnlyProcedureDescriptors} from "../api/only-procedure-descriptors.js"
 
-export type ToShape<xGroupings extends ApiGroupings> = {
-	[P in keyof xGroupings]: xGroupings[P] extends ProcedureDescriptor<any, any, any[], any, any>
+export type ToShape<xApiGroup extends ApiGroup> = {
+	[P in keyof xApiGroup]: xApiGroup[P] extends ProcedureDescriptor<any, any, any[], any, any>
 		? true
-		: xGroupings[P] extends ApiGroupings
-			? xGroupings[P] extends ToApiContext<any, any, any, any>
+		: xApiGroup[P] extends ApiGroup
+			? xApiGroup[P] extends ToApiContext<any, any, any, any>
 				? {
-					[_gravy]: Gravy<xGroupings[P][typeof _context]["auth"]>
+					[_augment]: Augment<xApiGroup[P][typeof _context]["auth"]>
 				} & {
-					[P2 in keyof OnlyProcedureDescriptors<xGroupings[P]>]: true
+					[P2 in keyof OnlyProcedureDescriptors<xApiGroup[P]>]: true
 				}
-				: ToShape<xGroupings[P]>
+				: ToShape<xApiGroup[P]>
 			: never
 }
