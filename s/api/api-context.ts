@@ -6,9 +6,9 @@ import {isFunction} from "../identities/is-function.js"
 import {Topic} from "../types/primitives/topic.js"
 import {Policy} from "../types/primitives/policy.js"
 import {ToApiContext} from "../types/api/to-api-context.js"
-import {_butter} from "../types/symbols/butter-symbol.js"
+import {_descriptor} from "../types/symbols/descriptor-symbol.js"
 import {_context} from "../types/symbols/context-symbol.js"
-import {ButteredProcedure} from "../types/api/buttered-procedure.js"
+import {ProcedureDescriptor} from "../types/api/procedure-descriptor.js"
 
 export function apiContext<xAuth, xMeta>() {
 	return function recurse<xPolicy extends Policy<xAuth, xMeta>, xTopic extends Topic<xMeta>>(
@@ -18,8 +18,8 @@ export function apiContext<xAuth, xMeta>() {
 
 		return objectMap(topic, (value, key) => {
 			if (isFunction(value))
-				return <ButteredProcedure<xAuth, xMeta, any, any, xPolicy>>{
-					[_butter]: true,
+				return <ProcedureDescriptor<xAuth, xMeta, any, any, xPolicy>>{
+					[_descriptor]: true,
 					policy,
 					func: value,
 				}
