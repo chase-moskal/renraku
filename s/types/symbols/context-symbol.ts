@@ -1,2 +1,2 @@
 
-export const _context = Symbol()
+export const contextSymbol = Symbol()

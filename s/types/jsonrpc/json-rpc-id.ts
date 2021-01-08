@@ -1,2 +1,6 @@
 
-export type JsonRpcId = number | string | null | undefined
+export type JsonRpcId =
+	| number
+	| string
+	| null
+	| undefined

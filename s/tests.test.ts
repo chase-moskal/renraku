@@ -1,27 +1,16 @@
 
 import {Suite, assert} from "cynic"
 
-// // import {makeApi, makeApi2, PolicyOptions, ToPolicy, asPolicy} from "./api/make-api.js"
-// import {ApiError} from "./api/api-error.js"
-// // import {ToShape} from "./types/primitives/to-shape.js"
-// import {HttpRequest} from "./types/http/http-request.js"
-// import {HttpResponse} from "./types/http/http-response.js"
-// import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
-// // import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
-// import {makeJsonHttpResponder} from "./jsonrpc/json-http-responder.js"
-// // import {JsonRpcId} from "./types/jsonrpc/json-rpc-id.js"
-
+import {apiContext} from "./api/api-context.js"
 import {asTopic} from "./identities/as-topic.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
-import { makeJsonHttpResponder } from "./jsonrpc/json-http-responder.js"
-import {parseJsonRequest} from "./jsonrpc/parse-json-request.js"
-import { loopbackJsonRemote } from "./remote/loopback-json-remote"
-import { makeServelet } from "./api/make-servelet"
-import { ToShape } from "./types/shape/to-shape"
-import { Gravy } from "./types/remote/gravy"
-import { Policy } from "./types/primitives/policy"
-import { prepareJsonApi } from "./prepare-json-api.js"
-import { _gravy } from "./types/symbols/gravy-symbol.js"
+import {makeJsonServelet} from "./servelet/make-json-servelet.js"
+import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
+
+import {Gravy} from "./types/remote/gravy.js"
+import {ToShape} from "./types/shape/to-shape.js"
+import {Policy} from "./types/primitives/policy.js"
+import {gravySymbol} from "./types/symbols/gravy-symbol.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
@@ -55,10 +44,10 @@ export default <Suite>{
 		}
 
 		const createContext = () => ({
-			alpha: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
-			bravo: prepareJsonApi<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
+			alpha: apiContext<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
+			bravo: apiContext<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
 			group: {
-				alpha2: prepareJsonApi<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
+				alpha2: apiContext<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
 			},
 		})
 
@@ -76,16 +65,16 @@ export default <Suite>{
 
 		const myShape: ToShape<MyContext> = {
 			alpha: {
-				[_gravy]: alphaGravy,
+				[gravySymbol]: alphaGravy,
 				sum: true,
 			},
 			bravo: {
-				[_gravy]: bravoGravy,
+				[gravySymbol]: bravoGravy,
 				divide: true,
 			},
 			group: {
 				alpha2: {
-					[_gravy]: alphaGravy,
+					[gravySymbol]: alphaGravy,
 					sum: true,
 				}
 			},
@@ -93,11 +82,7 @@ export default <Suite>{
 
 		////////
 
-		const servelet = makeServelet({
-			expose: createContext(),
-			responder: makeJsonHttpResponder({headers: {}}),
-			parseRequest: parseJsonRequest,
-		})
+		const servelet = makeJsonServelet(createContext())
 
 		const r0 = await servelet(jsonHttpRequest({
 			link: goodLink,

@@ -1,4 +1,7 @@
 
+import {isObject} from "./is-object.js"
+
 export function isApiError(error: Error) {
-	return typeof error === "number"
+	const err: any = error
+	return isObject(err) && typeof err.code === "number"
 }

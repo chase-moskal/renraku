@@ -1,9 +1,6 @@
-import { ApiContext } from "./api-context"
 
-//
-// SHAPES
-//
+import {ToApiContext} from "./to-api-context.js"
 
-export type ApiGroupings = ApiContext<any, any, any, any> | {
-	[key: string]: ApiContext<any, any, any, any> | ApiGroupings
+export type ApiGroupings = ToApiContext<any, any, any, any> | {
+	[key: string]: ToApiContext<any, any, any, any> | ApiGroupings
 }

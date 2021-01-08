@@ -1,14 +1,15 @@
 
-import { objectMap } from "../tools/object-map.js"
-import { Requester } from "../types/remote/requester.js"
-import { isObject } from "../identities/is-object"
-import { ApiGroupings } from "../types/api/api-groupings"
-import { Gravy } from "../types/remote/gravy"
-import { ToShape } from "../types/shape/to-shape"
-import { ToRemote } from "../types/remote/to-remote"
-import { isShapeContext } from "../identities/is-shape-context"
-import { ShapeContext } from "../types/shape/shape-context"
-import { _gravy } from "../types/symbols/gravy-symbol.js"
+import {objectMap} from "../tools/object-map.js"
+import {isObject} from "../identities/is-object.js"
+import {Requester} from "../types/remote/requester.js"
+import {isShapeContext} from "../identities/is-shape-context.js"
+
+import {Gravy} from "../types/remote/gravy.js"
+import {ToShape} from "../types/shape/to-shape.js"
+import {ToRemote} from "../types/remote/to-remote.js"
+import {ApiGroupings} from "../types/api/api-groupings.js"
+import {ShapeContext} from "../types/shape/shape-context.js"
+import {gravySymbol} from "../types/symbols/gravy-symbol.js"
 
 export function generateRemote<xGroupings extends ApiGroupings>({
 		link,
@@ -24,7 +25,7 @@ export function generateRemote<xGroupings extends ApiGroupings>({
 
 	return objectMap(shape, (value, key) => {
 		if (isShapeContext(value)) {
-			const { getAuth }: Gravy<any> = value[_gravy]
+			const { getAuth }: Gravy<any> = value[gravySymbol]
 			function recurseOverContext(shapeContext: ShapeContext<any>, subpath: string[] = []): any {
 				return objectMap(shapeContext, (value2, key2) => {
 					if (value2 === true) {

@@ -1,7 +1,4 @@
-import { RemoteProcedureCall } from "./remote-procedure-call.js"
 
-//
-// API CONTEXT
-//
+import {RemoteProcedureCall} from "./remote-procedure-call.js"
 
 export type ParseRequest<xRequest, xAuth> = (request: xRequest) => Promise<RemoteProcedureCall<xAuth>>
