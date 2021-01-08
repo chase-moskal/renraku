@@ -31,5 +31,7 @@
 	"[markdown]": {
 		"editor.tabSize": 2,
 		"editor.insertSpaces": true
-	}
+	},
+	"javascript.format.semicolons": "remove",
+	"typescript.format.semicolons": "remove"
 }

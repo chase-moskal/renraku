@@ -15,7 +15,13 @@ import {asTopic} from "./identities/as-topic.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import { makeJsonHttpResponder } from "./jsonrpc/json-http-responder.js"
 import {parseJsonRequest} from "./jsonrpc/parse-json-request.js"
-import { Gravy, loopbackJsonRemote2, makeServelet, Policy2, prepareJsonApi, ToShape, _gravy } from "./scratch.js"
+import { loopbackJsonRemote } from "./remote/loopback-json-remote"
+import { makeServelet } from "./api/make-servelet"
+import { ToShape } from "./types/shape/to-shape"
+import { Gravy } from "./types/remote/gravy"
+import { Policy } from "./types/primitives/policy"
+import { prepareJsonApi } from "./prepare-json-api.js"
+import { _gravy } from "./types/symbols/gravy-symbol.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
@@ -40,11 +46,11 @@ export default <Suite>{
 			},
 		})
 
-		const alphaPolicy: Policy2<AlphaAuth, AlphaMeta> = {
+		const alphaPolicy: Policy<AlphaAuth, AlphaMeta> = {
 			processAuth: async auth => undefined
 		}
 
-		const bravoPolicy: Policy2<BravoAuth, BravoMeta> = {
+		const bravoPolicy: Policy<BravoAuth, BravoMeta> = {
 			processAuth: async auth => undefined
 		}
 
@@ -103,7 +109,7 @@ export default <Suite>{
 
 		assert(r0.status === 200, "direct servelet request status not 200")
 
-		const myRemote = loopbackJsonRemote2({
+		const myRemote = loopbackJsonRemote({
 			link: goodLink,
 			servelet,
 			shape: myShape,
