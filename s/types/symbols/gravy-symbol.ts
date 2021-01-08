@@ -1,2 +1,2 @@
 
-export const gravySymbol = Symbol()
+export const _gravy = Symbol()

@@ -2,15 +2,15 @@
 import {Suite, assert} from "cynic"
 
 import {apiContext} from "./api/api-context.js"
+import {asShape} from "./identities/as-shape.js"
 import {asTopic} from "./identities/as-topic.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import {makeJsonServelet} from "./servelet/make-json-servelet.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 
 import {Gravy} from "./types/remote/gravy.js"
-import {ToShape} from "./types/remote/to-shape.js"
 import {Policy} from "./types/primitives/policy.js"
-import {gravySymbol} from "./types/symbols/gravy-symbol.js"
+import {_gravy} from "./types/symbols/gravy-symbol.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
@@ -63,22 +63,22 @@ export default <Suite>{
 			getAuth: async() => ({abc: "abc"})
 		}
 
-		const myShape: ToShape<MyContext> = {
+		const myShape = asShape<MyContext>({
 			alpha: {
-				[gravySymbol]: alphaGravy,
+				[_gravy]: alphaGravy,
 				sum: true,
 			},
 			bravo: {
-				[gravySymbol]: bravoGravy,
+				[_gravy]: bravoGravy,
 				divide: true,
 			},
 			group: {
 				alpha2: {
-					[gravySymbol]: alphaGravy,
+					[_gravy]: alphaGravy,
 					sum: true,
 				}
 			},
-		}
+		})
 
 		////////
 

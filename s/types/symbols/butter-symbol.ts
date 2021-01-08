@@ -1,2 +1,2 @@
 
-export const butterSymbol = Symbol()
+export const _butter = Symbol()
