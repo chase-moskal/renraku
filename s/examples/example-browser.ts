@@ -15,5 +15,5 @@ void async function main() {
 	const result = await greeter.sayHello("Chase")
 
 	console.log(result)
-
+	;(<any>window).greeter = greeter
 }()

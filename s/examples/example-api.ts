@@ -7,7 +7,6 @@ import {_augment} from "../types/symbols/augment-symbol.js"
 
 // exposed api functionality
 export const greeterTopic = asTopic<ExampleMeta>()({
-
 	async sayHello(meta, name: string) {
 		if (meta.doctorate) return `Hello Dr. ${name}, welcome!`
 		else return `Hello ${name}, welcome!`
@@ -19,7 +18,7 @@ export interface ExampleAuth {
 	token: string
 }
 
-// processed data derived from the auth data
+// processed data that the policy derives from the auth data
 export interface ExampleMeta {
 	doctorate: boolean
 }

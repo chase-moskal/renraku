@@ -1,6 +1,6 @@
 
 export type HttpRequestHeaders = {
-	"Origin"?: string
-	"Content-Type": string
+	"origin"?: string
+	"content-type": string
 	[key: string]: string
 }
