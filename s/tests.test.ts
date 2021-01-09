@@ -44,10 +44,19 @@ export default <Suite>{
 		}
 
 		const createContext = () => ({
-			alpha: apiContext<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha),
-			bravo: apiContext<BravoAuth, BravoMeta>()(bravoPolicy, bravo),
+			alpha: apiContext<AlphaAuth, AlphaMeta>()({
+				policy: alphaPolicy,
+				expose: alpha,
+			}),
+			bravo: apiContext<BravoAuth, BravoMeta>()({
+				policy: bravoPolicy,
+				expose: bravo,
+			}),
 			group: {
-				alpha2: apiContext<AlphaAuth, AlphaMeta>()(alphaPolicy, alpha)
+				alpha2: apiContext<AlphaAuth, AlphaMeta>()({
+					policy: alphaPolicy,
+					expose: alpha,
+				})
 			},
 		})
 

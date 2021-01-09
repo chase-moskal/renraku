@@ -1,6 +1,17 @@
 
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
+🔆 **the elegant typescript api library**  
+&nbsp; &nbsp; &nbsp; 🛎️ simple — expose async functions  
+&nbsp; &nbsp; &nbsp; 🎭 shapeshifting remotes — client objects impersonate serverside api  
+&nbsp; &nbsp; &nbsp; 🔒 flexible auth — set auth policies for each group of functions  
+&nbsp; &nbsp; &nbsp; 🛠️ testability — pass remotes, real business objects, or mocks to clientside  
+&nbsp; &nbsp; &nbsp; 🧠 sophisticated types — painstakingly engineered  
+&nbsp; &nbsp; &nbsp; 🌐 compatible — exposes standard json rpc  
+
+------
+------
+
 🔆 library for making elegant apis to power web apps  
 &nbsp; &nbsp; &nbsp; 📡 typescript and node oriented  
 &nbsp; &nbsp; &nbsp; 🌐 json rpc compliant for interop  
