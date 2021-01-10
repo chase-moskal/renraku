@@ -117,7 +117,7 @@
     an api contains api contexts
     - an api context contains a topic and the `policy` which processes the auth for that topic
     - our example `processAuth` is stupid-simple: if the token is "abc", the user has a doctorate.  
-      of course in a real app, this is where we might do token verification, and query our database about the user and whatnot.  
+      of course in a real app, this is where we might do token verification, and query our database about the user and whatnot
     - and yes, you can group your api-contexts into arbitrarily-nested objects
     - but you cannot nest a context under another context (so that auth policies cannot conflict)
 
@@ -132,7 +132,7 @@
     ```
     now our server is up and running
     - the `servelet` simply accepts requests and returns responses.  
-      it runs the auth processing and executes the appropriate topic function.
+      it runs the auth processing and executes the appropriate topic function
     - then we make and start a standard node http server with the servelet
 
 1. **clientside: we define a shape object for our api**
@@ -151,7 +151,7 @@
     the shape outlines your api and auth data for each topic
     - typescript will enforce that the shape matches your topic exactly
     - each topic must be given an `_augment` object with a `getAuth` function.  
-      this specifies what auth data will be sent with each request to the topic.  
+      this specifies what auth data will be sent with each request to the topic
     - this runtime shape object is vital for generating remotes
 
 1. **clientside: we generate a remote, and start calling functions from the browser**
@@ -171,7 +171,7 @@
 
       console.log(result1) // "Hello Dr. Chase, welcome!"
       console.log(result2) // "Goodbye Dr. Moskal, see you later."
-    }
+    }()
     ```
 
 ## ⛩️ RENRAKU ERROR HANDLING
