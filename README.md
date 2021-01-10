@@ -187,8 +187,10 @@
 - `topic` — business logic functions. organized into objects, recursive
 - `api-context` — binds a topic together with an auth policy
 - `api` — recursive collection of api contexts
+- `policy` — defines how auth data is processed by the serverside
 - `servelet` — a function which executes an api, accepts a request and returns a response
 - `shape` — data structure describes an api's surface area and auth augmentations
+- `augment` — defines how the client sends auth data with requests
 - `remote` — a clientside proxy that mimics the shape of an api, whose functions execute remote calls
 
 ------
