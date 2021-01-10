@@ -9,7 +9,7 @@ import {Servelet} from "../types/primitives/servelet.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {HttpResponse} from "../types/http/http-response.js"
 
-export function loopbackJsonRemote<xApiGroup extends ApiGroup>({ link, shape, servelet }: {
+export function loopbackJsonRemote<xApiGroup extends ApiGroup>({link, shape, servelet}: {
 		link: string
 		shape: ToShape<xApiGroup>
 		servelet: Servelet<HttpRequest, HttpResponse>
