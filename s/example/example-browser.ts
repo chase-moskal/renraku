@@ -11,9 +11,12 @@ void async function main() {
 		link: "http://localhost:8001",
 	})
 
-	// execute a remote procedure call
-	const result = await greeter.sayHello("Chase")
+	// execute an http json remote procedure call
+	const result1 = await greeter.sayHello("Chase")
+	const result2 = await greeter.sayGoodbye("Moskal")
 
-	console.log(result)
+	console.log(result1) // "Hello Dr. Chase, welcome!"
+	console.log(result2) // "Goodbye Dr. Moskal, see you later."
+
 	;(<any>window).greeter = greeter
 }()

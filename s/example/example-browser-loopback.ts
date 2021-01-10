@@ -1,24 +1,28 @@
 
 import {exampleApi, exampleShape} from "./example-api.js"
-import {makeJsonServelet} from "../servelet/make-json-servelet.js"
+import {makeJsonHttpServelet} from "../servelet/make-json-http-servelet.js"
 import {loopbackJsonRemote} from "../remote/loopback-json-remote.js"
 
 void async function main() {
 
-	// spin up the servelet which is normally on the serverside
-	const servelet = makeJsonServelet(exampleApi())
+	// spin up the servelet on the clientside
+	// (servelet is normally on the serverside)
+	const servelet = makeJsonHttpServelet(exampleApi())
 
 	// generate a "loopback" remote which directly calls the servelet
 	// instead of any network activity
 	const {greeter} = loopbackJsonRemote({
-		link: "http://localhost:8001",
 		servelet,
 		shape: exampleShape,
+		link: "http://localhost:8001",
 	})
 
-	// execute a remote procedure call
-	const result = await greeter.sayHello("Chase")
+	// execute locally, no network activity
+	const result1 = await greeter.sayHello("Chase")
+	const result2 = await greeter.sayGoodbye("Moskal")
 
-	console.log(result)
+	console.log(result1) // "Hello Dr. Chase, welcome!"
+	console.log(result2) // "Goodbye Dr. Moskal, see you later."
+
 	;(<any>window).greeter = greeter
 }()

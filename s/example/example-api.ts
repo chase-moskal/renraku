@@ -7,10 +7,16 @@ import {_augment} from "../types/symbols/augment-symbol.js"
 
 // exposed api functionality
 export const greeterTopic = asTopic<ExampleMeta>()({
+
 	async sayHello(meta, name: string) {
 		if (meta.doctorate) return `Hello Dr. ${name}, welcome!`
 		else return `Hello ${name}, welcome!`
-	}
+	},
+
+	async sayGoodbye(meta, name: string) {
+		if (meta.doctorate) return `Goodbye Dr. ${name}, see you later.`
+		else return `Goodbye ${name}, see you later.`
+	},
 })
 
 // auth data sent with every request
@@ -36,5 +42,6 @@ export const exampleShape = asShape<ReturnType<typeof exampleApi>>({
 	greeter: {
 		[_augment]: {getAuth: async() => ({token: "abc"})},
 		sayHello: true,
+		sayGoodbye: true,
 	}
 })

@@ -24,10 +24,13 @@ export function makeServelet<xRequest, xResponse, xApiGroup extends ApiGroup>({
 	return async function execute(request: xRequest): Promise<xResponse> {
 		let errorRequestId: JsonRpcId
 		try {
-			const { requestId, specifier, auth, args } = await parseRequest(request)
+			const {requestId, specifier, auth, args} = await parseRequest(request)
 			errorRequestId = requestId
-			const {func, policy}: ProcedureDescriptor<any, any, any[], any, Policy<any, any>> =
-				obtain(specifier, expose)
+
+			const {func,policy}:
+				ProcedureDescriptor<any, any, any[], any, Policy<any, any>> =
+					obtain(specifier, expose)
+
 			const meta = await policy.processAuth(auth)
 			const result = await func(meta, ...args)
 			return responder.resultResponse(requestId, result)

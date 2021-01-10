@@ -1,192 +1,207 @@
 
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
-🔆 **the elegant typescript api library**  
-&nbsp; &nbsp; &nbsp; 🛎️ simple — expose async functions  
-&nbsp; &nbsp; &nbsp; 🎭 shapeshifting remotes — client objects impersonate serverside api  
-&nbsp; &nbsp; &nbsp; 🔒 flexible auth — set auth policies for each group of functions  
-&nbsp; &nbsp; &nbsp; 🛠️ testability — pass remotes, real business objects, or mocks to clientside  
-&nbsp; &nbsp; &nbsp; 🧠 sophisticated types — painstakingly engineered  
-&nbsp; &nbsp; &nbsp; 🌐 compatible — exposes standard json rpc  
+**🔆 the enlightened typescript api library**  
+&nbsp; &nbsp; 🛎️ simple — expose async functions  
+&nbsp; &nbsp; 🎭 shapeshifting — client objects impersonate serverside api  
+&nbsp; &nbsp; 🛡 flexible auth — set auth policies for each group of functions  
+&nbsp; &nbsp; 🛠 testability — run your business logic on the client during dev  
+&nbsp; &nbsp; 🧠 sophisticated types — painstakingly engineered for integrity  
+&nbsp; &nbsp; 🌐 compatible — exposes standard json rpc  
+&nbsp; &nbsp; ⚠️ experimental — live on the edge  
 
-------
-------
+## 🚧 RENRAKU DEV TODO
 
-🔆 library for making elegant apis to power web apps  
-&nbsp; &nbsp; &nbsp; 📡 typescript and node oriented  
-&nbsp; &nbsp; &nbsp; 🌐 json rpc compliant for interop  
+- new names for 'auth' and 'meta', maybe just swap
+- rename 'api-group' to just 'api'
+- curry meta function for simpler testing without full loopback
+- write readme section about testing/development scenarios
 
-🧠 futuristic decoupled approach  
-&nbsp; &nbsp; &nbsp; 🛎️ expose simple groups of async functions as api topics  
-&nbsp; &nbsp; &nbsp; 🎭 shapeshifting api client objects, called "remotes", impersonate your exposed apis  
-&nbsp; &nbsp; &nbsp; 🛠️ originally designed to be simple, now designed to be capable and complete  
+## ⛩️ RENRAKU STEP-BY-STEP
 
-🛡 auth processing and security policies  
-&nbsp; &nbsp; &nbsp; 🔓 cors for public apis  
-&nbsp; &nbsp; &nbsp; 🔒 easily customize auth processing  
+> you can skip this tutorial and just read the working [s/example/](s/example/) code (which is used for testing purposes, so mind the relative import paths)  
 
-🚧 **TODO**  
-&nbsp; &nbsp; &nbsp; ⚠️ multiple apis per server, or alt auth for subtopics  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? server can host multiple apis  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ? policies are defined by recursive structure  
-&nbsp; &nbsp; &nbsp; ⚠️ simple node http server handles cors preflights  
-&nbsp; &nbsp; &nbsp; ⚠️ prefab auth policy for simple cors origin whitelisting  
-&nbsp; &nbsp; &nbsp; ⚠️ koa middleware  
-&nbsp; &nbsp; &nbsp; ⚠️ express middleware  
-&nbsp; &nbsp; &nbsp; ⚠️ working fullstack example  
-&nbsp; &nbsp; &nbsp; ⚠️ complete tutorial: auth section, and promote decoupled architecture  
+1. **let's build a really simple api together,**  
+    and we'll integrate auth like it's a real app,  
+    and call its functions from the browser  
 
-## ⛩️ RENRAKU LESSON ONE — MAKE A PUBLIC API, AND CALL IT
+1. **we'll start with two functions**  
+    ```typescript
+    export async function sayHello(name: string) {
+      return `Hello ${name}, welcome!`
+    }
 
-renraku tries to be as simple as possible. but no simpler.  
-it's designed with auth in mind, but let's ignore that for now to keep our first examples simpler
+    export async function sayGoodbye(name: string) {
+      return `Goodbye ${name}, see you later.`
+    }
+    ```
+    this will soon become our api
 
-&nbsp; **node api server**
+1. **now let's spice that up with some auth**
+    ```typescript
+    export interface ExampleMeta {
+      doctorate: boolean
+    }
 
-- first, we formalize our api's business logic into "topics"  
-  &nbsp; &nbsp; *~ make-math-topic.ts ~*
-  ```ts
-  import {asTopic} from "renraku/x/identities/as-topic.js"
+    export async function sayHello(meta: ExampleMeta, name: string) {
+      if (meta.doctorate) return `Hello Dr. ${name}, welcome!`
+      else return `Hello ${name}, welcome!`
+    }
 
-   // formalized api topic allows us to leverage typescipt magic
-   //          ↓                     ↓
-  export const makeMathTopic = () => asTopic<{}>()({
-   //                                        ↑  ↑
-   // skipping auth rules for now, don't worry about it
+    export async function sayGoodbye(meta: ExampleMeta, name: string) {
+      if (meta.doctorate) return `Goodbye Dr. ${name}, see you later.`
+      else return `Goodbye ${name}, see you later.`
+    }
+    ```
+    now we're greeting users who have a doctorate differently than otherwise
 
-     // you can group functions together arbitrarily, recursively
-     //  ↓
-    arithmetic: {
+    these functions are now properly conforming renraku procedures
+    - all renraku functions must always accept a first argument called `meta`
+    - the meta argument is reserved for processed auth data (usually a user's details and privileges)
 
-       // async functions will be exposed on the api
-       //   ↓
-      async sum(meta, x: number, y: number) {
-       //       ↑
-       // meta is reserved for auth stuff, ignore this for now
+1. **we formalize those functions into a renraku "topic"**
+    ```typescript
+    import {asTopic} from "renraku/x/identities/as-topic.js"
 
-        return x + y
+    export interface ExampleMeta {
+      doctorate: boolean
+    }
+
+    export const greeterTopic = asTopic<ExampleMeta>()({
+     //                                              ↑
+     //                ⚠️ curried for magical typescript inference ⚠️
+
+      async sayHello(meta, name: string) {
+        if (meta.doctorate) return `Hello Dr. ${name}, welcome!`
+        else return `Hello ${name}, welcome!`
+      },
+
+      async sayGoodbye(meta, name: string) {
+        if (meta.doctorate) return `Goodbye Dr. ${name}, see you later.`
+        else return `Goodbye ${name}, see you later.`
+      },
+    })
+    ```
+    we named this topic "greeter"
+    - every function in the same renraku topic must share the same `meta` type.  
+    - some renraku library functions, like `asTopic`, are curried up and you have to invoke them twice, like `asTopic()(topic)`.  
+      it looks weird, but you desparately want this: it circumvents a typescript limitation, allowing you to specify your `meta` type *while* also allowing your topic type to be inferred (so you can avoid maintaining a separate interface for your topic)
+    - and if you like, you can group your topic functions into arbitrarily-nested objects, like this
+        ```typescript
+        const greeter = asTopic<ExampleMeta>()({
+          async sayBoo(meta) {return "BOO!"},
+          nestedGroupA: {
+            nestedGroupB: {
+              async sayYolo(meta) {return "#YOLO"},
+            }
+          }
+        })
+        ```
+
+1. **we assemble topics into an api object**
+    ```typescript
+    import {apiContext} from "renraku/x/api/api-context.js"
+    import {asApiGroup} from "renraku/x/identities/as-api-group.js"
+
+    export interface ExampleAuth {
+      token: string
+    }
+
+    export const exampleApi = () => asApiGroup({
+      greeter: apiContext<ExampleAuth, ExampleMeta>()({
+        expose: greeterTopic,
+        policy: {processAuth: async auth => ({doctorate: auth.token === "abc"})},
+      })
+    })
+    ```
+    an api contains api contexts
+    - an api context contains a topic and the `policy` which processes the auth for that topic
+    - our example `processAuth` is stupid-simple: if the token is "abc", the user has a doctorate.  
+      of course in a real app, this is where we might do token verification, and query our database about the user and whatnot.  
+    - and yes, you can group your api-contexts into arbitrarily-nested objects
+    - but you cannot nest a context under another context (so that auth policies cannot conflict)
+
+1. **we expose the api on a nodejs server**
+    ```typescript
+    import {makeJsonHttpServelet} from "renraku/x/servelet/make-json-http-servelet.js"
+    import {makeNodeHttpServer} from "renraku/x/server/make-node-http-server.js"
+
+    const servelet = makeJsonHttpServelet(exampleApi())
+    const server = makeNodeHttpServer(servelet)
+    server.listen(8001)
+    ```
+    now our server is up and running
+    - the `servelet` simply accepts requests and returns responses.  
+      it runs the auth processing and executes the appropriate topic function.
+    - then we make and start a standard node http server with the servelet
+
+1. **clientside: we define a shape object for our api**
+    ```typescript
+    import {asShape} from "renraku/x/identities/as-shape.js"
+    import {_augment} from "renraku/x/types/symbols/augment-symbol.js"
+
+    export const exampleShape = asShape<ReturnType<typeof exampleApi>>({
+      greeter: {
+        [_augment]: {getAuth: async() => ({token: "abc"})},
+        sayHello: true,
+        sayGoodbye: true,
       }
+    })
+    ```
+    the shape outlines your api and auth data for each topic
+    - typescript will enforce that the shape matches your topic exactly
+    - each topic must be given an `_augment` object with a `getAuth` function.  
+      this specifies what auth data will be sent with each request to the topic.  
+    - this runtime shape object is vital for generating remotes
+
+1. **clientside: we generate a remote, and start calling functions from the browser**
+    ```typescript
+    import {generateJsonBrowserRemote} from "renraku/x/remote/generate-json-browser-remote.js"
+    void async function main() {
+
+      const {greeter} = generateJsonBrowserRemote({
+        headers: {},
+        shape: exampleShape,
+        link: "http://localhost:8001",
+      })
+
+      // execute an http json remote procedure call
+      const result1 = await greeter.sayHello("Chase")
+      const result2 = await greeter.sayGoodbye("Moskal")
+
+      console.log(result1) // "Hello Dr. Chase, welcome!"
+      console.log(result2) // "Goodbye Dr. Moskal, see you later."
     }
-  })
+    ```
 
-   // provide easy access to the topic type
-  export type MathTopic = ReturnType<typeof makeMathTopic>
-  ```
+## ⛩️ RENRAKU ERROR HANDLING
 
-- second, let's spool up a node server to expose the api  
-  &nbsp; &nbsp; *~ node-server.ts ~*  
-  ```ts
-  import {makeJsonApi} from "renraku/x/api/make-json-api.js"
-  import {makeHttpServerForApi} from "renraku/x/api/make-http-server-for-api.js"
-  import {makeMathTopic} from "./make-math-topic.js"
+- *...explanations coming soon...*
 
-   // generate an api function which exposes our api topic
-  const api = makeJsonApi({
-    expose: makeMathTopic()
-  })
+## ⛩️ RENRAKU FOR DEVELOPMENT AND TESTING
 
-   // wrap our api in a standard node http server, and start listening
-  makeHttpServerForApi(api).listen(5000)
-  ```
+- *...explanations coming soon...*
 
-&nbsp; **browser api remote**
+## 📖 RENRAKU TERMINOLOGY
 
-- third, we generate an api client object we call a "remote"  
-  &nbsp; &nbsp; *~ make-math-remote.ts ~*
-  ```ts
-  import {makeJsonRemoteForBrowser} from "renraku/x/remote/make-json-remote-for-browser.js"
-  import {makeMathTopic, MathTopic} from "./make-math-topic.js"
-
-  export const makeMathRemote = () => makeJsonRemoteForBrowser<{}, MathTopic>({
-
-     // we provide the url to our node api server
-    link: "http://localhost:5000/",
-
-     // we have to describe the 'shape' of the topic.
-     // typescript enforces that this matches exactly
-    shape: {arithmetic: {sum: true}},
-
-     // here's where you'd supply custom headers
-     // to send with each request
-    headers: {},
-
-     // auth processing that we're ignoring for now
-    getAuth: async() => ({}),
-  })
-  ```
-
-- now, you can grab a remote on the frontend, and call your functions fluently  
-  &nbsp; &nbsp; *~ my-frontend-system.ts ~*
-  ```ts
-  import {makeMathRemote} from "./make-math-remote.js"
-
-  async function main() {
-
-     // make the math remote and grab the arithmetic subtopic
-    const {arithmetic} = makeMathRemote()
-
-     // perform api calls fluently
-    const result1 = await arithmetic.sum(1, 1)
-    const result2 = await arithmetic.sum(2, 3)
-
-    console.log(result1) //> 2
-    console.log(result2) //> 5
-  }
-  ```
-
-📖 **terminology review**
 - `topic` — business logic functions. organized into objects, recursive
-- `api` — a function which executes the business logic in a topic
-- `server` — an http server which executes api functions
-- `shape` — json data structure that describes a topic's surface area
-- `remote` — a clientside proxy that mimics the shape of a topic, makes http calls
+- `api-context` — binds a topic together with an auth policy
+- `api` — recursive collection of api contexts
+- `servelet` — a function which executes an api, accepts a request and returns a response
+- `shape` — data structure describes an api's surface area and auth augmentations
+- `remote` — a clientside proxy that mimics the shape of an api, whose functions execute remote calls
 
-## ⛩️ RENRAKU LESSON TWO — API WITH AUTHENTICATION AND AUTHORIZATION
+------
 
-now we're going to improve the first examples by adding auth
+## ⛩️ RENRAKU WANTS YOU
 
-we'll also add some more functions to show off some more capabilities
+contributions welcome
 
-- so let's make a better version of our topic  
-  &nbsp; &nbsp; *~ make-math-topic.ts ~*
-  ```ts
-  import {asTopic} from "renraku/x/identities/as-topic.js"
+please consider posting an issue for any problems, questions, or comments you may have
 
-  export const makeMathTopic2 = () => asTopic({
-    expose: {
-      arithmetic: {
-        [policy]: {
-          parseRequest: async() => {},
-          processAuth: async() => {},
-        },
-        async sum(meta, x: number, y: number) {
-          return x + y
-        },
-      },
-    },
-  })
+and give me your github stars!  
+&nbsp; // chase
 
-  export const makeMathTopic = () => asTopic<{}>()({
-    arithmetic: {
+------
 
-      async sum(meta, x: number, y: number) {
-        return x + y
-      },
-
-      async average(meta, ...points: number[]) {
-        if (points.length === 0) throw new ApiError("cannot average nothing")
-        let total = 0
-        for (const point of points) total += point
-        return total / points.length
-      },
-    }
-  })
-
-   // provide easy access to the topic type
-  export type MathTopic = ReturnType<typeof makeMathTopic>
-  ```
-
-
-*todo: coming soon*
-
-&nbsp; &nbsp; &nbsp; &nbsp; *— RENRAKU means "contact" —*
+&nbsp; &nbsp; &nbsp; *— RENRAKU means "contact" —*  

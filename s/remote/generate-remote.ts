@@ -25,7 +25,7 @@ export function generateRemote<xApiGroup extends ApiGroup>({
 
 	return objectMap(shape, (value, key) => {
 		if (isShapeContext(value)) {
-			const { getAuth }: Augment<any> = value[_augment]
+			const {getAuth}: Augment<any> = value[_augment]
 			function recurseOverContext(shapeContext: ShapeContext<any>, subpath: string[] = []): any {
 				return objectMap(shapeContext, (value2, key2) => {
 					if (value2 === true) {

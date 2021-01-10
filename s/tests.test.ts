@@ -5,7 +5,7 @@ import {apiContext} from "./api/api-context.js"
 import {asShape} from "./identities/as-shape.js"
 import {asTopic} from "./identities/as-topic.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
-import {makeJsonServelet} from "./servelet/make-json-servelet.js"
+import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 
 import {Augment} from "./types/remote/augment.js"
@@ -91,7 +91,7 @@ export default <Suite>{
 
 		////////
 
-		const servelet = makeJsonServelet(createContext())
+		const servelet = makeJsonHttpServelet(createContext())
 
 		const r0 = await servelet(jsonHttpRequest({
 			link: goodLink,
