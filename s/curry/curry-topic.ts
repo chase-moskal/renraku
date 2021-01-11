@@ -4,7 +4,7 @@ import {isObject} from "../identities/is-object.js"
 import {isFunction} from "../identities/is-function.js"
 
 import {Topic} from "../types/primitives/topic.js"
-import {CurryTopic} from "../types/api/curry-topic.js"
+import {CurryTopic} from "../types/curry/curry-topic.js"
 import {_augment} from "../types/symbols/augment-symbol.js"
 
 export function curryTopic<xAuth>() {

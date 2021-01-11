@@ -18,7 +18,7 @@
     and we'll integrate auth like it's a real app,  
     and call its functions from the browser  
 
-1. **we'll start with two functions**  
+1. **we'll start with two functions**
     ```typescript
     export async function sayHello(name: string) {
       return `Hello ${name}, welcome!`
@@ -173,7 +173,60 @@
 
 ## ⛩️ RENRAKU FOR DEVELOPMENT AND TESTING
 
-- *...explanations coming soon...*
+- **curry a topic for direct usage**
+    ```typescript
+    import {asTopic} from "renraku/x/identities/as-topic.js"
+    import {curryTopic} from "renraku/x/curry/curry-topic.js"
+
+    interface ExampleAuth {
+      doctorate: boolean
+    }
+
+    const greeter = asTopic<ExampleAuth>()({
+      async sayHello(auth, name: string) {
+        if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
+        else return `Hello ${name}, welcome!`
+      }
+    })
+
+    // now we can curry the topic for local usage
+    const greeterWithAuth = curryTopic<ExampleAuth>()({
+      topic: greeter,
+
+      // we define what auth is passed with each call
+      getAuth: async() => ({doctorate: true}),
+    })
+
+    // now we can call functions, and the auth is baked-in
+    void async function main() {
+      const result = await greeterWithAuth.sayHello("Chase")
+      console.log(result) // "Hello Dr. Chase, welcome!"
+    }()
+    ```
+    - this is useful for running simple tests
+
+- **full loopback for full-stack testing**
+    ```typescript
+    // spin up the servelet on the clientside
+    // (servelet is normally on the serverside)
+    const servelet = makeJsonHttpServelet(exampleApi())
+
+    // generate a "loopback" remote which directly calls the servelet
+    // instead of any network activity
+    const {greeter} = loopbackJsonRemote({
+      servelet,
+      shape: exampleShape,
+      link: "http://localhost:8001",
+    })
+
+    // execute locally, no network activity
+    const result1 = await greeter.sayHello("Chase")
+    const result2 = await greeter.sayGoodbye("Moskal")
+
+    console.log(result1) // "Hello Dr. Chase, welcome!"
+    console.log(result2) // "Goodbye Dr. Moskal, see you later."
+    ```
+    - this fully excercises all facilities, clientside and serverside, emulating http transactions, and running your auth processing — all without any real network activity
 
 ## 📖 RENRAKU TERMINOLOGY
 
