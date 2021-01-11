@@ -63,8 +63,8 @@
     }
 
     export const greeter = asTopic<ExampleAuth>()({
-     //                                              ↑
-     //                ⚠️ curried for magical typescript inference ⚠️
+     //                                         ↑
+     //          ⚠️ curried for magical typescript inference ⚠️
 
       async sayHello(auth, name: string) {
         if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
