@@ -171,7 +171,7 @@
     }()
     ```
 
-## ⛩️ RENRAKU FOR ARCHITECTURE, DEVELOPMENT, AND TESTING
+## ⛩️ RENRAKU IDEAL ARCHITECTURE, DEVELOPMENT, AND TESTING
 
 - **your frontend systems should be agnostic about how they receive business logic**  
     so you can freely pass in remote or local functionality
@@ -180,7 +180,7 @@
     async function makeMyFrontendSystem({greeter}: {
 
         // accept business logic,
-        // but you don't want to know if it's remote or local
+        // but you don't even want to know if it's remote or local
         greeter: Business<GreeterTopic>
 
       }) {
@@ -190,10 +190,10 @@
     ```
     i like to run my whole serverside in loopback within the browser, for rapid development
 
-- **curry a topic for direct usage**
+- **transform a topic to business logic for direct usage**
     ```typescript
     import {asTopic} from "renraku/x/identities/as-topic.js"
-    import {curryTopic} from "renraku/x/curry/curry-topic.js"
+    import {toBusiness} from "renraku/x/transform/to-business.js"
 
     interface ExampleAuth {
       doctorate: boolean
@@ -208,7 +208,7 @@
 
     // now we can curry the topic for local usage
     // we specify the auth provided with each call
-    const greeter = curryTopic<ExampleAuth>()({
+    const greeter = toBusiness<ExampleAuth>()({
       topic: greeter,
       getAuth: async() => ({doctorate: true}),
     })
@@ -244,7 +244,7 @@
     console.log(result1) // "Hello Dr. Chase, welcome!"
     console.log(result2) // "Goodbye Dr. Moskal, see you later."
     ```
-    - this fully excercises all facilities, clientside and serverside, emulating http transactions, and running your auth processing — all without any real network activity
+    - a loopback fully excercises all facilities, clientside and serverside, emulating http transactions, and running your auth processing — all without any real network activity
 
 ## ⛩️ RENRAKU ERROR HANDLING
 
