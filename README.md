@@ -231,9 +231,9 @@
 
 - `topic` — business logic functions. organized into objects, recursive
 - `meta` — data sent with each request
-- `auth` — data passed to business logic functions, derived from the meta data
+- `auth` — processed auth data, passed to each business function
+- `api` — server definition containing topics. is a recursive collection of api contexts
 - `api-context` — binds a topic together with an auth policy
-- `api` — recursive collection of api contexts
 - `policy` — defines how meta data is processed into auth data by the serverside
 - `servelet` — a function which executes an api, accepts a request and returns a response
 - `shape` — data structure describes an api's surface area and meta augmentations
