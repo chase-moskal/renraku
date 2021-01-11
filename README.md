@@ -173,7 +173,7 @@
 
 <br/>
 
-## ⛩️ RENRAKU IDEAL ARCHITECTURE, DEVELOPMENT, AND TESTING
+## ⛩️ RENRAKU FOR ARCHITECTURE, DEVELOPMENT, AND TESTING
 
 - **your frontend systems should be agnostic about how they receive business logic**  
     so you can freely pass in remote or local functionality
