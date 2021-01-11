@@ -1,6 +1,8 @@
 
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
+`npm install renraku`
+
 **🔆 enlightened typescript api library**  
 &nbsp; &nbsp; 🛎️ simple — expose async functions  
 &nbsp; &nbsp; 🎭 shapeshifting — client objects impersonate serverside api  
@@ -169,7 +171,15 @@
 
 ## ⛩️ RENRAKU ERROR HANDLING
 
-- *...explanations coming soon...*
+- thrown exceptions will trigger exceptions on the clientside
+- if you throw a renraku `ApiError`, the message and the http status code will be sent to the client
+    ```typescript
+    import {ApiError} from "renraku/x/api/api-error.js"
+
+    // later, somewhere in your topic functionality
+    throw new ApiError(403, "forbidden; user must be qualified with a doctorate")
+    ```
+- for all other thrown exceptions, the details are censored from the client, and a generic 500 ApiError is sent instead
 
 ## ⛩️ RENRAKU FOR DEVELOPMENT AND TESTING
 
