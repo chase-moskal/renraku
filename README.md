@@ -171,6 +171,8 @@
     }()
     ```
 
+<br/>
+
 ## ⛩️ RENRAKU IDEAL ARCHITECTURE, DEVELOPMENT, AND TESTING
 
 - **your frontend systems should be agnostic about how they receive business logic**  
@@ -246,6 +248,8 @@
     ```
     - a loopback fully excercises all facilities, clientside and serverside, emulating http transactions, and running your auth processing — all without any real network activity
 
+<br/>
+
 ## ⛩️ RENRAKU ERROR HANDLING
 
 - thrown exceptions will trigger exceptions on the clientside
@@ -257,6 +261,8 @@
     throw new ApiError(403, "forbidden; user must be qualified with a doctorate")
     ```
 - for all other thrown exceptions, the details are censored from the client, and a generic 500 ApiError is sent instead
+
+<br/>
 
 ## 📖 RENRAKU TERMINOLOGY
 
