@@ -190,10 +190,9 @@
     })
 
     // now we can curry the topic for local usage
+    // we specify the auth provided with each call
     const greeterWithAuth = curryTopic<ExampleAuth>()({
       topic: greeter,
-
-      // we define what auth is passed with each call
       getAuth: async() => ({doctorate: true}),
     })
 
