@@ -12,8 +12,6 @@
 
 ## 🚧 RENRAKU DEV TODO
 
-- new names for 'auth' and 'meta', maybe just swap
-- rename 'api-group' to just 'api'
 - curry meta function for simpler testing without full loopback
 - write readme section about testing/development scenarios
 
@@ -39,60 +37,60 @@
 
 1. **now let's spice that up with some auth**
     ```typescript
-    export interface ExampleMeta {
+    export interface ExampleAuth {
       doctorate: boolean
     }
 
-    export async function sayHello(meta: ExampleMeta, name: string) {
-      if (meta.doctorate) return `Hello Dr. ${name}, welcome!`
+    export async function sayHello(auth: ExampleAuth, name: string) {
+      if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
       else return `Hello ${name}, welcome!`
     }
 
-    export async function sayGoodbye(meta: ExampleMeta, name: string) {
-      if (meta.doctorate) return `Goodbye Dr. ${name}, see you later.`
+    export async function sayGoodbye(auth: ExampleAuth, name: string) {
+      if (auth.doctorate) return `Goodbye Dr. ${name}, see you later.`
       else return `Goodbye ${name}, see you later.`
     }
     ```
     now we're greeting users who have a doctorate differently than otherwise
 
     these functions are now properly conforming renraku procedures
-    - all renraku functions must always accept a first argument called `meta`
-    - the meta argument is reserved for processed auth data (usually a user's details and privileges)
+    - all renraku functions must always accept a first argument called `auth`
+    - the auth argument is reserved for processed auth data (usually a user's details and privileges)
 
 1. **we formalize those functions into a renraku "topic"**
     ```typescript
     import {asTopic} from "renraku/x/identities/as-topic.js"
 
-    export interface ExampleMeta {
+    export interface ExampleAuth {
       doctorate: boolean
     }
 
-    export const greeterTopic = asTopic<ExampleMeta>()({
+    export const greeterTopic = asTopic<ExampleAuth>()({
      //                                              ↑
      //                ⚠️ curried for magical typescript inference ⚠️
 
-      async sayHello(meta, name: string) {
-        if (meta.doctorate) return `Hello Dr. ${name}, welcome!`
+      async sayHello(auth, name: string) {
+        if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
         else return `Hello ${name}, welcome!`
       },
 
-      async sayGoodbye(meta, name: string) {
-        if (meta.doctorate) return `Goodbye Dr. ${name}, see you later.`
+      async sayGoodbye(auth, name: string) {
+        if (auth.doctorate) return `Goodbye Dr. ${name}, see you later.`
         else return `Goodbye ${name}, see you later.`
       },
     })
     ```
     we named this topic "greeter"
-    - every function in the same renraku topic must share the same `meta` type.  
+    - every function in the same renraku topic must share the same `auth` type.  
     - some renraku library functions, like `asTopic`, are curried up and you have to invoke them twice, like `asTopic()(topic)`.  
-      it looks weird, but you desparately want this: it circumvents a typescript limitation, allowing you to specify your `meta` type *while* also allowing your topic type to be inferred (so you can avoid maintaining a separate interface for your topic)
+      it looks weird, but you desparately want this: it circumvents a typescript limitation, allowing you to specify your `auth` type *while* also allowing your topic type to be inferred (so you can avoid maintaining a separate interface for your topic)
     - and if you like, you can group your topic functions into arbitrarily-nested objects, like this
         ```typescript
-        const greeter = asTopic<ExampleMeta>()({
-          async sayBoo(meta) {return "BOO!"},
+        const greeter = asTopic<ExampleAuth>()({
+          async sayBoo(auth) {return "BOO!"},
           nestedGroupA: {
             nestedGroupB: {
-              async sayYolo(meta) {return "#YOLO"},
+              async sayYolo(auth) {return "#YOLO"},
             }
           }
         })
@@ -101,16 +99,16 @@
 1. **we assemble topics into an api object**
     ```typescript
     import {apiContext} from "renraku/x/api/api-context.js"
-    import {asApiGroup} from "renraku/x/identities/as-api-group.js"
+    import {asApi} from "renraku/x/identities/as-api.js"
 
-    export interface ExampleAuth {
+    export interface ExampleMeta {
       token: string
     }
 
-    export const exampleApi = () => asApiGroup({
-      greeter: apiContext<ExampleAuth, ExampleMeta>()({
+    export const exampleApi = () => asApi({
+      greeter: apiContext<ExampleMeta, ExampleAuth>()({
         expose: greeterTopic,
-        policy: {processAuth: async auth => ({doctorate: auth.token === "abc"})},
+        policy: {processAuth: async meta => ({doctorate: meta.token === "abc"})},
       })
     })
     ```
@@ -142,16 +140,16 @@
 
     export const exampleShape = asShape<ReturnType<typeof exampleApi>>({
       greeter: {
-        [_augment]: {getAuth: async() => ({token: "abc"})},
+        [_augment]: {getMeta: async() => ({token: "abc"})},
         sayHello: true,
         sayGoodbye: true,
       }
     })
     ```
-    the shape outlines your api and auth data for each topic
+    the shape outlines your api and auth `meta` data for each topic
     - typescript will enforce that the shape matches your topic exactly
-    - each topic must be given an `_augment` object with a `getAuth` function.  
-      this specifies what auth data will be sent with each request to the topic
+    - each topic must be given an `_augment` object with a `getMeta` function.  
+      this specifies what meta data will be sent with each request to the topic
     - this runtime shape object is vital for generating remotes
 
 1. **clientside: we generate a remote, and start calling functions from the browser**
@@ -185,12 +183,14 @@
 ## 📖 RENRAKU TERMINOLOGY
 
 - `topic` — business logic functions. organized into objects, recursive
+- `meta` — data sent with each request
+- `auth` — data passed to business logic functions, derived from the meta data
 - `api-context` — binds a topic together with an auth policy
 - `api` — recursive collection of api contexts
-- `policy` — defines how auth data is processed by the serverside
+- `policy` — defines how meta data is processed into auth data by the serverside
 - `servelet` — a function which executes an api, accepts a request and returns a response
-- `shape` — data structure describes an api's surface area and auth augmentations
-- `augment` — defines how the client sends auth data with requests
+- `shape` — data structure describes an api's surface area and meta augmentations
+- `augment` — defines how the client sends meta data with requests
 - `remote` — a clientside proxy that mimics the shape of an api, whose functions execute remote calls
 
 ------

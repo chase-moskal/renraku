@@ -7,16 +7,16 @@ import {Requester} from "../types/remote/requester.js"
 import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 import {HttpResponseHeaders} from "../types/http/http-response-headers.js"
 
-export function makeJsonRequester<xAuth>({fetch, headers}: {
+export function makeJsonRequester<xMeta>({fetch, headers}: {
 		fetch: typeof window.fetch
 		headers: Partial<HttpRequestHeaders>
-	}): Requester<xAuth> {
+	}): Requester<xMeta> {
 
-	return async function requester({link, args, auth, specifier}) {
+	return async function requester({link, args, meta, specifier}) {
 		const request = jsonHttpRequest({
 			link,
 			args,
-			auth,
+			meta,
 			headers,
 			specifier,
 		})

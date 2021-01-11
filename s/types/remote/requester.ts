@@ -1,7 +1,7 @@
 
-export type Requester<xAuth> = (options: {
+export type Requester<xMeta> = (options: {
 	link: string
-	auth: xAuth
+	meta: xMeta
 	args: any[]
 	specifier: string
 }) => Promise<any>

@@ -2,45 +2,45 @@
 import {apiContext} from "../api/api-context.js"
 import {asShape} from "../identities/as-shape.js"
 import {asTopic} from "../identities/as-topic.js"
-import {asApiGroup} from "../identities/as-api-group.js"
+import {asApi} from "../identities/as-api.js"
 import {_augment} from "../types/symbols/augment-symbol.js"
 
 // exposed api functionality
-export const greeterTopic = asTopic<ExampleMeta>()({
+export const greeterTopic = asTopic<ExampleAuth>()({
 
-	async sayHello(meta, name: string) {
-		if (meta.doctorate) return `Hello Dr. ${name}, welcome!`
+	async sayHello(auth, name: string) {
+		if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
 		else return `Hello ${name}, welcome!`
 	},
 
-	async sayGoodbye(meta, name: string) {
-		if (meta.doctorate) return `Goodbye Dr. ${name}, see you later.`
+	async sayGoodbye(auth, name: string) {
+		if (auth.doctorate) return `Goodbye Dr. ${name}, see you later.`
 		else return `Goodbye ${name}, see you later.`
 	},
 })
 
-// auth data sent with every request
-export interface ExampleAuth {
+// meta data sent with every request
+export interface ExampleMeta {
 	token: string
 }
 
-// processed data that the policy derives from the auth data
-export interface ExampleMeta {
+// processed data that the policy derives from the meta data
+export interface ExampleAuth {
 	doctorate: boolean
 }
 
-// api configured with an auth policy
-export const exampleApi = () => asApiGroup({
-	greeter: apiContext<ExampleAuth, ExampleMeta>()({
+// api configured with an meta policy
+export const exampleApi = () => asApi({
+	greeter: apiContext<ExampleMeta, ExampleAuth>()({
 		expose: greeterTopic,
-		policy: {processAuth: async auth => ({doctorate: auth.token === "abc"})},
+		policy: {processMeta: async meta => ({doctorate: meta.token === "abc"})},
 	})
 })
 
-// shape for generating remotes specifies auth
+// shape for generating remotes specifies meta
 export const exampleShape = asShape<ReturnType<typeof exampleApi>>({
 	greeter: {
-		[_augment]: {getAuth: async() => ({token: "abc"})},
+		[_augment]: {getMeta: async() => ({token: "abc"})},
 		sayHello: true,
 		sayGoodbye: true,
 	}

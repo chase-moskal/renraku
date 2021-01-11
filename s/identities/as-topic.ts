@@ -1,8 +1,8 @@
 
 import {Topic} from "../types/primitives/topic.js"
 
-export function asTopic<xMeta>() {
-	return function<xTopic extends Topic<xMeta>>(topic: xTopic) {
+export function asTopic<xAuth>() {
+	return function<xTopic extends Topic<xAuth>>(topic: xTopic) {
 		return topic
 	}
 }

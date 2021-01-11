@@ -10,24 +10,24 @@ import {ToApiContext} from "../types/api/to-api-context.js"
 import {_descriptor} from "../types/symbols/descriptor-symbol.js"
 import {ProcedureDescriptor} from "../types/api/procedure-descriptor.js"
 
-export function apiContext<xAuth, xMeta>() {
+export function apiContext<xMeta, xAuth>() {
 	return function recurse<
-			xPolicy extends Policy<xAuth, xMeta>,
-			xTopic extends Topic<xMeta>,
+			xPolicy extends Policy<xMeta, xAuth>,
+			xTopic extends Topic<xAuth>,
 		>({expose, policy}: {
 			expose: xTopic
 			policy: xPolicy
-		}): ToApiContext<xAuth, xMeta, xTopic, xPolicy> {
+		}): ToApiContext<xMeta, xAuth, xTopic, xPolicy> {
 
 		return objectMap(expose, (value, key) => {
 			if (isFunction(value))
-				return <ProcedureDescriptor<xAuth, xMeta, any, any, xPolicy>>{
+				return <ProcedureDescriptor<xMeta, xAuth, any, any, xPolicy>>{
 					[_descriptor]: true,
 					policy,
 					func: value,
 				}
 			else if (isObject(value))
-				return <ToApiContext<xAuth, xMeta, xTopic, xPolicy>>{
+				return <ToApiContext<xMeta, xAuth, xTopic, xPolicy>>{
 					[_context]: true,
 					...recurse({policy, expose: value})
 				}

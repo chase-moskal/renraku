@@ -17,43 +17,43 @@ const {origin: goodOrigin} = new URL(goodLink)
 
 export default <Suite>{
 	"make a servelet and execute a loopback procedure": async() => {
-		type AlphaAuth = {token: string}
-		type AlphaMeta = {access: boolean}
+		type AlphaMeta = {token: string}
+		type AlphaAuth = {access: boolean}
 
-		type BravoAuth = {abc: string}
-		type BravoMeta = {tables: boolean}
+		type BravoMeta = {abc: string}
+		type BravoAuth = {tables: boolean}
 
-		const alpha = asTopic<AlphaMeta>()({
-			async sum(meta, x: number, y: number) {
+		const alpha = asTopic<AlphaAuth>()({
+			async sum(auth, x: number, y: number) {
 				return x + y
 			},
 		})
 
-		const bravo = asTopic<BravoMeta>()({
-			async divide(meta, x: number, y: number) {
+		const bravo = asTopic<BravoAuth>()({
+			async divide(auth, x: number, y: number) {
 				return x / y
 			},
 		})
 
-		const alphaPolicy: Policy<AlphaAuth, AlphaMeta> = {
-			processAuth: async auth => undefined
+		const alphaPolicy: Policy<AlphaMeta, AlphaAuth> = {
+			processMeta: async meta => undefined
 		}
 
-		const bravoPolicy: Policy<BravoAuth, BravoMeta> = {
-			processAuth: async auth => undefined
+		const bravoPolicy: Policy<BravoMeta, BravoAuth> = {
+			processMeta: async meta => undefined
 		}
 
 		const createContext = () => ({
-			alpha: apiContext<AlphaAuth, AlphaMeta>()({
+			alpha: apiContext<AlphaMeta, AlphaAuth>()({
 				policy: alphaPolicy,
 				expose: alpha,
 			}),
-			bravo: apiContext<BravoAuth, BravoMeta>()({
+			bravo: apiContext<BravoMeta, BravoAuth>()({
 				policy: bravoPolicy,
 				expose: bravo,
 			}),
 			group: {
-				alpha2: apiContext<AlphaAuth, AlphaMeta>()({
+				alpha2: apiContext<AlphaMeta, AlphaAuth>()({
 					policy: alphaPolicy,
 					expose: alpha,
 				})
@@ -64,12 +64,12 @@ export default <Suite>{
 
 		////////
 
-		const alphaAugment: Augment<AlphaAuth> = {
-			getAuth: async() => ({token: "t123"})
+		const alphaAugment: Augment<AlphaMeta> = {
+			getMeta: async() => ({token: "t123"})
 		}
 
-		const bravoAugment: Augment<BravoAuth> = {
-			getAuth: async() => ({abc: "abc"})
+		const bravoAugment: Augment<BravoMeta> = {
+			getMeta: async() => ({abc: "abc"})
 		}
 
 		const myShape = asShape<MyContext>({
@@ -95,7 +95,7 @@ export default <Suite>{
 
 		const r0 = await servelet(jsonHttpRequest({
 			link: goodLink,
-			auth: <AlphaAuth>{token: "t123"},
+			meta: <AlphaMeta>{token: "t123"},
 			headers: {},
 			specifier: "alpha.sum",
 			args: [1, 2],

@@ -1,4 +1,4 @@
 
-export type Augment<xAuth> = {
-	getAuth: () => Promise<xAuth>
+export type Augment<xMeta> = {
+	getMeta: () => Promise<xMeta>
 }

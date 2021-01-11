@@ -1,4 +1,4 @@
 
-export type ContextHint<xAuth> = {
-	auth: xAuth
+export type ContextHint<xMeta> = {
+	meta: xMeta
 }

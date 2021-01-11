@@ -5,16 +5,16 @@ import {HttpRequest} from "../types/http/http-request.js"
 import {JsonRequest} from "../types/jsonrpc/json-request.js"
 import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 
-export function jsonHttpRequest<xAuth>({
+export function jsonHttpRequest<xMeta>({
 		link,
-		auth,
+		meta,
 		args,
 		specifier,
 		requestOrigin,
 		headers: moreHeaders,
 	}: {
 		link: string
-		auth: xAuth
+		meta: xMeta
 		args: any[]
 		specifier: string
 		headers: Partial<HttpRequestHeaders>
@@ -40,7 +40,7 @@ export function jsonHttpRequest<xAuth>({
 		body: JSON.stringify(<JsonRequest>{
 			jsonrpc: "2.0",
 			method: specifier,
-			params: [auth, ...args],
+			params: [meta, ...args],
 		}),
 	}
 }

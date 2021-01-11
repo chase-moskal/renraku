@@ -8,10 +8,10 @@ import {Procedure} from "../primitives/procedure.js"
 import {ProcedureDescriptor} from "./procedure-descriptor.js"
 import {_context} from "../symbols/context-symbol.js"
 
-export type ToApiContext<xAuth, xMeta, xTopic extends Topic<xMeta>, xPolicy extends Policy<xAuth, xMeta>> = {
-	[P in keyof xTopic]: xTopic[P] extends Procedure<xMeta, any[], any>
-		? ProcedureDescriptor<xAuth, xMeta, DropFirst<Parameters<xTopic[P]>>, Await<ReturnType<xTopic[P]>>, xPolicy>
-		: xTopic[P] extends Topic<xMeta>
-			? ToApiContext<xAuth, xMeta, xTopic[P], xPolicy>
+export type ToApiContext<xMeta, xAuth, xTopic extends Topic<xAuth>, xPolicy extends Policy<xMeta, xAuth>> = {
+	[P in keyof xTopic]: xTopic[P] extends Procedure<xAuth, any[], any>
+		? ProcedureDescriptor<xMeta, xAuth, DropFirst<Parameters<xTopic[P]>>, Await<ReturnType<xTopic[P]>>, xPolicy>
+		: xTopic[P] extends Topic<xAuth>
+			? ToApiContext<xMeta, xAuth, xTopic[P], xPolicy>
 			: never
-} & {[_context]: ContextHint<xAuth>}
+} & {[_context]: ContextHint<xMeta>}

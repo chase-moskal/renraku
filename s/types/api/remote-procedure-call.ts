@@ -1,9 +1,9 @@
 
 import {JsonRpcId} from "../jsonrpc/json-rpc-id.js"
 
-export type RemoteProcedureCall<xAuth> = {
+export type RemoteProcedureCall<xMeta> = {
 	requestId: JsonRpcId,
 	specifier: string,
-	auth: xAuth,
+	meta: xMeta,
 	args: any[],
 }

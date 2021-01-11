@@ -1,6 +1,6 @@
 
 export type Procedure<
-	xMeta,
+	xAuth,
 	xArgs extends any[],
 	xResult,
-> = (meta: xMeta, ...args: xArgs) => Promise<xResult>
+> = (auth: xAuth, ...args: xArgs) => Promise<xResult>

@@ -1,6 +1,6 @@
 
 import {Procedure} from "./procedure.js"
 
-export type Topic<xMeta> = {
-	[key: string]: Topic<xMeta> | Procedure<xMeta, any[], any>
+export type Topic<xAuth> = {
+	[key: string]: Topic<xAuth> | Procedure<xAuth, any[], any>
 }

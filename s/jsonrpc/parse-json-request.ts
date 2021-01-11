@@ -5,11 +5,11 @@ import {JsonRequest} from "../types/jsonrpc/json-request.js"
 export async function parseJsonRequest(request: HttpRequest) {
 	const {id, method, params}: JsonRequest = JSON.parse(request.body)
 	const specifier = method
-	const [auth, ...args] = params
+	const [meta, ...args] = params
 	return {
 		requestId: id,
 		specifier,
-		auth,
+		meta,
 		args,
 	}
 }
