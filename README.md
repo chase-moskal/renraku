@@ -12,6 +12,8 @@
 &nbsp; &nbsp; 🌐 compatible — exposes standard json rpc  
 &nbsp; &nbsp; ⚠️ experimental — live on the edge  
 
+<br/>
+
 ## ⛩️ RENRAKU STEP-BY-STEP
 
 > you can skip this tutorial and just read the working [s/example/](s/example/) code (which is used for testing purposes, so mind the relative import paths)  
