@@ -250,6 +250,8 @@
 - `augment` — defines how the client sends meta data with requests
 - `remote` — a clientside proxy that mimics the shape of an api, whose functions execute remote calls
 
+<br/>
+
 ------
 
 ## ⛩️ RENRAKU WANTS YOU
