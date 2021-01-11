@@ -178,7 +178,7 @@
 - **your frontend systems should be agnostic about how they receive business logic**  
     so you can freely pass in remote or local functionality
     ```typescript
-    import {Business} from "renraku/x/types/business.js"
+    import {Business} from "renraku/x/types/primitives/business.js"
     async function makeMyFrontendSystem({greeter}: {
 
         // accept business logic,
