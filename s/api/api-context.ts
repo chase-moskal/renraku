@@ -32,7 +32,7 @@ export function apiContext<xMeta, xAuth>() {
 					...recurse({policy, expose: value})
 				}
 			else
-				throw new Error(`unknown value for "${key}"`)
+				throw new Error(`unknown api context subtype for "${key}"`)
 		})
 	}
 }
