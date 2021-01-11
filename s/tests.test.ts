@@ -11,6 +11,7 @@ import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 import {Augment} from "./types/remote/augment.js"
 import {Policy} from "./types/primitives/policy.js"
 import {_augment} from "./types/symbols/augment-symbol.js"
+import { curryTopic } from "./remote/curry-api-context.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)
@@ -36,11 +37,11 @@ export default <Suite>{
 		})
 
 		const alphaPolicy: Policy<AlphaMeta, AlphaAuth> = {
-			processMeta: async meta => undefined
+			processAuth: async meta => ({access: true})
 		}
 
 		const bravoPolicy: Policy<BravoMeta, BravoAuth> = {
-			processMeta: async meta => undefined
+			processAuth: async meta => ({tables: true})
 		}
 
 		const createContext = () => ({
@@ -114,5 +115,15 @@ export default <Suite>{
 
 		assert(r1 === 3, "r1 must be 3")
 		assert(r2 === 5, "r2 must be 5")
+
+		////////
+
+		const mockAlpha = curryTopic<AlphaAuth>()({
+			topic: alpha,
+			getAuth: async() => ({access: true}),
+		})
+
+		const m1 = await mockAlpha.sum(4, 5)
+		assert(m1, "m1 must be 9")
 	},
 }

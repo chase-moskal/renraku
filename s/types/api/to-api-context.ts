@@ -5,8 +5,8 @@ import {ContextHint} from "./context-hint.js"
 import {Policy} from "../primitives/policy.js"
 import {DropFirst} from "../tools/drop-first.js"
 import {Procedure} from "../primitives/procedure.js"
-import {ProcedureDescriptor} from "./procedure-descriptor.js"
 import {_context} from "../symbols/context-symbol.js"
+import {ProcedureDescriptor} from "./procedure-descriptor.js"
 
 export type ToApiContext<xMeta, xAuth, xTopic extends Topic<xAuth>, xPolicy extends Policy<xMeta, xAuth>> = {
 	[P in keyof xTopic]: xTopic[P] extends Procedure<xAuth, any[], any>

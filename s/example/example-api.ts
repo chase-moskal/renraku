@@ -33,7 +33,7 @@ export interface ExampleAuth {
 export const exampleApi = () => asApi({
 	greeter: apiContext<ExampleMeta, ExampleAuth>()({
 		expose: greeterTopic,
-		policy: {processMeta: async meta => ({doctorate: meta.token === "abc"})},
+		policy: {processAuth: async meta => ({doctorate: meta.token === "abc"})},
 	})
 })
 

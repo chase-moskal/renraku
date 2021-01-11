@@ -27,11 +27,11 @@ export function makeServelet<xRequest, xResponse, xApi extends Api>({
 			const {requestId, specifier, meta, args} = await parseRequest(request)
 			errorRequestId = requestId
 
-			const {func,policy}:
+			const {func, policy}:
 				ProcedureDescriptor<any, any, any[], any, Policy<any, any>> =
 					obtain(specifier, expose)
 
-			const auth = await policy.processMeta(meta)
+			const auth = await policy.processAuth(meta)
 			const result = await func(auth, ...args)
 			return responder.resultResponse(requestId, result)
 		}

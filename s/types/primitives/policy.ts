@@ -1,4 +1,4 @@
 
 export type Policy<xMeta, xAuth> = {
-	processMeta: (meta: xMeta) => Promise<xAuth>
+	processAuth: (meta: xMeta) => Promise<xAuth>
 }
