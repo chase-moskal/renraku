@@ -4,14 +4,14 @@ import {isObject} from "../identities/is-object.js"
 import {isFunction} from "../identities/is-function.js"
 
 import {Topic} from "../types/primitives/topic.js"
-import {StripAuth} from "../types/curry/strip-auth.js"
+import {Business} from "../types/primitives/business.js"
 import {_augment} from "../types/symbols/augment-symbol.js"
 
-export function curryTopic<xAuth>() {
+export function toBusiness<xAuth>() {
 	return function recurse<xTopic extends Topic<xAuth>>({topic, getAuth}: {
 			topic: xTopic
 			getAuth: () => Promise<xAuth>
-		}): StripAuth<xTopic> {
+		}): Business<xTopic> {
 
 		return objectMap(topic, (value, key) => {
 			if (isFunction(value))

@@ -62,7 +62,7 @@
       doctorate: boolean
     }
 
-    export const greeter = asTopic<ExampleAuth>()({
+    export const greeterTopic = asTopic<ExampleAuth>()({
      //                                         ↑
      //          ⚠️ curried for magical typescript inference ⚠️
 
@@ -83,7 +83,7 @@
       it looks weird, but you desparately want this: it circumvents a typescript limitation, allowing you to specify your `auth` type *while* also allowing your topic type to be inferred (so you can avoid maintaining a separate interface for your topic)
     - and if you like, you can group your topic functions into arbitrarily-nested objects, like this
         ```typescript
-        const greeter = asTopic<ExampleAuth>()({
+        const greeterTopic = asTopic<ExampleAuth>()({
           async sayBoo(auth) {return "BOO!"},
           nestedGroupA: {
             nestedGroupB: {
@@ -104,7 +104,7 @@
 
     export const exampleApi = () => asApi({
       greeter: apiContext<ExampleMeta, ExampleAuth>()({
-        expose: greeter,
+        expose: greeterTopic,
         policy: {processAuth: async meta => ({doctorate: meta.token === "abc"})},
       })
     })
@@ -169,19 +169,24 @@
     }()
     ```
 
-## ⛩️ RENRAKU ERROR HANDLING
+## ⛩️ RENRAKU FOR ARCHITECTURE, DEVELOPMENT, AND TESTING
 
-- thrown exceptions will trigger exceptions on the clientside
-- if you throw a renraku `ApiError`, the message and the http status code will be sent to the client
+- **your frontend systems should be agnostic about how they receive business logic**  
+    so you can freely pass in remote or local functionality
     ```typescript
-    import {ApiError} from "renraku/x/api/api-error.js"
+    import {Business} from "renraku/x/types/business.js"
+    async function makeMyFrontendSystem({greeter}: {
 
-    // later, somewhere in your topic functionality
-    throw new ApiError(403, "forbidden; user must be qualified with a doctorate")
+        // accept business logic,
+        // but you don't want to know if it's remote or local
+        greeter: Business<GreeterTopic>
+
+      }) {
+      const result = greeter.sayHello("Chase")
+      console.log(result)
+    }
     ```
-- for all other thrown exceptions, the details are censored from the client, and a generic 500 ApiError is sent instead
-
-## ⛩️ RENRAKU FOR DEVELOPMENT AND TESTING
+    i like to run my whole serverside in loopback within the browser, for rapid development
 
 - **curry a topic for direct usage**
     ```typescript
@@ -192,7 +197,7 @@
       doctorate: boolean
     }
 
-    const greeter = asTopic<ExampleAuth>()({
+    const greeterTopic = asTopic<ExampleAuth>()({
       async sayHello(auth, name: string) {
         if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
         else return `Hello ${name}, welcome!`
@@ -201,14 +206,14 @@
 
     // now we can curry the topic for local usage
     // we specify the auth provided with each call
-    const greeterWithAuth = curryTopic<ExampleAuth>()({
+    const greeter = curryTopic<ExampleAuth>()({
       topic: greeter,
       getAuth: async() => ({doctorate: true}),
     })
 
     // now we can call functions, and the auth is baked-in
     void async function main() {
-      const result = await greeterWithAuth.sayHello("Chase")
+      const result = await greeter.sayHello("Chase")
       console.log(result) // "Hello Dr. Chase, welcome!"
     }()
     ```
@@ -216,6 +221,8 @@
 
 - **full loopback for full-stack testing**
     ```typescript
+    import {loopbackJsonRemote} from "renraku/x/remote/loopback-json-remote.js"
+
     // spin up the servelet on the clientside
     // (servelet is normally on the serverside)
     const servelet = makeJsonHttpServelet(exampleApi())
@@ -236,6 +243,18 @@
     console.log(result2) // "Goodbye Dr. Moskal, see you later."
     ```
     - this fully excercises all facilities, clientside and serverside, emulating http transactions, and running your auth processing — all without any real network activity
+
+## ⛩️ RENRAKU ERROR HANDLING
+
+- thrown exceptions will trigger exceptions on the clientside
+- if you throw a renraku `ApiError`, the message and the http status code will be sent to the client
+    ```typescript
+    import {ApiError} from "renraku/x/api/api-error.js"
+
+    // later, somewhere in your topic functionality
+    throw new ApiError(403, "forbidden; user must be qualified with a doctorate")
+    ```
+- for all other thrown exceptions, the details are censored from the client, and a generic 500 ApiError is sent instead
 
 ## 📖 RENRAKU TERMINOLOGY
 

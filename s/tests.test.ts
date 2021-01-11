@@ -4,7 +4,7 @@ import {Suite, assert} from "cynic"
 import {apiContext} from "./api/api-context.js"
 import {asShape} from "./identities/as-shape.js"
 import {asTopic} from "./identities/as-topic.js"
-import {curryTopic} from "./curry/curry-topic.js"
+import {toBusiness} from "./transforms/to-business.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
@@ -118,7 +118,7 @@ export default <Suite>{
 
 		////////
 
-		const mockAlpha = curryTopic<AlphaAuth>()({
+		const mockAlpha = toBusiness<AlphaAuth>()({
 			topic: alpha,
 			getAuth: async() => ({access: true}),
 		})
