@@ -1,7 +1,7 @@
 
 import {exampleApi} from "./example-api.js"
-import {makeJsonHttpServelet} from "../servelet/make-json-http-servelet.js"
 import {makeNodeHttpServer} from "../server/make-node-http-server.js"
+import {makeJsonHttpServelet} from "../servelet/make-json-http-servelet.js"
 
 void async function main() {
 	const servelet = makeJsonHttpServelet(exampleApi())

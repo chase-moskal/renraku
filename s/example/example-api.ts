@@ -1,8 +1,8 @@
 
+import {asApi} from "../identities/as-api.js"
 import {apiContext} from "../api/api-context.js"
 import {asShape} from "../identities/as-shape.js"
 import {asTopic} from "../identities/as-topic.js"
-import {asApi} from "../identities/as-api.js"
 import {_augment} from "../types/symbols/augment-symbol.js"
 
 // exposed api functionality

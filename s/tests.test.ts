@@ -4,14 +4,14 @@ import {Suite, assert} from "cynic"
 import {apiContext} from "./api/api-context.js"
 import {asShape} from "./identities/as-shape.js"
 import {asTopic} from "./identities/as-topic.js"
+import {curryTopic} from "./remote/curry-topic.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
-import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
+import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
 
 import {Augment} from "./types/remote/augment.js"
 import {Policy} from "./types/primitives/policy.js"
 import {_augment} from "./types/symbols/augment-symbol.js"
-import { curryTopic } from "./remote/curry-api-context.js"
 
 const goodLink = "http://localhost:5000/"
 const {origin: goodOrigin} = new URL(goodLink)

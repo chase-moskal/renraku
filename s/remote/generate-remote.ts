@@ -3,8 +3,8 @@ import {objectMap} from "../tools/object-map.js"
 import {isObject} from "../identities/is-object.js"
 import {isShapeContext} from "../identities/is-shape-context.js"
 
-import {Augment} from "../types/remote/augment.js"
 import {Api} from "../types/api/api.js"
+import {Augment} from "../types/remote/augment.js"
 import {ToShape} from "../types/remote/to-shape.js"
 import {ToRemote} from "../types/remote/to-remote.js"
 import {Requester} from "../types/remote/requester.js"
@@ -15,7 +15,7 @@ export function generateRemote<xApi extends Api>({
 		link,
 		shape,
 		specpath = [],
-		requester
+		requester,
 	}: {
 		link: string
 		shape: ToShape<xApi>

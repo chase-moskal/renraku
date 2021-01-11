@@ -1,19 +1,14 @@
 
 # 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
 
-**🔆 the enlightened typescript api library**  
+**🔆 enlightened typescript api library**  
 &nbsp; &nbsp; 🛎️ simple — expose async functions  
 &nbsp; &nbsp; 🎭 shapeshifting — client objects impersonate serverside api  
 &nbsp; &nbsp; 🛡 flexible auth — set auth policies for each group of functions  
-&nbsp; &nbsp; 🛠 testability — run your business logic on the client during dev  
+&nbsp; &nbsp; 🔧 testability — run your functions anywhere for testing or dev  
 &nbsp; &nbsp; 🧠 sophisticated types — painstakingly engineered for integrity  
 &nbsp; &nbsp; 🌐 compatible — exposes standard json rpc  
 &nbsp; &nbsp; ⚠️ experimental — live on the edge  
-
-## 🚧 RENRAKU DEV TODO
-
-- curry meta function for simpler testing without full loopback
-- write readme section about testing/development scenarios
 
 ## ⛩️ RENRAKU STEP-BY-STEP
 
@@ -65,7 +60,7 @@
       doctorate: boolean
     }
 
-    export const greeterTopic = asTopic<ExampleAuth>()({
+    export const greeter = asTopic<ExampleAuth>()({
      //                                              ↑
      //                ⚠️ curried for magical typescript inference ⚠️
 
@@ -107,7 +102,7 @@
 
     export const exampleApi = () => asApi({
       greeter: apiContext<ExampleMeta, ExampleAuth>()({
-        expose: greeterTopic,
+        expose: greeter,
         policy: {processAuth: async meta => ({doctorate: meta.token === "abc"})},
       })
     })
@@ -117,7 +112,7 @@
     - our example `processAuth` is stupid-simple: if the token is "abc", the user has a doctorate.  
       of course in a real app, this is where we might do token verification, and query our database about the user and whatnot
     - and yes, you can group your api-contexts into arbitrarily-nested objects
-    - but you cannot nest a context under another context (so that auth policies cannot conflict)
+    - however you cannot nest a context under another context (so that auth policies cannot conflict)
 
 1. **we expose the api on a nodejs server**
     ```typescript

@@ -1,7 +1,7 @@
 
 import {exampleApi, exampleShape} from "./example-api.js"
-import {makeJsonHttpServelet} from "../servelet/make-json-http-servelet.js"
 import {loopbackJsonRemote} from "../remote/loopback-json-remote.js"
+import {makeJsonHttpServelet} from "../servelet/make-json-http-servelet.js"
 
 void async function main() {
 
