@@ -16,9 +16,9 @@
 
 > you can skip this tutorial and just read the working [s/example/](s/example/) code (which is used for testing purposes, so mind the relative import paths)  
 
-1. **let's build a really simple api together,**  
-    and we'll integrate auth like it's a real app,  
-    and call its functions from the browser  
+1. **let's build a really simple api together.**  
+    we'll integrate auth like it's a real app,  
+    run a node server, and call it from the browser  
 
 1. **we'll start with two functions**
     ```typescript
