@@ -1,6 +1,6 @@
 {
 	"name": "renraku",
-	"version": "0.0.0-dev.32",
+	"version": "0.0.0-dev.33",
 	"description": "expose async functions as an api",
 	"license": "ISC",
 	"author": "Chase Moskal <chasemoskal@gmail.com>",
@@ -41,7 +41,7 @@
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/isomorphic-fetch": "0.0.35",
-		"@types/node": "^14.14.20",
+		"@types/node": "^14.14.22",
 		"cynic": "0.1.0-dev.14",
 		"isomorphic-fetch": "^3.0.0",
 		"mkdirp": "^1.0.4",
