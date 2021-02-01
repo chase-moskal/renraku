@@ -5,14 +5,15 @@ import {isFunction} from "../identities/is-function.js"
 
 import {Topic} from "../types/primitives/topic.js"
 import {Policy} from "../types/primitives/policy.js"
+import {HttpRequest} from "../types/http/http-request.js"
 import {_context} from "../types/symbols/context-symbol.js"
 import {ToApiContext} from "../types/api/to-api-context.js"
 import {_descriptor} from "../types/symbols/descriptor-symbol.js"
 import {ProcedureDescriptor} from "../types/api/procedure-descriptor.js"
 
-export function apiContext<xMeta, xAuth>() {
+export function apiContext<xMeta, xAuth, xRequest = HttpRequest>() {
 	return function recurse<
-			xPolicy extends Policy<xMeta, xAuth>,
+			xPolicy extends Policy<xMeta, xAuth, xRequest>,
 			xTopic extends Topic<xAuth>,
 		>({expose, policy}: {
 			expose: xTopic

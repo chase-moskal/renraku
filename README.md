@@ -97,8 +97,8 @@
 
 1. **we assemble topics into an api object**
     ```typescript
-    import {apiContext} from "renraku/x/api/api-context.js"
     import {asApi} from "renraku/x/identities/as-api.js"
+    import {apiContext} from "renraku/x/api/api-context.js"
 
     export interface ExampleMeta {
       token: string
@@ -107,7 +107,7 @@
     export const exampleApi = () => asApi({
       greeter: apiContext<ExampleMeta, ExampleAuth>()({
         expose: greeterTopic,
-        policy: {processAuth: async meta => ({doctorate: meta.token === "abc"})},
+        policy: {processAuth: async (meta, request) => ({doctorate: meta.token === "abc"})},
       })
     })
     ```

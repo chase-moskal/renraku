@@ -37,11 +37,11 @@ export default <Suite>{
 		})
 
 		const alphaPolicy: Policy<AlphaMeta, AlphaAuth> = {
-			processAuth: async meta => ({access: true})
+			processAuth: async (meta, request) => ({access: true})
 		}
 
 		const bravoPolicy: Policy<BravoMeta, BravoAuth> = {
-			processAuth: async meta => ({tables: true})
+			processAuth: async (meta, request) => ({tables: true})
 		}
 
 		const createContext = () => ({
