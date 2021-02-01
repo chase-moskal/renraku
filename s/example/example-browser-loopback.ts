@@ -14,7 +14,8 @@ void async function main() {
 	const {greeter} = loopbackJsonRemote({
 		servelet,
 		shape: exampleShape,
-		link: "http://localhost:8001",
+		link: "http://localhost:8001/",
+		headers: {origin: "http://localhost:8001"},
 	})
 
 	// execute locally, no network activity

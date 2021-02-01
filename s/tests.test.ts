@@ -105,9 +105,10 @@ export default <Suite>{
 		assert(r0.status === 200, "direct servelet request status not 200")
 
 		const myRemote = loopbackJsonRemote({
-			link: goodLink,
 			servelet,
+			link: goodLink,
 			shape: myShape,
+			headers: {origin: "http://localhost:5000"},
 		})
 
 		const r1 = await myRemote.alpha.sum(1, 2)

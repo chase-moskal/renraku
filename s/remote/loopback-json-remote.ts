@@ -8,10 +8,12 @@ import {ToShape} from "../types/remote/to-shape.js"
 import {Servelet} from "../types/primitives/servelet.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {HttpResponse} from "../types/http/http-response.js"
+import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 
-export function loopbackJsonRemote<xApi extends Api>({link, shape, servelet}: {
+export function loopbackJsonRemote<xApi extends Api>({link, shape, headers, servelet}: {
 		link: string
 		shape: ToShape<xApi>
+		headers: Partial<HttpRequestHeaders>
 		servelet: Servelet<HttpRequest, HttpResponse>
 	}) {
 
@@ -23,8 +25,8 @@ export function loopbackJsonRemote<xApi extends Api>({link, shape, servelet}: {
 				link,
 				args,
 				meta,
+				headers,
 				specifier,
-				headers: {},
 			})
 			const response = await servelet(request)
 			return parseJsonResponse(response)
