@@ -1,5 +1,5 @@
 
-import {fixHeaderCasing} from "../tools/fix-header-casing.js"
+import {capitalizedHeaders} from "../tools/capitalized-headers.js"
 import {jsonHttpRequest} from "../jsonrpc/json-http-request.js"
 import {parseJsonResponse} from "../jsonrpc/parse-json-response.js"
 
@@ -24,7 +24,7 @@ export function makeJsonRequester<xMeta>({fetch, headers}: {
 		const fetchRequest = new window.Request(link, {
 			body: request.body,
 			method: request.method,
-			headers: fixHeaderCasing(request.headers),
+			headers: capitalizedHeaders(request.headers),
 		})
 		const fetchResponse = await fetch(fetchRequest)
 

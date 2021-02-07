@@ -8,6 +8,7 @@ import {HttpMethod} from "../types/http/http-method.js"
 import {Servelet} from "../types/primitives/servelet.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {HttpResponse} from "../types/http/http-response.js"
+import {lowercasedHeaders} from "../tools/lowercased-headers.js"
 import {HttpRequestHeaders} from "../types/http/http-request-headers.js"
 
 export function makeRequestListener(
@@ -19,7 +20,9 @@ export function makeRequestListener(
 			path: request.url,
 			body: await readStream(request),
 			method: <HttpMethod>request.method,
-			headers: <HttpRequestHeaders>readRawHeaders(request.rawHeaders),
+			headers: <HttpRequestHeaders>lowercasedHeaders(
+				readRawHeaders(request.rawHeaders)
+			),
 		})
 
 		for (const [headerKey, headerValue] of Object.entries(renrakuResponse.headers))

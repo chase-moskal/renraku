@@ -1,5 +1,5 @@
 
-export function fixHeaderCasing(headers: {[key: string]: string}) {
+export function capitalizedHeaders(headers: {[key: string]: string}) {
 	const headers2: {[key: string]: string} = {}
 	for (const [key, value] of Object.entries(headers)) {
 		const parts = key.split("-")
