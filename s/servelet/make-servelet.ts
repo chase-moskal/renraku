@@ -40,7 +40,8 @@ export function makeServelet<xRequest, xResponse, xApi extends Api>({
 				return responder.errorResponse(errorRequestId, error)
 			}
 			else {
-				throw new ApiError(500, "error")
+				console.error("⚠️ unexpected error", error)
+				return responder.errorResponse(errorRequestId, new ApiError(500, "error"))
 			}
 		}
 	}
