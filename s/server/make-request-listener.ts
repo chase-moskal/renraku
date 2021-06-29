@@ -19,7 +19,7 @@ export function makeRequestListener(
 		const renrakuResponse = await servelet({
 			path: request.url,
 			body: await readStream(request),
-			method: <HttpMethod>request.method,
+			method: <HttpMethod>request.method.toLowerCase(),
 			headers: <HttpRequestHeaders>lowercasedHeaders(
 				readRawHeaders(request.rawHeaders)
 			),
