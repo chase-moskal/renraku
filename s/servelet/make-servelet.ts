@@ -12,12 +12,13 @@ import {Servelet} from "../types/primitives/servelet.js"
 import {JsonRpcId} from "../types/jsonrpc/json-rpc-id.js"
 import {ParseRequest} from "../types/api/parse-request.js"
 import {ServeletLogger} from "../types/servelet/servelet-logger.js"
+import {serveletLoggerPlain} from "./logger/servelet-logger-plain.js"
 import {ProcedureDescriptor} from "../types/api/procedure-descriptor.js"
 
 export function makeServelet<xRequest, xResponse, xApi extends Api>({
 		expose,
 		responder,
-		serveletLogger = noServeletLogger(),
+		serveletLogger = serveletLoggerPlain(console),
 		parseRequest,
 	}: {
 		expose: xApi

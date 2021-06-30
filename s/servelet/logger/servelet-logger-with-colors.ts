@@ -6,8 +6,9 @@ import {doubleSpaceLogger} from "../../tools/fancy-logging/double-space-logger.j
 
 import {Logger} from "../../types/tools/logger.js"
 
-export function serveletLoggerWithColors(logger: Logger) {
+export function serveletLoggerWithColors(logger: Logger, detailed = false) {
 	return serveletLoggerCore(
-		timestampedLogger(coloredLogger(doubleSpaceLogger(logger)))
+		timestampedLogger(coloredLogger(doubleSpaceLogger(logger))),
+		detailed,
 	)
 }

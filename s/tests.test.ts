@@ -7,6 +7,7 @@ import {asTopic} from "./identities/as-topic.js"
 import {toBusiness} from "./transforms/to-business.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
+import {noServeletLogger} from "./servelet/logger/no-servelet-logger.js"
 import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
 
 import {Augment} from "./types/remote/augment.js"
@@ -14,7 +15,6 @@ import {Policy} from "./types/primitives/policy.js"
 import {_augment} from "./types/symbols/augment-symbol.js"
 
 const goodLink = "http://localhost:5000/"
-const {origin: goodOrigin} = new URL(goodLink)
 
 export default <Suite>{
 	"make a servelet and execute a loopback procedure": async() => {
@@ -92,7 +92,7 @@ export default <Suite>{
 
 		////////
 
-		const servelet = makeJsonHttpServelet(createContext())
+		const servelet = makeJsonHttpServelet(createContext(), noServeletLogger())
 
 		const r0 = await servelet(jsonHttpRequest({
 			link: goodLink,
