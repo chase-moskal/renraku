@@ -1,4 +1,2 @@
 
-export type Augment<xMeta> = {
-	getMeta: () => Promise<xMeta>
-}
+export type Augment<xMeta> = () => Promise<xMeta>

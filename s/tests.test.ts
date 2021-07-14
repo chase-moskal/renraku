@@ -12,7 +12,7 @@ import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
 
 import {Augment} from "./types/remote/augment.js"
 import {Policy} from "./types/primitives/policy.js"
-import {_augment} from "./types/symbols/augment-symbol.js"
+import {_meta} from "./types/symbols/meta-symbol.js"
 
 const goodLink = "http://localhost:5000/"
 
@@ -36,13 +36,11 @@ export default <Suite>{
 			},
 		})
 
-		const alphaPolicy: Policy<AlphaMeta, AlphaAuth> = {
-			processAuth: async (meta, request) => ({access: true})
-		}
+		const alphaPolicy: Policy<AlphaMeta, AlphaAuth> =
+			async(meta, request) => ({access: true})
 
-		const bravoPolicy: Policy<BravoMeta, BravoAuth> = {
-			processAuth: async (meta, request) => ({tables: true})
-		}
+		const bravoPolicy: Policy<BravoMeta, BravoAuth> =
+			async(meta, request) => ({tables: true})
 
 		const createContext = () => ({
 			alpha: apiContext<AlphaMeta, AlphaAuth>()({
@@ -65,26 +63,21 @@ export default <Suite>{
 
 		////////
 
-		const alphaAugment: Augment<AlphaMeta> = {
-			getMeta: async() => ({token: "t123"})
-		}
-
-		const bravoAugment: Augment<BravoMeta> = {
-			getMeta: async() => ({abc: "abc"})
-		}
+		const alphaAugment: Augment<AlphaMeta> = async() => ({token: "t123"})
+		const bravoAugment: Augment<BravoMeta> = async() => ({abc: "abc"})
 
 		const myShape = asShape<MyContext>({
 			alpha: {
-				[_augment]: alphaAugment,
+				[_meta]: alphaAugment,
 				sum: true,
 			},
 			bravo: {
-				[_augment]: bravoAugment,
+				[_meta]: bravoAugment,
 				divide: true,
 			},
 			group: {
 				alpha2: {
-					[_augment]: alphaAugment,
+					[_meta]: alphaAugment,
 					sum: true,
 				}
 			},

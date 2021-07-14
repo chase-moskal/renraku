@@ -45,7 +45,7 @@ export function makeServelet<xRequest, xResponse, xApi extends Api>({
 			}
 
 			const authClock = stopwatch()
-			const auth = await policy.processAuth(meta, request)
+			const auth = await policy(meta, request)
 			times.auth = authClock()
 
 			const procedureClock = stopwatch()

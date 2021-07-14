@@ -1,8 +1,8 @@
 
 import {Augment} from "./augment.js"
-import {_augment} from "../symbols/augment-symbol.js"
+import {_meta} from "../symbols/meta-symbol.js"
 
 export interface ShapeContext<xMeta> {
-	[_augment]: Augment<xMeta>
+	[_meta]: Augment<xMeta>
 	[key: string]: true | ShapeContext<xMeta>
 }

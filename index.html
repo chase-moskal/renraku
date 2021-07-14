@@ -1,7 +1,11 @@
 <!doctype html>
 <html>
 	<head>
-		<title>renraku client testing</title>
-		<script type="module" src="./x/example/example-browser.js"></script>
+		<title>renraku example - clientside loopback</title>
+		<script type="module">
+			import {runBrowserDemo} from "./x/example/run-browser-demo.js"
+			import {exampleBrowserLoopback} from "./x/example/example-browser.js"
+			runBrowserDemo(exampleBrowserLoopback())
+		</script>
 	</head>
 </html>

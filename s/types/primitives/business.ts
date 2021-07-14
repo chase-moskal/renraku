@@ -1,7 +1,7 @@
 
 import {Topic} from "./topic.js"
-import {DropFirst} from "../tools/drop-first.js"
 import {Procedure} from "./procedure.js"
+import {DropFirst} from "../tools/drop-first.js"
 import {_context} from "../symbols/context-symbol.js"
 
 export type Business<xTopic extends Topic<any>> = {

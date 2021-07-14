@@ -4,8 +4,8 @@ import {isObject} from "../identities/is-object.js"
 import {isFunction} from "../identities/is-function.js"
 
 import {Topic} from "../types/primitives/topic.js"
+import {_meta} from "../types/symbols/meta-symbol.js"
 import {Business} from "../types/primitives/business.js"
-import {_augment} from "../types/symbols/augment-symbol.js"
 
 export function toBusiness<xAuth>() {
 	return function recurse<xTopic extends Topic<xAuth>>({topic, getAuth}: {

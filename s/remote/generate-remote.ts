@@ -8,7 +8,7 @@ import {Augment} from "../types/remote/augment.js"
 import {ToShape} from "../types/remote/to-shape.js"
 import {ToRemote} from "../types/remote/to-remote.js"
 import {Requester} from "../types/remote/requester.js"
-import {_augment} from "../types/symbols/augment-symbol.js"
+import {_meta} from "../types/symbols/meta-symbol.js"
 import {ShapeContext} from "../types/remote/shape-context.js"
 
 export function generateRemote<xApi extends Api>({
@@ -25,7 +25,7 @@ export function generateRemote<xApi extends Api>({
 
 	return objectMap(shape, (value, key) => {
 		if (isShapeContext(value)) {
-			const {getMeta}: Augment<any> = value[_augment]
+			const getMeta: Augment<any> = value[_meta]
 			function recurseOverContext(shapeContext: ShapeContext<any>, subpath: string[] = []): any {
 				return objectMap(shapeContext, (value2, key2) => {
 					if (value2 === true) {
