@@ -5,8 +5,8 @@ import {isShapeContext} from "../identities/is-shape-context.js"
 
 import {Api} from "../types/api/api.js"
 import {Augment} from "../types/remote/augment.js"
-import {ToShape} from "../types/remote/to-shape.js"
-import {ToRemote} from "../types/remote/to-remote.js"
+import {Shape} from "../types/remote/shape.js"
+import {Remote} from "../types/remote/remote.js"
 import {Requester} from "../types/remote/requester.js"
 import {_meta} from "../types/symbols/meta-symbol.js"
 import {ShapeContext} from "../types/remote/shape-context.js"
@@ -18,10 +18,10 @@ export function generateRemote<xApi extends Api>({
 		requester,
 	}: {
 		link: string
-		shape: ToShape<xApi>
+		shape: Shape<xApi>
 		specpath?: string[]
 		requester: Requester<any>
-	}): ToRemote<xApi> {
+	}): Remote<xApi> {
 
 	return objectMap(shape, (value, key) => {
 		if (isShapeContext(value)) {

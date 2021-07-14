@@ -1,6 +1,6 @@
 
 import {exampleApi} from "./example-api.js"
-import {ToRemote} from "../types/remote/to-remote.js"
+import {Remote} from "../types/remote/remote.js"
 
 export interface ExampleMeta {
 	token: string
@@ -11,4 +11,4 @@ export interface ExampleAuth {
 }
 
 export type ExampleApi = typeof exampleApi
-export type ExampleRemote = ToRemote<ExampleApi>
+export type ExampleRemote = Remote<ExampleApi>

@@ -7,7 +7,7 @@ import {Topic} from "../types/primitives/topic.js"
 import {Policy} from "../types/primitives/policy.js"
 import {HttpRequest} from "../types/http/http-request.js"
 import {_context} from "../types/symbols/context-symbol.js"
-import {ToApiContext} from "../types/api/to-api-context.js"
+import {ApiContext} from "../types/api/api-context.js"
 import {_descriptor} from "../types/symbols/descriptor-symbol.js"
 import {ProcedureDescriptor} from "../types/api/procedure-descriptor.js"
 
@@ -18,7 +18,7 @@ export function apiContext<xMeta, xAuth, xRequest = HttpRequest>() {
 		>({expose, policy}: {
 			expose: xTopic
 			policy: xPolicy
-		}): ToApiContext<xMeta, xAuth, xTopic, xPolicy> {
+		}): ApiContext<xMeta, xAuth, xTopic, xPolicy> {
 
 		return objectMap(expose, (value, key) => {
 			if (isFunction(value))
@@ -28,7 +28,7 @@ export function apiContext<xMeta, xAuth, xRequest = HttpRequest>() {
 					func: value,
 				}
 			else if (isObject(value))
-				return <ToApiContext<xMeta, xAuth, xTopic, xPolicy>>{
+				return <ApiContext<xMeta, xAuth, xTopic, xPolicy>>{
 					[_context]: true,
 					...recurse({policy, expose: value})
 				}

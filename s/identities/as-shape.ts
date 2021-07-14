@@ -1,9 +1,9 @@
 
 import {Api} from "../types/api/api.js"
-import {ToShape} from "../types/remote/to-shape.js"
+import {Shape} from "../types/remote/shape.js"
 
 export function asShape<xApi extends Api>(
-		shape: ToShape<xApi>
+		shape: Shape<xApi>
 	) {
 
 	return shape
