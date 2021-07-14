@@ -6,8 +6,6 @@
 	"files.encoding": "utf8",
 	"files.insertFinalNewline": true,
 
-	"typescript.tsdk": "node_modules/typescript/lib/",
-
 	"files.exclude": {
 		"x": false,
 		"*.log*": true,
@@ -30,8 +28,16 @@
 
 	"[markdown]": {
 		"editor.tabSize": 2,
-		"editor.insertSpaces": true
+		"editor.insertSpaces": true,
 	},
+
+	"typescript.tsdk": "node_modules/typescript/lib",
 	"javascript.format.semicolons": "remove",
-	"typescript.format.semicolons": "remove"
+	"typescript.format.semicolons": "remove",
+	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+	"javascript.preferences.importModuleSpecifierEnding": "js",
+	"typescript.preferences.importModuleSpecifierEnding": "js",
 }
