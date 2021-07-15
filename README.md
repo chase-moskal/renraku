@@ -7,7 +7,7 @@
 &nbsp; &nbsp; 🛎️ simple — expose async functions  
 &nbsp; &nbsp; 🎭 shapeshifting — client objects impersonate serverside api  
 &nbsp; &nbsp; 🛡 flexible auth — set auth policies for each group of functions  
-&nbsp; &nbsp; 🔧 testability — run your functions anywhere for testing or dev  
+&nbsp; &nbsp; 🔧 testability — run your api anywhere for testing or dev  
 &nbsp; &nbsp; 🧠 sophisticated types — painstakingly engineered for integrity  
 &nbsp; &nbsp; 🌐 compatible — exposes standard json rpc  
 &nbsp; &nbsp; ⚠️ experimental — live on the edge  
@@ -18,9 +18,9 @@
 
 > you can skip this tutorial and just read the working [s/example/](s/example/) code (which is used for testing purposes, so mind the relative import paths)  
 
-1. **let's build a really simple api together.**  
-    we'll integrate auth like it's a real app,  
-    run a node server, and call it from the browser  
+1. **let's build a really simple api together.**
+    - we'll integrate auth, like it's a real app
+    - and we'll run it in a node server, and call it from the browser
 
 1. **we'll start with two functions**
     ```typescript
@@ -32,142 +32,151 @@
       return `Goodbye ${name}, see you later.`
     }
     ```
-    this will soon become our api
+    this is the starting point for our api
 
-1. **now let's spice that up with some auth**
+1. **let's rewrite that to add some auth**  
+    let's greet users who have a doctorate differently
     ```typescript
     export interface ExampleAuth {
       doctorate: boolean
     }
 
     export async function sayHello(auth: ExampleAuth, name: string) {
-      if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
-      else return `Hello ${name}, welcome!`
+      return auth.doctorate
+        ? `Hello Dr ${name}, welcome!`
+        : `Hi ${name}, what's up?`
     }
 
     export async function sayGoodbye(auth: ExampleAuth, name: string) {
-      if (auth.doctorate) return `Goodbye Dr. ${name}, see you later.`
-      else return `Goodbye ${name}, see you later.`
+      return auth.doctorate
+        ? `Goodbye Dr ${name}, see you again soon`
+        : `Cya later ${name}`
     }
     ```
-    now we're greeting users who have a doctorate differently than otherwise
+    these functions are now renraku procedures
+    - renraku procedures must always accept a first argument called `auth`
+    - you'll probably use the auth arguments for user details and privileges
 
-    these functions are now properly conforming renraku procedures
-    - all renraku functions must always accept a first argument called `auth`
-    - the auth argument is reserved for processed auth data (usually a user's details and privileges)
-
-1. **we formalize those functions into a renraku "topic"**
+1. **let's rewrite that to make it a renraku "api context"**
     ```typescript
-    import {asTopic} from "renraku/x/identities/as-topic.js"
-
-    export interface ExampleAuth {
-      doctorate: boolean
-    }
-
-    export const greeterTopic = asTopic<ExampleAuth>()({
-     //                                         ↑
-     //          ⚠️ curried for magical typescript inference ⚠️
-
-      async sayHello(auth, name: string) {
-        if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
-        else return `Hello ${name}, welcome!`
-      },
-
-      async sayGoodbye(auth, name: string) {
-        if (auth.doctorate) return `Goodbye Dr. ${name}, see you later.`
-        else return `Goodbye ${name}, see you later.`
-      },
-    })
-    ```
-    we named this topic "greeter"
-    - every function in the same renraku topic must share the same `auth` type.  
-    - some renraku library functions, like `asTopic`, are curried up and you have to invoke them twice, like `asTopic()(topic)`.  
-      it looks weird, but you desparately want this: it circumvents a typescript limitation, allowing you to specify your `auth` type *while* also allowing your topic type to be inferred (so you can avoid maintaining a separate interface for your topic)
-    - and if you like, you can group your topic functions into arbitrarily-nested objects, like this
-        ```typescript
-        const greeterTopic = asTopic<ExampleAuth>()({
-          async sayBoo(auth) {return "BOO!"},
-          nestedGroupA: {
-            nestedGroupB: {
-              async sayYolo(auth) {return "#YOLO"},
-            }
-          }
-        })
-        ```
-
-1. **we assemble topics into an api object**
-    ```typescript
-    import {asApi} from "renraku/x/identities/as-api.js"
     import {apiContext} from "renraku/x/api/api-context.js"
 
     export interface ExampleMeta {
       token: string
     }
 
-    export const exampleApi = () => asApi({
-      greeter: apiContext<ExampleMeta, ExampleAuth>()({
-        expose: greeterTopic,
-        policy: {processAuth: async (meta, request) => ({doctorate: meta.token === "abc"})},
+    export interface ExampleAuth {
+      doctorate: boolean
+    }
+
+    export const greeter = apiContext<ExampleMeta, ExampleApi>()({
+     //                                                        ↑
+     //                                            ⚠️ notice subtlety ⚠️
+     //                         curried for magical typescript inference
+
+      policy: async(meta, request) => ({
+        doctorate: meta.token === "yes-has-doctorate"
       })
+
+      expose: {
+        async sayHello(auth, name: string) {
+          return auth.doctorate
+            ? `Hello Dr ${name}, welcome!`
+            : `Hi ${name}, what's up?`
+        },
+
+        async sayGoodbye(auth, name: string) {
+          return auth.doctorate
+            ? `Goodbye Dr ${name}, see you again soon`
+            : `Cya later ${name}`
+        },
+      },
     })
     ```
-    an api contains api contexts
-    - an api context contains a topic and the `policy` which processes the auth for that topic
-    - our example `processAuth` is stupid-simple: if the token is "abc", the user has a doctorate.  
-      of course in a real app, this is where we might do token verification, and query our database about the user and whatnot
-    - and yes, you can group your api-contexts into arbitrarily-nested objects
-    - however you cannot nest a context under another context (so that auth policies cannot conflict)
+    this api context is called "greeter"
+    - the `ExampleMeta` is data the client sends with each request
+    - the `policy` function processes the meta to create the auth object. our example is a very simple policy, if the token equals `"yes-has-doctorate"`, then `auth.doctorate` is true
+    - the `expose` object contains our client-callable api functions
+    - ⚠️ some renraku library functions, like `apiContext`, are curried up and you have to invoke them carefully, like `apiContext()(context)`.  
+      it looks weird, but it's important: it circumvents a typescript limitation, and allows you to specify your `auth` type *while* also allowing your function types to be inferred (so you can avoid maintaining a separate interface for your functions)
+    - if you like, you can group your topic functions into arbitrarily-nested objects, like this
+        ```typescript
+        ({
+          expose: {
+            sayBoo(auth) {return "boo!"},
+            countries: {
+              canada: {
+                async getGourmet(auth) {return "timmies"},
+              },
+            },
+          },
+        })
+        ```
+    okay, we can save the above file as `greeter.ts`
 
-1. **we expose the api on a nodejs server**
+1. **now we assemble our greeter into an api object, and a shape object**
     ```typescript
-    import {makeJsonHttpServelet} from "renraku/x/servelet/make-json-http-servelet.js"
-    import {makeNodeHttpServer} from "renraku/x/server/make-node-http-server.js"
+    import {greeter} from "./greeter.js"
+    import {asApi} from "renraku/x/identities/as-api.js"
+    import {apiContext} from "renraku/x/api/api-context.js"
+    import {asShape} from "renraku/x/identities/as-shape.js"
+    import {_meta} from "renraku/x/types/symbols/meta-symbol.js"
 
-    const servelet = makeJsonHttpServelet(exampleApi())
+    export const exampleApi = asApi({greeter})
+
+    export const exampleShape = (token: string) =>
+      asShape<typeof exampleApi>({
+        greeter: {
+          [_meta]: async() => ({token}),
+          sayHello: true,
+          sayGoodbye: true,
+        },
+      })
+    ```
+    about the api object
+    - an api object can contain many contexts, which can have different auth policies
+    - and yes, you can use arbitrarily-nested objects as groupings in your api object
+    about the shape object
+    - the shape object is for the clientside
+    - it seems weird, but this is what outlines to the client what functions are callable
+    - it's also where you specify what meta object is sent with each client request
+    - don't worry, typescript will complain whenever your shape doesn't match your functions
+    we save this as `example-api.ts`
+
+1. **serverside: we expose the api on a nodejs server**
+    ```typescript
+    import {exampleApi} from "./example-api.js"
+    import {makeNodeHttpServer} from "renraku/x/server/make-node-http-server.js"
+    import {makeJsonHttpServelet} from "renraku/x/servelet/make-json-http-servelet.js"
+
+    const servelet = makeJsonHttpServelet(exampleApi)
     const server = makeNodeHttpServer(servelet)
     server.listen(8001)
     ```
     now our server is up and running
     - the `servelet` simply accepts requests and returns responses.  
-      it runs the auth processing and executes the appropriate topic function
+      it runs the auth processing and executes the appropriate function
     - then we make and start a standard node http server with the servelet
 
-1. **clientside: we define a shape object for our api**
+1. **clientside: we generate the remote, and start calling functions from the browser**
     ```typescript
-    import {asShape} from "renraku/x/identities/as-shape.js"
-    import {_augment} from "renraku/x/types/symbols/augment-symbol.js"
-
-    export const exampleShape = asShape<ReturnType<typeof exampleApi>>({
-      greeter: {
-        [_augment]: {getMeta: async() => ({token: "abc"})},
-        sayHello: true,
-        sayGoodbye: true,
-      }
-    })
-    ```
-    the shape outlines your api and auth `meta` data for each topic
-    - typescript will enforce that the shape matches your topic exactly
-    - each topic must be given an `_augment` object with a `getMeta` function.  
-      this specifies what meta data will be sent with each request to the topic
-    - this runtime shape object is vital for generating remotes
-
-1. **clientside: we generate a remote, and start calling functions from the browser**
-    ```typescript
+    import {exampleShape} from "./example-api.js"
     import {generateJsonBrowserRemote} from "renraku/x/remote/generate-json-browser-remote.js"
     void async function main() {
+      const token = "yes-has-doctorate"
 
       const {greeter} = generateJsonBrowserRemote({
         headers: {},
-        shape: exampleShape,
+        shape: exampleShape(token),
         link: "http://localhost:8001",
       })
 
-      // execute an http json remote procedure call
+      // call the functions, remotely!
       const result1 = await greeter.sayHello("Chase")
-      const result2 = await greeter.sayGoodbye("Moskal")
+      const result2 = await greeter.sayGoodbye("Chase")
 
-      console.log(result1) // "Hello Dr. Chase, welcome!"
-      console.log(result2) // "Goodbye Dr. Moskal, see you later."
+      console.log(result1) // Hello Dr Chase, welcome!
+      console.log(result2) // Goodbye Dr Chase, see you again soon
     }()
     ```
 
@@ -175,61 +184,27 @@
 
 ## ⛩️ RENRAKU FOR ARCHITECTURE, DEVELOPMENT, AND TESTING
 
-- **your frontend systems should be agnostic about how they receive business logic**  
-    so you can freely pass in remote or local functionality
+- **your frontend systems should expect to use 'remotes'**  
+    the remote can point to a real server, or actually be a clientside loopback
     ```typescript
-    import {Business} from "renraku/x/types/primitives/business.js"
-    async function makeMyFrontendSystem({greeter}: {
-
-        // accept business logic,
-        // but you don't even want to know if it's remote or local
-        greeter: Business<GreeterTopic>
-
-      }) {
+    import {greeter} from "./greeter.js"
+    import {Remote} from "renraku/x/types/remote/remote.js"
+    async function myFrontendSystem(
+        greeter: Remote<typeof greeter>
+      ) {
       const result = greeter.sayHello("Chase")
       console.log(result)
     }
     ```
-    i like to run my whole serverside in loopback within the browser, for rapid development
 
-- **transform a topic to business logic for direct usage**
+- **genius-level full loopback for full-stack testing and development**
     ```typescript
-    import {asTopic} from "renraku/x/identities/as-topic.js"
-    import {toBusiness} from "renraku/x/transform/to-business.js"
-
-    interface ExampleAuth {
-      doctorate: boolean
-    }
-
-    const greeterTopic = asTopic<ExampleAuth>()({
-      async sayHello(auth, name: string) {
-        if (auth.doctorate) return `Hello Dr. ${name}, welcome!`
-        else return `Hello ${name}, welcome!`
-      }
-    })
-
-    // now we can curry the topic for local usage
-    // we specify the auth provided with each call
-    const greeter = toBusiness<ExampleAuth>()({
-      topic: greeter,
-      getAuth: async() => ({doctorate: true}),
-    })
-
-    // now we can call functions, and the auth is baked-in
-    void async function main() {
-      const result = await greeter.sayHello("Chase")
-      console.log(result) // "Hello Dr. Chase, welcome!"
-    }()
-    ```
-    - this is useful for running simple tests
-
-- **full loopback for full-stack testing**
-    ```typescript
+    import {exampleApi, exampleShape} from "./example-api.js"
     import {loopbackJsonRemote} from "renraku/x/remote/loopback-json-remote.js"
 
     // spin up the servelet on the clientside
-    // (servelet is normally on the serverside)
-    const servelet = makeJsonHttpServelet(exampleApi())
+    // (servelet is normally on the serverside, but not today!)
+    const servelet = makeJsonHttpServelet(exampleApi)
 
     // generate a "loopback" remote which directly calls the servelet
     // instead of any network activity
@@ -242,36 +217,32 @@
     // execute locally, no network activity
     const result1 = await greeter.sayHello("Chase")
     const result2 = await greeter.sayGoodbye("Moskal")
-
-    console.log(result1) // "Hello Dr. Chase, welcome!"
-    console.log(result2) // "Goodbye Dr. Moskal, see you later."
     ```
-    - a loopback fully excercises all facilities, clientside and serverside, emulating http transactions, and running your auth processing — all without any real network activity
+    - a loopback allows you to fully excercise all facilities, clientside and serverside, emulating http transactions, and running your auth processing — all without any real network activity
 
 <br/>
 
 ## ⛩️ RENRAKU ERROR HANDLING
 
-- thrown exceptions will trigger exceptions on the clientside
+- serverside exceptions will trigger exceptions on the clientside
 - if you throw a renraku `ApiError`, the message and the http status code will be sent to the client
     ```typescript
     import {ApiError} from "renraku/x/api/api-error.js"
 
-    // later, somewhere in your topic functionality
     throw new ApiError(403, "forbidden; user must be qualified with a doctorate")
     ```
-- for all other thrown exceptions, the details are censored from the client, and a generic 500 ApiError is sent instead
+- for all other thrown exceptions, the message and details are censored from the client, and a generic 500 ApiError is sent instead
 
 <br/>
 
 ## 📖 RENRAKU TERMINOLOGY
 
-- `topic` — business logic functions. organized into objects, recursive
 - `meta` — data sent with each request
 - `auth` — processed auth data, passed to each business function
 - `api` — server definition containing topics. is a recursive collection of api contexts
-- `api-context` — binds a topic together with an auth policy
+- `topic` — business logic functions to be exposed
 - `policy` — defines how meta data is processed into auth data by the serverside
+- `api-context` — a topic and associated auth policy prepared to be assembled in an api object
 - `servelet` — a function which executes an api, accepts a request and returns a response
 - `shape` — data structure describes an api's surface area and meta augmentations
 - `augment` — defines how the client sends meta data with requests
