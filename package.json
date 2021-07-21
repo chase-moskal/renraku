@@ -41,7 +41,7 @@
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/isomorphic-fetch": "0.0.35",
-		"@types/node": "^16.3.2",
+		"@types/node": "^16.4.0",
 		"cynic": "^0.1.0-dev.16",
 		"isomorphic-fetch": "^3.0.0",
 		"mkdirp": "^1.0.4",
