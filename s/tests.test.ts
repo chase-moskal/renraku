@@ -122,22 +122,32 @@ export default <Suite>{
 		assert(m1, "m1 must be 9")
 	},
 	async "mock remotes work"() {
-		let fired = false
+		let successCount = 0
+
 		const valid = true
 		const invalid = false
-		const context = apiContext()({
-			async policy() {
-				return {a: invalid}
+
+		type Meta = {metaTest: boolean}
+		type Auth = {authTest: boolean}
+
+		const context = apiContext<Meta, Auth>()({
+			async policy(meta) {
+				return {authTest: meta.metaTest ? valid : invalid}
 			},
 			expose: {
-				async lol({a}, b: boolean) {
-					if (a === valid && b === valid)
-						fired = true
+				async lol({authTest}, argTest: boolean) {
+					if (authTest === valid && argTest === valid)
+						successCount += 1
 				},
 			},
 		})
-		const remote = mockRemote(context)(async() => ({a: valid}))
-		await remote.lol(valid)
-		assert(fired, "remote call should fire")
+
+		const remote1 = mockRemote(context).forceAuth({authTest: valid})
+		await remote1.lol(valid)
+		assert(successCount === 1, "mock remote forceAuth call should succeed")
+
+		const remote2 = mockRemote(context).withMeta({metaTest: true})
+		await remote2.lol(valid)
+		assert(successCount === 2, "mock remote withMeta call should succeed")
 	},
 }
