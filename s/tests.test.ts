@@ -13,6 +13,7 @@ import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
 import {Augment} from "./types/remote/augment.js"
 import {Policy} from "./types/primitives/policy.js"
 import {_meta} from "./types/symbols/meta-symbol.js"
+import {mockRemote} from "./remote/mock-remote.js"
 
 const goodLink = "http://localhost:5000/"
 
@@ -119,5 +120,24 @@ export default <Suite>{
 
 		const m1 = await mockAlpha.sum(4, 5)
 		assert(m1, "m1 must be 9")
+	},
+	async "mock remotes work"() {
+		let fired = false
+		const valid = true
+		const invalid = false
+		const context = apiContext()({
+			async policy() {
+				return {a: invalid}
+			},
+			expose: {
+				async lol({a}, b: boolean) {
+					if (a === valid && b === valid)
+						fired = true
+				},
+			},
+		})
+		const remote = mockRemote(context)(async() => ({a: valid}))
+		await remote.lol(valid)
+		assert(fired, "remote call should fire")
 	},
 }
