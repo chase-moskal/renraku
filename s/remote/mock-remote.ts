@@ -6,6 +6,7 @@ import {ApiContext} from "../types/api/api-context.js"
 import {_context} from "../types/symbols/context-symbol.js"
 import {_descriptor} from "../types/symbols/descriptor-symbol.js"
 import {ProcedureDescriptor} from "../types/api/procedure-descriptor.js"
+import {HttpRequest} from "../types/http/http-request.js"
 
 export function mockRemote<
 		xApiContext extends ApiContext<any, any, any, any>
@@ -40,8 +41,13 @@ export function mockRemote<
 	}
 
 	return {
-		withMeta<xRequest>(meta: xMeta, request?: xRequest) {
-			return prepareRoutine(async procedure => procedure.policy(meta, request))
+		withMeta<xRequest>({meta, request}: {
+				meta: xMeta
+				request: xRequest
+			}) {
+			return prepareRoutine(
+				async procedure => procedure.policy(meta, request)
+			)
 		},
 		forceAuth(auth: xAuth) {
 			return prepareRoutine(async() => auth)

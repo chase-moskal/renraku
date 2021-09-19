@@ -4,7 +4,9 @@ import {Suite, assert} from "cynic"
 import {apiContext} from "./api/api-context.js"
 import {asShape} from "./identities/as-shape.js"
 import {asTopic} from "./identities/as-topic.js"
+import {mockRemote} from "./remote/mock-remote.js"
 import {toBusiness} from "./transforms/to-business.js"
+import {mockHttpRequest} from "./remote/mock-http-request.js"
 import {jsonHttpRequest} from "./jsonrpc/json-http-request.js"
 import {loopbackJsonRemote} from "./remote/loopback-json-remote.js"
 import {noServeletLogger} from "./servelet/logger/no-servelet-logger.js"
@@ -13,7 +15,6 @@ import {makeJsonHttpServelet} from "./servelet/make-json-http-servelet.js"
 import {Augment} from "./types/remote/augment.js"
 import {Policy} from "./types/primitives/policy.js"
 import {_meta} from "./types/symbols/meta-symbol.js"
-import {mockRemote} from "./remote/mock-remote.js"
 
 const goodLink = "http://localhost:5000/"
 
@@ -146,7 +147,10 @@ export default <Suite>{
 		await remote1.lol(valid)
 		assert(successCount === 1, "mock remote forceAuth call should succeed")
 
-		const remote2 = mockRemote(context).withMeta({metaTest: true})
+		const remote2 = mockRemote(context).withMeta({
+			meta: {metaTest: true},
+			request: mockHttpRequest({origin: "example.com"}),
+		})
 		await remote2.lol(valid)
 		assert(successCount === 2, "mock remote withMeta call should succeed")
 	},
