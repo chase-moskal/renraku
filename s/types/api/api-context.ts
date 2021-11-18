@@ -14,4 +14,4 @@ export type ApiContext<xMeta, xAuth, xTopic extends Topic<xAuth>, xPolicy extend
 		: xTopic[P] extends Topic<xAuth>
 			? ApiContext<xMeta, xAuth, xTopic[P], xPolicy>
 			: never
-} & {[_context]: ContextHint<xMeta>}
+} & {[_context]: ContextHint<xMeta, xAuth>}

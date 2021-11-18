@@ -10,14 +10,9 @@ import {ProcedureDescriptor} from "../types/api/procedure-descriptor.js"
 export function mockRemote<
 		xApiContext extends ApiContext<any, any, any, any>
 	>(apiContext: xApiContext) {
-	
-	type xMeta = xApiContext extends ApiContext<infer zMeta, any, any, any>
-		? zMeta
-		: never
-	
-	type xAuth = xApiContext extends ApiContext<any, infer zAuth, any, any>
-		? zAuth
-		: never
+
+	type xMeta = xApiContext[typeof _context]["meta"]
+	type xAuth = xApiContext[typeof _context]["auth"]
 
 	type xProcedure = ProcedureDescriptor<xMeta, xAuth, any, any, any>
 

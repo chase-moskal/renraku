@@ -30,7 +30,7 @@ export function apiContext<xMeta, xAuth, xRequest = HttpRequest>() {
 			else if (isObject(value))
 				return <ApiContext<xMeta, xAuth, xTopic, xPolicy>>{
 					[_context]: true,
-					...recurse({policy, expose: value})
+					...(<any>recurse)({policy: <any>policy, expose: <any>value})
 				}
 			else
 				throw new Error(`unknown api context subtype for "${key}"`)
