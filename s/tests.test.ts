@@ -143,13 +143,13 @@ export default <Suite>{
 			},
 		})
 
-		const remote1 = mockRemote(context).forceAuth({authTest: valid})
+		const remote1 = mockRemote(context).useAuth(async() => ({authTest: valid}))
 		await remote1.lol(valid)
 		assert(successCount === 1, "mock remote forceAuth call should succeed")
 
-		const remote2 = mockRemote(context).withMeta({
-			meta: {metaTest: true},
-			request: mockHttpRequest({origin: "example.com"}),
+		const remote2 = mockRemote(context).useMeta({
+			getMeta: async() => ({metaTest: true}),
+			getRequest: async() => mockHttpRequest({origin: "example.com"}),
 		})
 		await remote2.lol(valid)
 		assert(successCount === 2, "mock remote withMeta call should succeed")

@@ -35,16 +35,18 @@ export function mockRemote<
 	}
 
 	return {
-		withMeta<xRequest>({meta, request}: {
-				meta: xMeta
-				request: xRequest
+		useMeta<xRequest>({getMeta, getRequest}: {
+				getMeta: () => Promise<xMeta>
+				getRequest: () => Promise<xRequest>
 			}) {
-			return prepareRoutine(
-				async procedure => procedure.policy(meta, request)
-			)
+			return prepareRoutine(async procedure => {
+				const meta = await getMeta()
+				const request = await getRequest()
+				return procedure.policy(meta, request)
+			})
 		},
-		forceAuth(auth: xAuth) {
-			return prepareRoutine(async() => auth)
+		useAuth(getAuth: () => Promise<xAuth>) {
+			return prepareRoutine(getAuth)
 		},
 	}
 }
