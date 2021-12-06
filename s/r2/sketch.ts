@@ -1,4 +1,5 @@
 
+import {obtain} from "../tools/obtain.js"
 import {objectMap} from "../tools/object-map.js"
 
 export interface Methods {
@@ -21,20 +22,6 @@ export interface Service<xMeta, xAuth, xMethods extends Methods> {
 	expose: Expose<xAuth, xMethods>
 }
 
-// export function policy<xMeta, xAuth>(p: Policy<xMeta, xAuth>) {
-// 	return {
-// 		expose<xMethods extends Methods>(e: Expose<xAuth, xMethods>) {
-// 			return {
-// 				[is_renraku_service]: is_renraku_service,
-// 				expose: e,
-// 				policy: p,
-// 			}
-// 		},
-// 	}
-// }
-
-// service.
-
 export const service = {
 	policy<xMeta, xAuth>(p: Policy<xMeta, xAuth>) {
 		return {
@@ -53,7 +40,7 @@ export interface Api {
 	[key: string]: Api | Service<any, any, Methods>
 }
 
-export function api<xApi extends Api>(setup: (s: typeof service) => xApi) {
+export function renrakuApi<xApi extends Api>(setup: (s: typeof service) => xApi) {
 	return setup(service)
 }
 
@@ -93,7 +80,7 @@ function forService<xService extends Service<any, any, Methods>>(service: xServi
 		: never
 	function prepareProxy(getAuth: () => Promise<xAuth>): xMethods {
 		return new Proxy(<xMethods>{}, {
-			set: () => { throw new Error("remote is readonly") },
+			set: () => { throw new Error("renraku remote is readonly") },
 			get: (t, property: string) => async(...args: any[]) => {
 				const auth = await getAuth()
 				const methods = service.expose(auth)
@@ -101,7 +88,7 @@ function forService<xService extends Service<any, any, Methods>>(service: xServi
 				if (method)
 					return method(...args)
 				else
-					throw new Error(`remote method "${property}" not found`)
+					throw new Error(`renraku remote method "${property}" not found`)
 			},
 		})
 	}
@@ -139,7 +126,7 @@ function prepareRecursiveMapping(
 	}
 }
 
-export const mock = {
+export const renrakuMock = {
 	forService,
 	forApi<xApi extends Api>(api: xApi) {
 		return {
@@ -159,16 +146,103 @@ export const mock = {
 	},
 }
 
-export function servelet(api: Api) {
-	console.warn("TODO implement servelet")
-	function receiveHttpRequest(request: any) {
-		const method = request.method
-		const headers = request.headers
-	}
+export interface Request {
+	meta: any
+	method: string
+	params: any[]
 }
 
-export const client = {
-	link(url: string) {
+export interface Response {
+	result: any
+}
+
+export interface Requester {
+	(request: Request): Promise<any>
+}
+
+export interface JsonRpcRequest {
+	jsonrpc: "2.0"
+	method: string
+	params: any[]
+	id: number
+}
+
+export interface JsonRpcResponse {
+	jsonrpc: "2.0"
+	result: any
+	error: {
+		code: number
+		message: string
+	}
+	id: number
+}
+
+export interface Servelet {
+	(request: Request): Promise<any>
+}
+
+export const renrakuServer = {
+	forApi: (api: Api) => {
+		async function servelet(request: Request) {
+			const servicePath = request.method.slice(1).split(".")
+			const methodName = servicePath.pop()
+			const service: Service<any, any, Methods> = obtain(servicePath.join("."), api)
+			if (!service)
+				throw new Error(`renraku service not found "${servicePath}"`)
+			const auth = await service.policy(request.meta)
+			const methods = service.expose(auth)
+			const executor = methods[methodName]
+			if (!executor)
+				throw new Error(`renraku method "${methodName}" not found on service "${servicePath}"`)
+			return executor(...request.params)
+		}
+		return {
+			httpJsonRpc: (port: number) => {
+				// TODO implement server
+				return {
+					stop() {},
+				}
+			},
+		}
+	},
+}
+
+export const renrakuBrowserRequesters = {
+	httpJsonRpc: (link: string): Requester => {
+		let count = 0
+		return async function requester({meta, method, params}) {
+			const response: JsonRpcResponse = await fetch(link, {
+				method: "POST",
+				mode: "cors",
+				cache: "no-cache",
+				credentials: "omit",
+				redirect: "follow",
+				referrerPolicy: "no-referrer",
+				headers: {
+
+					// sent as plain text, to avoid cors "options" preflight requests,
+					// by qualifying as a cors "simple request"
+					"Content-Type": "text/plain; charset=utf-8",
+
+					"Authorization": JSON.stringify(meta),
+				},
+				body: JSON.stringify(<JsonRpcRequest>{
+					jsonrpc: "2.0",
+					method,
+					params,
+					id: count++,
+				})
+			}).then(r => r.json())
+			if (response.error)
+				throw new Error(`remote call error: ${response.error.code} ${response.error.message} (from "${link}")`)
+			else
+				return response.result
+		}
+	},
+}
+
+export const renrakuClient = {
+	usingRequester(requester: Requester) {
 		return {
 			withMetaMap<xApi extends Api>(map: MetaMap<xApi>) {
 				function recurse(mapGroup: MetaMap<xApi>, path: string[] = []): Remote<xApi> {
@@ -176,85 +250,75 @@ export const client = {
 						const newPath = [...path, key]
 						const item = mapGroup[key]
 						if (typeof item === "function") {
-							// TODO lol finish recursion
+							const getMeta: () => Promise<any> = item
+							return new Proxy({}, {
+								set: () => { throw new Error("renraku remote is readonly") },
+								get: (target, property: string) => async(...params: any[]) => {
+									const method = "." + [...newPath, property].join(".")
+									const meta = await getMeta()
+									return requester({meta, method, params})
+								},
+							})
 						}
 						else {
 							return recurse(<any>item, newPath)
 						}
 					})
 				}
-				// const recurse2 = prepareRecursiveMapping(
-				// 	(service, getter) => forService(service).withMeta(getter)
-				// )
-				// return <Remote<xApi>>recurse2(api, map)
+				return recurse(map)
 			},
 		}
 	},
 }
 
-// export function shape<xApi extends Api>(shape: Shape<xApi>) {
+//
+//
+//
 
-// }
-
-// export function client<xApi extends Api>(link: string): xApi {
-
-// 	function recurse() {}
-
-// 	return undefined
-// }
-
-const genius = api(service => ({
+const geniusApi = renrakuApi(renrakuService => ({
 	math: {
-		calculator: (
-			service
-				.policy(async(meta: {lotto: number}) => ({winner: meta.lotto === 9}))
-				.expose(auth => ({
-					async sum(x: number, y: number) {
-						return x + y
-					},
-				}))
-		)
+		calculator: renrakuService
+			.policy(async(meta: {lotto: number}) => ({winner: meta.lotto === 9}))
+			.expose(auth => ({
+				async sum(x: number, y: number) {
+					return x + y
+				},
+			})),
 	},
 }))
 
-const remoteCalculator1 = (
-	mock
-		.forService(genius.math.calculator)
-		.withMeta(async() => ({lotto: 9}))
-)
+const remoteCalculator1 = renrakuMock
+	.forService(geniusApi.math.calculator)
+	.withMeta(async() => ({lotto: 9}))
 
-const remoteCalculator2 = (
-	mock
-		.forService(genius.math.calculator)
-		.withAuth(async() => ({winner: true}))
-)
+const remoteCalculator2 = renrakuMock
+	.forService(geniusApi.math.calculator)
+	.withAuth(async() => ({winner: true}))
 
-const remoteGenius1 = (
-	mock
-		.forApi(genius)
-		.withMetaMap({
-			math: {
-				calculator: async() => ({lotto: 9}),
-			},
-		})
-)
+const remoteGenius1 = renrakuMock
+	.forApi(geniusApi)
+	.withMetaMap({
+		math: {
+			calculator: async() => ({lotto: 9}),
+		},
+	})
 
-const remoteGenius2 = (
-	mock
-		.forApi(genius)
-		.withAuthMap({
-			math: {
-				calculator: async() => ({winner: true}),
-			},
-		})
-)
+const remoteGenius2 = renrakuMock
+	.forApi(geniusApi)
+	.withAuthMap({
+		math: {
+			calculator: async() => ({winner: true}),
+		},
+	})
 
-const geniusServelet = servelet(genius)
+const server = renrakuServer
+	.forApi(geniusApi)
+	.httpJsonRpc(8000)
 
-const geniusClient = (
-	client
-		.link("https://api.xiome.io/")
-		.withMetaMap({
-
-		})
-)
+const geniusClient = renrakuClient
+	.usingRequester(renrakuBrowserRequesters.httpJsonRpc("https://api.xiome.io/"))
+	.withMetaMap<typeof geniusApi>({
+		math: {
+			calculator: async() => ({lotto: 5}),
+		},
+	})
