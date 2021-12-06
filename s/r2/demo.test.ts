@@ -1,7 +1,6 @@
 
-import {renrakuServer} from "./node.js"
-import {renrakuBrowserClient} from "./browser.js"
-import {renrakuMock, renrakuApi, RenrakuRemote} from "./renraku.js"
+import {renrakuNodeServer} from "./http/node-server.js"
+import {renrakuMock, renrakuApi, RenrakuRemote, renrakuBrowserClient} from "./renraku.js"
 
 const lol = renrakuApi(renrakuService => ({
 	a: {
@@ -68,12 +67,13 @@ const remoteGenius2 = renrakuMock()
 		},
 	})
 
-const server = renrakuServer()
+const server = renrakuNodeServer()
+	.exposeErrors(false)
 	.forApi(geniusApi)
-	.httpJsonRpc(8000)
+	.listen(8000)
 
 const geniusClient = renrakuBrowserClient()
-	.httpJsonRpc("https://api.xiome.io/")
+	.linkToApiServer("https://api.xiome.io/")
 	.withMetaMap<typeof geniusApi>({
 		math: {
 			calculator: async() => ({lotto: 5}),

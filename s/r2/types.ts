@@ -70,20 +70,29 @@ export interface Requester {
 
 export interface JsonRpcRequest {
 	jsonrpc: "2.0"
+	id: number
 	method: string
 	params: any[]
+}
+
+export interface JsonRpcResponseCommon {
+	jsonrpc: "2.0"
 	id: number
 }
 
-export interface JsonRpcResponse {
-	jsonrpc: "2.0"
+export interface JsonRpcSuccessResponse extends JsonRpcResponseCommon {
 	result: any
+}
+
+export interface JsonRpcErrorResponse extends JsonRpcResponseCommon {
 	error: {
 		code: number
 		message: string
+		data?: any
 	}
-	id: number
 }
+
+export type JsonRpcResponse = JsonRpcSuccessResponse | JsonRpcErrorResponse
 
 export interface Servelet {
 	(request: RenrakuRequest): Promise<any>

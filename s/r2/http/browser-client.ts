@@ -1,12 +1,11 @@
 
-import {objectMap} from "../tools/object-map.js"
-import {JsonRpcResponse, JsonRpcRequest, Api, MetaMap, ApiRemote, RenrakuRequest} from "./types.js"
+import {objectMap} from "../../tools/object-map.js"
+import {Api, ApiRemote, JsonRpcErrorResponse, JsonRpcRequest, JsonRpcResponse, JsonRpcSuccessResponse, MetaMap, RenrakuRequest} from "../types.js"
 
 export const renrakuBrowserClient = () => ({
-	httpJsonRpc: (link: string) => {
+	linkToApiServer(link: string) {
 
 		let count = 0
-
 		async function requester({meta, method, params}: RenrakuRequest) {
 			const response: JsonRpcResponse = await fetch(link, {
 				method: "POST",
@@ -30,21 +29,21 @@ export const renrakuBrowserClient = () => ({
 					id: count++,
 				})
 			}).then(r => r.json())
-			if (response.error)
-				throw new Error(`remote call error: ${response.error.code} ${response.error.message} (from "${link}")`)
+			const {error} = <JsonRpcErrorResponse>response
+			const {result} = <JsonRpcSuccessResponse>response
+			if (error)
+				throw new Error(`remote call error: ${error.code} ${error.message} (from "${link}")`)
 			else
-				return response.result
+				return result
 		}
 
 		return {
-
 			withMetaMap<xApi extends Api>(map: MetaMap<xApi>) {
 				function recurse(mapGroup: MetaMap<xApi>, path: string[] = []): ApiRemote<xApi> {
 					return objectMap(mapGroup, (value, key) => {
 						const newPath = [...path, key]
-						const item = mapGroup[key]
-						if (typeof item === "function") {
-							const getMeta: () => Promise<any> = item
+						if (typeof value === "function") {
+							const getMeta: () => Promise<any> = value
 							return new Proxy({}, {
 								set: () => { throw new Error("renraku remote is readonly") },
 								get: (target, property: string) => async(...params: any[]) => {
@@ -55,12 +54,12 @@ export const renrakuBrowserClient = () => ({
 							})
 						}
 						else {
-							return recurse(<any>item, newPath)
+							return recurse(<any>value, newPath)
 						}
 					})
 				}
 				return recurse(map)
-			},
+			}
 		}
-	},
+	}
 })

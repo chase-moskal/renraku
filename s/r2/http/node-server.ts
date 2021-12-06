@@ -1,0 +1,65 @@
+
+import {createServer, RequestListener} from "http"
+
+import {renrakuServelet} from "../servelet.js"
+import {allowCors} from "./node-utils/allow-cors.js"
+import {readStream} from "./node-utils/read-stream.js"
+import {healthCheck} from "./node-utils/health-check.js"
+import {readRawHeaders} from "./node-utils/read-raw-headers.js"
+import {Api, JsonRpcRequest, JsonRpcResponse} from "../types.js"
+import {RenrakuError} from "../renraku-error.js"
+
+export const renrakuNodeServer = () => ({
+	exposeErrors: (exposeErrorsForDebugging: boolean) => ({
+		forApi(api: Api, processListener = (listener: RequestListener) => listener) {
+			const servelet = renrakuServelet(api)
+	
+			let listener: RequestListener = async(req, res) => {
+				const meta = JSON.parse(
+					readRawHeaders(req.rawHeaders)["Authorization"]
+				)
+				const body = await readStream(req)
+				const {method, params, id} = <JsonRpcRequest>JSON.parse(body)
+				res.setHeader("Content-Type", "application/json; charset=utf-8")
+				try {
+					const result = await servelet({meta, method, params})
+					res.statusCode = 200
+					res.end(<JsonRpcResponse>{jsonrpc: "2.0", id, result})
+				}
+				catch (error) {
+					if (error instanceof RenrakuError) {
+						const {code, message} = error
+						res.statusCode = code
+						res.end(<JsonRpcResponse>{
+							jsonrpc: "2.0",
+							id,
+							error: {code, message},
+						})
+					}
+					else {
+						res.statusCode = 500
+						res.end(<JsonRpcResponse>{
+							jsonrpc: "2.0",
+							id,
+							error: exposeErrorsForDebugging
+								? {
+									code: 500,
+									message: "internal server error",
+								}
+								: {
+									code: 500,
+									message: error.message,
+									data: JSON.stringify(error),
+								},
+						})
+					}
+				}
+			}
+
+			listener = healthCheck("/health", listener)
+			listener = allowCors(listener)
+			listener = processListener(listener)
+			return createServer(listener)
+		},
+	}),
+})
