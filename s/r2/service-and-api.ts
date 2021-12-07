@@ -15,6 +15,6 @@ export const renrakuService = () => ({
 	},
 })
 
-export function renrakuApi<xApi extends Api>(setup: (s: typeof renrakuService) => xApi) {
-	return setup(renrakuService)
+export function renrakuApi<xApi extends Api>(api: xApi) {
+	return api
 }
