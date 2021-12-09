@@ -1,4 +1,5 @@
 
+import {RenrakuError} from "../error.js"
 import {objectMap} from "./../tools/object-map.js"
 import {Api, ApiRemote, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, MetaMap, RenrakuRequest} from "../types.js"
 
@@ -31,7 +32,7 @@ export const renrakuBrowserClient = () => ({
 			const {error} = <JsonRpcErrorResponse>response
 			const {result} = <JsonRpcSuccessResponse>response
 			if (error)
-				throw new Error(`remote call error: ${error.code} ${error.message} (from "${link}")`)
+				throw new RenrakuError(error.code, `remote call error: ${error.code} ${error.message} (from "${link}")`)
 			else
 				return result
 		}
@@ -44,7 +45,7 @@ export const renrakuBrowserClient = () => ({
 						if (typeof value === "function") {
 							const getMeta: () => Promise<any> = value
 							return new Proxy({}, {
-								set: () => { throw new Error("renraku remote is readonly") },
+								set: () => { throw new RenrakuError(400, "renraku remote is readonly") },
 								get: (target, property: string) => async(...params: any[]) => {
 									const method = "." + [...newPath, property].join(".")
 									const meta = await getMeta()

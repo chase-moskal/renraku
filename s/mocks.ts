@@ -1,4 +1,5 @@
 
+import {RenrakuError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
 import {Api, MetaMap, ApiRemote, AuthMap, Service, Methods, is_renraku_service} from "./types.js"
 
@@ -34,7 +35,7 @@ function forService<xService extends Service<any, any, Methods>>(service: xServi
 		: never
 	function prepareProxy(getAuth: () => Promise<xAuth>): xMethods {
 		return new Proxy(<xMethods>{}, {
-			set: () => { throw new Error("renraku remote is readonly") },
+			set: () => { throw new RenrakuError(400, "renraku remote is readonly") },
 			get: (t, property: string) => async(...args: any[]) => {
 				const auth = await getAuth()
 				const methods = service.expose(auth)
@@ -42,7 +43,7 @@ function forService<xService extends Service<any, any, Methods>>(service: xServi
 				if (method)
 					return method(...args)
 				else
-					throw new Error(`renraku remote method "${property}" not found`)
+					throw new RenrakuError(400, `renraku remote method "${property}" not found`)
 			},
 		})
 	}
