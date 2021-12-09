@@ -7,7 +7,7 @@ import {readStream} from "./node-utils/read-stream.js"
 import {healthCheck} from "./node-utils/health-check.js"
 import {readRawHeaders} from "./node-utils/read-raw-headers.js"
 import {Api, JsonRpcRequest, JsonRpcResponse} from "../types.js"
-import {RenrakuError} from "../renraku-error.js"
+import {RenrakuError} from "../error.js"
 
 export const renrakuNodeServer = () => ({
 	exposeErrors: (exposeErrorsForDebugging: boolean) => ({
