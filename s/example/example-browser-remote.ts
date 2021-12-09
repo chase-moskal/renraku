@@ -1,5 +1,5 @@
 
-import {example as exampleApi} from "./example-api.js"
+import type {example as exampleApi} from "./example-api.js"
 import {renrakuBrowserClient} from "../http/browser-client.js"
 
 export function makeBrowserRemoteForExample() {
