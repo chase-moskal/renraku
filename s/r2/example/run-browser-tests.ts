@@ -2,9 +2,9 @@
 import {test, expect} from "cynic"
 import {makeBrowserRemoteForExample} from "./example-browser-remote.js"
 
-void async function main() {
+export async function runBrowserTests() {
 	const example = makeBrowserRemoteForExample()
-	const result = await test("renraku suite", {
+	return test("renraku suite", {
 
 		"greeter.sayHello": async() =>
 			expect(await example.greeter.sayHello()).equals("hello"),
@@ -16,5 +16,4 @@ void async function main() {
 			expect(await example.math.calculator.isWinner()).equals(true),
 
 	})
-	console.log(result.report)
-}()
+}
