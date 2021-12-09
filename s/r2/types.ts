@@ -75,6 +75,10 @@ export interface JsonRpcRequest {
 	params: any[]
 }
 
+export interface JsonRpcRequestWithMeta extends JsonRpcRequest {
+	meta: any
+}
+
 export interface JsonRpcResponseCommon {
 	jsonrpc: "2.0"
 	id: number

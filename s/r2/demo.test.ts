@@ -31,7 +31,7 @@
 // let lol2: RenrakuRemote<typeof lol>
 // lol2.a.b.c.d.e.f.g.h.i.j.lmao()
 
-// const geniusApi = renrakuApi(renrakuService => ({
+// const geniusApi = renrakuApi2(renrakuService => ({
 // 	math: {
 // 		calculator: renrakuService()
 // 			.policy(async(meta: {lotto: number}) => ({winner: meta.lotto === 9}))
