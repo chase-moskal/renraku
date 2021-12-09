@@ -1,5 +1,5 @@
 
-import {Logger} from "../../types/tools/logger.js"
+import {Logger} from "../../logger.js"
 
 export function coloredLogger(logger: Logger): Logger {
 

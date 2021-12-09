@@ -1,5 +1,5 @@
 
-import {obtain} from "../tools/obtain.js"
+import {obtain} from "./tools/obtain.js"
 import {Api, Methods, RenrakuRequest, Service} from "./types.js"
 
 export function renrakuServelet(api: Api) {

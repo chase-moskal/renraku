@@ -1,16 +1,26 @@
 
-import {greeter} from "./greeter.js"
-import {asApi} from "../identities/as-api.js"
-import {asShape} from "../identities/as-shape.js"
-import {_meta} from "../types/symbols/meta-symbol.js"
+import {renrakuApi, renrakuService} from "../renraku.js"
 
-export const exampleApi = asApi({greeter})
-
-export const exampleShape = (token: string) =>
-	asShape<typeof exampleApi>({
-		greeter: {
-			[_meta]: async() => ({token}),
-			sayHello: true,
-			sayGoodbye: true,
-		},
-	})
+export const example = renrakuApi({
+	greeter: (renrakuService()
+		.policy(async() => {})
+		.expose(auth => ({
+			async sayHello() {
+				return "hello"
+			},
+		}))
+	),
+	math: {
+		calculator: (renrakuService()
+			.policy(async(meta: {lotto: number}) => ({winner: meta.lotto === 9}))
+			.expose(auth => ({
+				async sum(a: number, b: number) {
+					return a + b
+				},
+				async isWinner() {
+					return auth.winner
+				},
+			}))
+		)
+	},
+})

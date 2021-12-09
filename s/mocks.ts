@@ -1,5 +1,5 @@
 
-import {objectMap} from "../tools/object-map.js"
+import {objectMap} from "./tools/object-map.js"
 import {Api, MetaMap, ApiRemote, AuthMap, Service, Methods, is_renraku_service} from "./types.js"
 
 export const renrakuMock = () => ({

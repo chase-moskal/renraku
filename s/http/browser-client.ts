@@ -1,5 +1,5 @@
 
-import {objectMap} from "../../tools/object-map.js"
+import {objectMap} from "./../tools/object-map.js"
 import {Api, ApiRemote, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, MetaMap, RenrakuRequest} from "../types.js"
 
 export const renrakuBrowserClient = () => ({
