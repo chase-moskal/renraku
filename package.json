@@ -15,13 +15,14 @@
 		"importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"compile": "tsc",
 		"watch": "npm run compile -s -- --watch",
-		"example-server": "node x/r2/example/example-server.js",
-		"example-server-debug": "node inspect x/example/example-server.js",
-		"example-client": "serve -l 8080",
-		"start": "run-p example-server example-client",
+		"start-example-server": "node x/example/example-server.js",
+		"start-example-server-debug": "node inspect x/example/example-server.js",
+		"start-websocket-server": "node x/websocket/example/example-socket-server.js",
+		"start-http": "serve -l 8080",
+		"start": "run-p start-example-server start-websocket-server start-http",
 		"generate-keys": "./node_modules/redcrypto/generate-keys",
-		"test": "cynic node x/r2/renraku.test.js",
-		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/r2/renraku.test.js"
+		"test": "cynic node x/renraku.test.js",
+		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/renraku.test.js"
 	},
 	"keywords": [
 		"rpc",
@@ -43,6 +44,7 @@
 	"devDependencies": {
 		"@types/isomorphic-fetch": "0.0.35",
 		"@types/node": "^16.11.7",
+		"@types/ws": "^8.2.2",
 		"cynic": "^0.1.0-dev.16",
 		"es-module-shims": "^1.3.6",
 		"importly": "^0.1.0",
@@ -52,5 +54,8 @@
 		"rimraf": "^3.0.2",
 		"serve": "^13.0.2",
 		"typescript": "^4.5.2"
+	},
+	"dependencies": {
+		"ws": "^8.3.0"
 	}
 }

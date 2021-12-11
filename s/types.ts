@@ -1,4 +1,10 @@
 
+export interface Logger {
+	log(...data: any[]): void
+	warn(...data: any[]): void
+	error(...data: any[]): void
+}
+
 export interface Methods {
 	[key: string]: (...args: any[]) => Promise<any>
 }
@@ -100,4 +106,12 @@ export type JsonRpcResponse = JsonRpcSuccessResponse | JsonRpcErrorResponse
 
 export interface Servelet {
 	(request: RenrakuRequest): Promise<any>
+}
+
+export interface Requester {
+	(request: RenrakuRequest): Promise<any>
+}
+
+export interface RenrakuConnectionControls {
+	close(): void
 }

@@ -2,7 +2,7 @@
 import {test, expect} from "cynic"
 import {makeBrowserRemoteForExample} from "./example-browser-remote.js"
 
-export async function runBrowserTests() {
+export async function runTests() {
 	const example = makeBrowserRemoteForExample()
 	return test("renraku suite", {
 

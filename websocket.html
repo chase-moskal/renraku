@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+	<head>
+		<title>renraku test</title>
+		<script defer type=importmap-shim src="x/importmap.json"></script>
+		<script type=module-shim>
+			import {runBrowserTests} from "./x/websocket/example/run-socket-browser-tests.js"
+			void async function main() {
+				const tests = await runBrowserTests()
+				const output = document.querySelector("output")
+				output.textContent = tests.report
+				if (tests.failed)
+					output.setAttribute("data-failed", "")
+			}()
+		</script>
+		<script defer src="node_modules/es-module-shims/dist/es-module-shims.js"></script>
+		<style>
+			html {
+				background: #000;
+				color: #444;
+			}
+			output {
+				white-space: pre-wrap;
+				color: #280;
+			}
+			output[data-failed] {
+				color: #820;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>renraku websocket tests</h1>
+		<output></output>
+	</body>
+</html>

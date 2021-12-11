@@ -4,13 +4,19 @@
 		<title>renraku test</title>
 		<script defer type=importmap-shim src="x/importmap.json"></script>
 		<script type=module-shim>
-			import {runBrowserTests} from "./x/r2/example/run-browser-tests.js"
-			void async function main() {
-				const tests = await runBrowserTests()
-				const output = document.querySelector("output")
-				output.textContent = tests.report
-				if (tests.failed)
+			import {runTests} from "./x/example/run-tests.js"
+			import {runSocketTests} from "./x/websocket/example/run-socket-tests.js"
+
+			function renderTestResults(suite, results) {
+				const output = document.querySelector(`output[data-suite="${suite}"]`)
+				output.textContent = results.report
+				if (results.failed)
 					output.setAttribute("data-failed", "")
+			}
+
+			void async function main() {
+				renderTestResults("http", await runTests())
+				renderTestResults("websocket", await runSocketTests())
 			}()
 		</script>
 		<script defer src="node_modules/es-module-shims/dist/es-module-shims.js"></script>
@@ -29,7 +35,9 @@
 		</style>
 	</head>
 	<body>
-		<h1>renraku test page</h1>
-		<output></output>
+		<h1>renraku http tests</h1>
+		<output data-suite=http></output>
+		<h1>renraku websocket tests</h1>
+		<output data-suite=websocket></output>
 	</body>
 </html>
