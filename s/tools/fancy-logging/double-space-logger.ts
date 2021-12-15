@@ -1,5 +1,5 @@
 
-import {Logger} from "../../logger.js"
+import {Logger} from "../../types.js"
 
 export function doubleSpaceLogger(logger: Logger): Logger {
 
