@@ -1,5 +1,5 @@
 
-import {renrakuApi, renrakuService} from "../renraku.js"
+import {renrakuApi, renrakuService} from "../../renraku.js"
 
 export const example = renrakuApi({
 	greeter: (renrakuService()
