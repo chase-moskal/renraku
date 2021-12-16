@@ -11,7 +11,7 @@ export function renrakuWebSocketServer({
 	}: {
 		port: number
 		exposeErrors: boolean
-		acceptConnection({controls}: {
+		acceptConnection({}: {
 			controls: RenrakuConnectionControls
 			clientApiMetaMap: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
 		}): {
