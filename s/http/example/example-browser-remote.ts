@@ -1,14 +1,15 @@
 
-import type {example as exampleApi} from "./example-api.js"
+import type {exampleApi} from "./example-api.js"
 import {renrakuBrowserClient} from "../browser-client.js"
 
 export function makeBrowserRemoteForExample() {
-	return renrakuBrowserClient()
-		.linkToApiServer("http://localhost:8000/")
-		.withMetaMap<typeof exampleApi>({
+	return renrakuBrowserClient<typeof exampleApi>({
+		url: "http://localhost:8000/",
+		metaMap: {
 			greeter: async() => {},
 			math: {
 				calculator: async() => ({lotto: 9})
 			},
-		})
+		},
+	})
 }

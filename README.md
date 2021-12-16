@@ -47,13 +47,15 @@ export const exampleApi = renrakuApi({
 
 *now let's run our api on a node server*
 ```ts
-import {renrakuNodeServer} from "renraku/http/node-server.js"
 import {exampleApi} from "./example-api.js"
+import {renrakuNodeServer} from "renraku/http/node-server.js"
 
-renrakuNodeServer()
-  .exposeErrors(true)
-  .forApi(exampleApi)
-  .listen(8000)
+const server = renrakuNodeServer({
+  api: exampleApi,
+  exposeErrors: false,
+})
+
+server.listen(8000)
 ```
 
 *now let's call that function from a browser*
@@ -65,12 +67,13 @@ import type {exampleApi} from "./example-api.js"
 let meta = {token: "doctor"}
 
 // we create a browser client
-const {greeter} = renrakuBrowserClient()
-  .linkToApiServer("http://localhost:8000/")
-  .withMetaMap<typeof exampleApi>({
+const {greeter} = renrakuBrowserClient({
+  url: "http://localhost:8000/",
+  metaMap: {
     // on the service, we specify which meta to use for api calls
     calculator: async() => meta,
-  })
+  },
+})
 
 // hey look, we're a doctor!
 const result1 = await greeter.greet("chase")

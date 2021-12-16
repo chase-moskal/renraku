@@ -1,7 +1,7 @@
 
 import {renrakuApi, renrakuService} from "../../renraku.js"
 
-export const example = renrakuApi({
+export const exampleApi = renrakuApi({
 	greeter: (renrakuService()
 		.policy(async() => {})
 		.expose(auth => ({
