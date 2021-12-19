@@ -13,7 +13,7 @@ export function renrakuWebSocketServer({
 		exposeErrors: boolean
 		acceptConnection({}: {
 			controls: RenrakuConnectionControls
-			clientApiMetaMap: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
+			prepareClientApi: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
 		}): {
 			api: Api
 			handleConnectionClosed(): void
@@ -31,7 +31,7 @@ export function renrakuWebSocketServer({
 					handleConnectionClosed()
 				},
 			},
-			clientApiMetaMap(map) {
+			prepareClientApi(map) {
 				const requester: Requester = async({meta, method, params}) => {
 					const {id, response} = startWaitingForResponse()
 					socket.send(JSON.stringify(<JsonRpcRequestWithMeta>{

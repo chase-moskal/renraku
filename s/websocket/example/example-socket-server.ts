@@ -5,7 +5,7 @@ import {clientsideApi, makeServersideApi} from "./example-socket-apis.js"
 renrakuWebSocketServer({
 	port: 8001,
 	exposeErrors: false,
-	acceptConnection: ({controls, clientApiMetaMap: prepareClientApi}) => ({
+	acceptConnection: ({controls, prepareClientApi}) => ({
 		handleConnectionClosed() {},
 		api: makeServersideApi(
 			controls,
