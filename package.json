@@ -2,7 +2,7 @@
 	"name": "renraku",
 	"version": "0.0.0-dev.43",
 	"description": "expose async functions as an api",
-	"license": "ISC",
+	"license": "MIT",
 	"author": "Chase Moskal <chasemoskal@gmail.com>",
 	"type": "module",
 	"main": "x/renraku.js",
