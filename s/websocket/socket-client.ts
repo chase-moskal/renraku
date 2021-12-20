@@ -37,6 +37,7 @@ export async function renrakuWebSocketClient<xServerApi extends Api>({
 	}
 	socket.onmessage = async event => acceptIncoming({
 		servelet,
+		headers: undefined,
 		exposeErrors: true,
 		incoming: JSON.parse(event.data.toString()),
 		respond: response => socket.send(JSON.stringify(response)),

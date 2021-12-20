@@ -1,15 +1,18 @@
 
 import {RenrakuError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
-import {Api, MetaMap, ApiRemote, AuthMap, Service, Methods, is_renraku_service} from "./types.js"
+import {Api, MetaMap, ApiRemote, AuthMap, Service, Methods, is_renraku_service, HttpHeaders} from "./types.js"
 
 export const renrakuMock = () => ({
 	forService,
 	forApi<xApi extends Api>(api: xApi) {
 		return {
-			withMetaMap(map: MetaMap<xApi>): ApiRemote<xApi> {
+			withMetaMap(
+					map: MetaMap<xApi>,
+					getHeaders: () => Promise<HttpHeaders> = async() => undefined
+				): ApiRemote<xApi> {
 				const recurse2 = prepareRecursiveMapping(
-					(service, getter) => forService(service).withMeta(getter)
+					(service, getter) => forService(service).withMeta(getter, getHeaders)
 				)
 				return <ApiRemote<xApi>>recurse2(api, map)
 			},
@@ -48,8 +51,16 @@ function forService<xService extends Service<any, any, Methods>>(service: xServi
 		})
 	}
 	return {
-		withMeta(getMeta: () => Promise<xMeta>): xMethods {
-			return prepareProxy(async() => service.policy(await getMeta()))
+		withMeta(
+				getMeta: () => Promise<xMeta>,
+				getHeaders: () => Promise<HttpHeaders> = async() => undefined
+			): xMethods {
+			return prepareProxy(
+				async() => service.policy(
+					await getMeta(),
+					await getHeaders()
+				)
+			)
 		},
 		withAuth(getAuth: () => Promise<xAuth>): xMethods {
 			return prepareProxy(getAuth)

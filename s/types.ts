@@ -9,8 +9,12 @@ export interface Methods {
 	[key: string]: (...args: any[]) => Promise<any>
 }
 
+export interface HttpHeaders {
+	[key: string]: string
+}
+
 export interface RenrakuPolicy<xMeta, xAuth> {
-	(meta: xMeta): Promise<xAuth>
+	(meta: xMeta, headers?: HttpHeaders): Promise<xAuth>
 }
 
 export interface Expose<xAuth, xMethods extends Methods> {
@@ -64,6 +68,7 @@ export interface RenrakuRequest {
 	meta: any
 	method: string
 	params: any[]
+	headers?: HttpHeaders
 }
 
 export interface RenrakuResponse {

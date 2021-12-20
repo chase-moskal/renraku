@@ -6,6 +6,7 @@ import {renrakuServelet} from "../servelet.js"
 import {allowCors} from "./node-utils/allow-cors.js"
 import {readStream} from "./node-utils/read-stream.js"
 import {healthCheck} from "./node-utils/health-check.js"
+import {readRawHeaders} from "./node-utils/read-raw-headers.js"
 import {Api, JsonRpcRequestWithMeta, JsonRpcResponse} from "../types.js"
 
 export function renrakuNodeServer({
@@ -25,7 +26,12 @@ export function renrakuNodeServer({
 		const {method, params, id, meta} = <JsonRpcRequestWithMeta>JSON.parse(body)
 		res.setHeader("Content-Type", "application/json; charset=utf-8")
 		try {
-			const result = await servelet({meta, method, params})
+			const result = await servelet({
+				meta,
+				method,
+				params,
+				headers: readRawHeaders(req.rawHeaders),
+			})
 			res.statusCode = 200
 			res.end(
 				JSON.stringify(<JsonRpcResponse>{
