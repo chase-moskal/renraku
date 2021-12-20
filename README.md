@@ -48,12 +48,14 @@
 
 1. *now let's run our api on a node server*
     ```ts
+    import {megabytes} from "renraku"
     import {exampleApi} from "./example-api.js"
     import {renrakuNodeServer} from "renraku/http/node-server.js"
 
     const server = renrakuNodeServer({
       api: exampleApi,
       exposeErrors: false,
+      maxPayloadSize: megabytes(10),
     })
 
     server.listen(8000)

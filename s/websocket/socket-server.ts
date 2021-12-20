@@ -3,14 +3,18 @@ import {WebSocketServer} from "ws"
 
 import {renrakuServelet} from "../servelet.js"
 import {negotiator} from "./helpers/negotiator.js"
+import {readRawHeaders} from "../http/node-utils/read-raw-headers.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, RenrakuConnectionControls, Requester} from "../types.js"
-import {readRawHeaders} from "../http/node-utils/read-raw-headers.js"
 
 export function renrakuWebSocketServer({
-		port, exposeErrors, acceptConnection,
+		port,
+		exposeErrors,
+		maxPayloadSize,
+		acceptConnection,
 	}: {
 		port: number
+		maxPayloadSize: number
 		exposeErrors: boolean
 		acceptConnection({}: {
 			controls: RenrakuConnectionControls
@@ -21,7 +25,10 @@ export function renrakuWebSocketServer({
 		}
 	}) {
 
-	const server = new WebSocketServer({port})
+	const server = new WebSocketServer({
+		port,
+		maxPayload: maxPayloadSize,
+	})
 
 	server.on("connection", async(socket, req) => {
 		const headers = readRawHeaders(req.rawHeaders)
