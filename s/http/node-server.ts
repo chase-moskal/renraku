@@ -16,7 +16,7 @@ export function renrakuNodeServer({
 		processListener = (listener: RequestListener) => listener,
 	}: {
 		api: Api
-		maxPayloadSize: number,
+		maxPayloadSize: number
 		exposeErrors: boolean
 		processListener?: (listener: RequestListener) => RequestListener
 	}) {
