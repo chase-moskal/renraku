@@ -1,9 +1,9 @@
 
 import {RenrakuError} from "../../error.js"
 import {objectMap} from "../../tools/object-map.js"
-import {Api, ApiRemote, RenrakuMetaMap, Requester} from "../../types.js"
+import {RenrakuApi, ApiRemote, RenrakuMetaMap, Requester} from "../../types.js"
 
-export function remoteWithMetaMap<xApi extends Api>(requester: Requester, map: RenrakuMetaMap<xApi>) {
+export function remoteWithMetaMap<xApi extends RenrakuApi>(requester: Requester, map: RenrakuMetaMap<xApi>) {
 	function recurse(mapGroup: RenrakuMetaMap<xApi>, path: string[] = []): ApiRemote<xApi> {
 		return objectMap(mapGroup, (value, key) => {
 			const newPath = [...path, key]

@@ -23,44 +23,44 @@ export interface Expose<xAuth, xMethods extends Methods> {
 
 export const is_renraku_service = Symbol("is_renraku_service")
 
-export interface Service<xMeta, xAuth, xMethods extends Methods> {
+export interface RenrakuService<xMeta, xAuth, xMethods extends Methods> {
 	[is_renraku_service]: symbol
 	policy: RenrakuPolicy<xMeta, xAuth>
 	expose: Expose<xAuth, xMethods>
 }
 
-export interface Api {
-	[key: string]: Api | Service<any, any, Methods>
+export interface RenrakuApi {
+	[key: string]: RenrakuApi | RenrakuService<any, any, Methods>
 }
 
-export type RenrakuMetaMap<xApi extends Api> = {
-	[P in keyof xApi]: xApi[P] extends Service<infer xMeta, any, Methods>
+export type RenrakuMetaMap<xApi extends RenrakuApi> = {
+	[P in keyof xApi]: xApi[P] extends RenrakuService<infer xMeta, any, Methods>
 		? () => Promise<xMeta>
-		: xApi[P] extends Api
+		: xApi[P] extends RenrakuApi
 			? RenrakuMetaMap<xApi[P]>
 			: never
 }
 
-export type AuthMap<xApi extends Api> = {
-	[P in keyof xApi]: xApi[P] extends Service<any, infer xAuth, Methods>
+export type AuthMap<xApi extends RenrakuApi> = {
+	[P in keyof xApi]: xApi[P] extends RenrakuService<any, infer xAuth, Methods>
 		? () => Promise<xAuth>
-		: xApi[P] extends Api
+		: xApi[P] extends RenrakuApi
 			? AuthMap<xApi[P]>
 			: never
 }
 
-export type ApiRemote<xApi extends Api> = {
-	[P in keyof xApi]: xApi[P] extends Service<any, any, infer xMethods>
+export type ApiRemote<xApi extends RenrakuApi> = {
+	[P in keyof xApi]: xApi[P] extends RenrakuService<any, any, infer xMethods>
 		? xMethods
-		: xApi[P] extends Api
+		: xApi[P] extends RenrakuApi
 			? ApiRemote<xApi[P]>
 			: never
 }
 
-export type RenrakuRemote<X extends Service<any, any, any> | Api> =
-	X extends Service<any, any, infer xMethods>
+export type RenrakuRemote<X extends RenrakuService<any, any, any> | RenrakuApi> =
+	X extends RenrakuService<any, any, infer xMethods>
 		? xMethods
-		: X extends Api
+		: X extends RenrakuApi
 			? ApiRemote<X>
 			: never
 

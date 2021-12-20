@@ -7,7 +7,7 @@ import {allowCors} from "./node-utils/allow-cors.js"
 import {readStream} from "./node-utils/read-stream.js"
 import {healthCheck} from "./node-utils/health-check.js"
 import {respondWithError} from "./node-utils/respond-with-error.js"
-import {Api, JsonRpcRequestWithMeta, JsonRpcResponse} from "../types.js"
+import {RenrakuApi, JsonRpcRequestWithMeta, JsonRpcResponse} from "../types.js"
 
 export function renrakuNodeServer({
 		api,
@@ -15,7 +15,7 @@ export function renrakuNodeServer({
 		maxPayloadSize,
 		processListener = (listener: RequestListener) => listener,
 	}: {
-		api: Api
+		api: RenrakuApi
 		maxPayloadSize: number
 		exposeErrors: boolean
 		processListener?: (listener: RequestListener) => RequestListener

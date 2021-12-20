@@ -1,13 +1,13 @@
 
 import {RenrakuError} from "./error.js"
 import {obtain} from "./tools/obtain.js"
-import {Api, Methods, RenrakuRequest, Service} from "./types.js"
+import {RenrakuApi, Methods, RenrakuRequest, RenrakuService} from "./types.js"
 
-export function renrakuServelet(api: Api) {
+export function renrakuServelet(api: RenrakuApi) {
 	return async function servelet(request: RenrakuRequest) {
 		const servicePath = request.method.slice(1).split(".")
 		const methodName = servicePath.pop()
-		const service: Service<any, any, Methods> = obtain(servicePath.join("."), api)
+		const service: RenrakuService<any, any, Methods> = obtain(servicePath.join("."), api)
 		if (!service)
 			throw new RenrakuError(400, `renraku service not found "${servicePath}"`)
 		const auth = await service.policy(request.meta)

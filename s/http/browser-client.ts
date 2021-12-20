@@ -1,9 +1,9 @@
 
 import {RenrakuError} from "../error.js"
 import {remoteWithMetaMap} from "./mapping/remote-with-meta-map.js"
-import {Api, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, RenrakuMetaMap, RenrakuRequest} from "../types.js"
+import {RenrakuApi, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, RenrakuMetaMap, RenrakuRequest} from "../types.js"
 
-export function renrakuBrowserClient<xApi extends Api>({url, metaMap}: {
+export function renrakuBrowserClient<xApi extends RenrakuApi>({url, metaMap}: {
 		url: string
 		metaMap: RenrakuMetaMap<xApi>
 	}) {

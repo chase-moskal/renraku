@@ -1,11 +1,11 @@
 
 import {RenrakuError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
-import {Api, RenrakuMetaMap, ApiRemote, AuthMap, Service, Methods, is_renraku_service, RenrakuHttpHeaders} from "./types.js"
+import {RenrakuApi, RenrakuMetaMap, ApiRemote, AuthMap, RenrakuService, Methods, is_renraku_service, RenrakuHttpHeaders} from "./types.js"
 
 export const renrakuMock = () => ({
 	forService,
-	forApi<xApi extends Api>(api: xApi) {
+	forApi<xApi extends RenrakuApi>(api: xApi) {
 		return {
 			withMetaMap(
 					map: RenrakuMetaMap<xApi>,
@@ -26,14 +26,14 @@ export const renrakuMock = () => ({
 	},
 })
 
-function forService<xService extends Service<any, any, Methods>>(service: xService) {
-	type xMeta = xService extends Service<infer X, any, Methods>
+function forService<xService extends RenrakuService<any, any, Methods>>(service: xService) {
+	type xMeta = xService extends RenrakuService<infer X, any, Methods>
 		? X
 		: never
-	type xAuth = xService extends Service<any, infer X, Methods>
+	type xAuth = xService extends RenrakuService<any, infer X, Methods>
 		? X
 		: never
-	type xMethods = xService extends Service<any, any, infer X>
+	type xMethods = xService extends RenrakuService<any, any, infer X>
 		? X
 		: never
 	function prepareProxy(getAuth: () => Promise<xAuth>): xMethods {
@@ -70,14 +70,14 @@ function forService<xService extends Service<any, any, Methods>>(service: xServi
 
 function prepareRecursiveMapping(
 		handler: (
-			service: Service<any, any, Methods>,
+			service: RenrakuService<any, any, Methods>,
 			getter: () => Promise<any>
 		) => Methods
 	) {
 	return function recursiveMapping(
-			apiGroup: Api,
-			mapGroup: RenrakuMetaMap<Api> | AuthMap<Api>,
-		): ApiRemote<Api> {
+			apiGroup: RenrakuApi,
+			mapGroup: RenrakuMetaMap<RenrakuApi> | AuthMap<RenrakuApi>,
+		): ApiRemote<RenrakuApi> {
 		return objectMap(apiGroup, (value, key) => {
 			if (value[is_renraku_service]) {
 				const service = value
