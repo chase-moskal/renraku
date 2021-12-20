@@ -1,4 +1,6 @@
 
+import type {IncomingHttpHeaders} from "http"
+
 export interface Logger {
 	log(...data: any[]): void
 	warn(...data: any[]): void
@@ -9,9 +11,7 @@ export interface Methods {
 	[key: string]: (...args: any[]) => Promise<any>
 }
 
-export interface HttpHeaders {
-	[key: string]: string
-}
+export interface HttpHeaders extends IncomingHttpHeaders {}
 
 export interface RenrakuPolicy<xMeta, xAuth> {
 	(meta: xMeta, headers?: HttpHeaders): Promise<xAuth>

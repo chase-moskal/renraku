@@ -3,7 +3,6 @@ import {WebSocketServer} from "ws"
 
 import {renrakuServelet} from "../servelet.js"
 import {negotiator} from "./helpers/negotiator.js"
-import {readRawHeaders} from "../http/node-utils/read-raw-headers.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, RenrakuConnectionControls, Requester} from "../types.js"
 
@@ -31,7 +30,6 @@ export function renrakuWebSocketServer({
 	})
 
 	server.on("connection", async(socket, req) => {
-		const headers = readRawHeaders(req.rawHeaders)
 		const {startWaitingForResponse, acceptIncoming} = negotiator()
 		const {api, handleConnectionClosed} = acceptConnection({
 			controls: {
@@ -64,8 +62,8 @@ export function renrakuWebSocketServer({
 		}
 		socket.onmessage = async event => acceptIncoming({
 			servelet,
-			headers,
 			exposeErrors,
+			headers: req.headers,
 			incoming: JSON.parse(event.data.toString()),
 			respond: response => socket.send(JSON.stringify(response)),
 		})

@@ -3,11 +3,9 @@ import {createServer, RequestListener} from "http"
 
 import {RenrakuError} from "../error.js"
 import {renrakuServelet} from "../servelet.js"
-import {megabytes} from "../tools/megabytes.js"
 import {allowCors} from "./node-utils/allow-cors.js"
 import {readStream} from "./node-utils/read-stream.js"
 import {healthCheck} from "./node-utils/health-check.js"
-import {readRawHeaders} from "./node-utils/read-raw-headers.js"
 import {respondWithError} from "./node-utils/respond-with-error.js"
 import {Api, JsonRpcRequestWithMeta, JsonRpcResponse} from "../types.js"
 
@@ -51,7 +49,7 @@ export function renrakuNodeServer({
 				meta,
 				method,
 				params,
-				headers: readRawHeaders(req.rawHeaders),
+				headers: req.headers,
 			})
 			res.statusCode = 200
 			res.end(
