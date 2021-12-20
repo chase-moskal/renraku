@@ -1,4 +1,10 @@
 
+### v0.0.0-dev.44
+
+- (breaking) complete renraku rewrite!
+
+  you have to redo your renraku implementation. *sorry not sorry*
+
 ### v0.0.0-dev.43
 
 - (breaking) remove mockRemote's withMeta and forceAuth with the newer more-capable `useMeta` and `useAuth`
