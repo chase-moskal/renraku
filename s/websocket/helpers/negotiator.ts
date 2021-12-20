@@ -1,6 +1,6 @@
 
 import {RenrakuError} from "../../error.js"
-import {HttpHeaders, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Servelet} from "../../types.js"
+import {RenrakuHttpHeaders, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Servelet} from "../../types.js"
 
 export function negotiator() {
 
@@ -39,7 +39,7 @@ export function negotiator() {
 
 		async acceptIncoming({servelet, headers, exposeErrors, incoming, respond}: {
 				servelet: Servelet
-				headers: HttpHeaders
+				headers: RenrakuHttpHeaders
 				exposeErrors: boolean
 				incoming: JsonRpcRequestWithMeta | JsonRpcResponse
 				respond: (response: JsonRpcResponse) => void

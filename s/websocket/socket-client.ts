@@ -2,13 +2,13 @@
 import {renrakuServelet} from "../servelet.js"
 import {negotiator} from "./helpers/negotiator.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
-import {Api, JsonRpcRequestWithMeta, MetaMap, Requester} from "../types.js"
+import {Api, JsonRpcRequestWithMeta, RenrakuMetaMap, Requester} from "../types.js"
 
 export async function renrakuWebSocketClient<xServerApi extends Api>({
 		link, metaMap, clientApi, handleConnectionClosed,
 	}: {
 		link: string
-		metaMap: MetaMap<xServerApi>
+		metaMap: RenrakuMetaMap<xServerApi>
 		clientApi: Api
 		handleConnectionClosed(): void
 	}) {

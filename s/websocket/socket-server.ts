@@ -4,7 +4,7 @@ import {WebSocketServer} from "ws"
 import {renrakuServelet} from "../servelet.js"
 import {negotiator} from "./helpers/negotiator.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
-import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, RenrakuConnectionControls, Requester} from "../types.js"
+import {Api, ApiRemote, JsonRpcRequestWithMeta, RenrakuMetaMap, RenrakuConnectionControls, Requester} from "../types.js"
 
 export function renrakuWebSocketServer({
 		port,
@@ -17,7 +17,7 @@ export function renrakuWebSocketServer({
 		exposeErrors: boolean
 		acceptConnection({}: {
 			controls: RenrakuConnectionControls
-			prepareClientApi: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
+			prepareClientApi: <xApi extends Api>(map: RenrakuMetaMap<xApi>) => ApiRemote<xApi>,
 		}): {
 			api: Api
 			handleConnectionClosed(): void

@@ -1,15 +1,15 @@
 
 import {RenrakuError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
-import {Api, MetaMap, ApiRemote, AuthMap, Service, Methods, is_renraku_service, HttpHeaders} from "./types.js"
+import {Api, RenrakuMetaMap, ApiRemote, AuthMap, Service, Methods, is_renraku_service, RenrakuHttpHeaders} from "./types.js"
 
 export const renrakuMock = () => ({
 	forService,
 	forApi<xApi extends Api>(api: xApi) {
 		return {
 			withMetaMap(
-					map: MetaMap<xApi>,
-					getHeaders: () => Promise<HttpHeaders> = async() => undefined
+					map: RenrakuMetaMap<xApi>,
+					getHeaders: () => Promise<RenrakuHttpHeaders> = async() => undefined
 				): ApiRemote<xApi> {
 				const recurse2 = prepareRecursiveMapping(
 					(service, getter) => forService(service).withMeta(getter, getHeaders)
@@ -53,7 +53,7 @@ function forService<xService extends Service<any, any, Methods>>(service: xServi
 	return {
 		withMeta(
 				getMeta: () => Promise<xMeta>,
-				getHeaders: () => Promise<HttpHeaders> = async() => undefined
+				getHeaders: () => Promise<RenrakuHttpHeaders> = async() => undefined
 			): xMethods {
 			return prepareProxy(
 				async() => service.policy(
@@ -76,7 +76,7 @@ function prepareRecursiveMapping(
 	) {
 	return function recursiveMapping(
 			apiGroup: Api,
-			mapGroup: MetaMap<Api> | AuthMap<Api>,
+			mapGroup: RenrakuMetaMap<Api> | AuthMap<Api>,
 		): ApiRemote<Api> {
 		return objectMap(apiGroup, (value, key) => {
 			if (value[is_renraku_service]) {

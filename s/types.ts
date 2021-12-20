@@ -11,10 +11,10 @@ export interface Methods {
 	[key: string]: (...args: any[]) => Promise<any>
 }
 
-export interface HttpHeaders extends IncomingHttpHeaders {}
+export interface RenrakuHttpHeaders extends IncomingHttpHeaders {}
 
 export interface RenrakuPolicy<xMeta, xAuth> {
-	(meta: xMeta, headers?: HttpHeaders): Promise<xAuth>
+	(meta: xMeta, headers?: RenrakuHttpHeaders): Promise<xAuth>
 }
 
 export interface Expose<xAuth, xMethods extends Methods> {
@@ -33,11 +33,11 @@ export interface Api {
 	[key: string]: Api | Service<any, any, Methods>
 }
 
-export type MetaMap<xApi extends Api> = {
+export type RenrakuMetaMap<xApi extends Api> = {
 	[P in keyof xApi]: xApi[P] extends Service<infer xMeta, any, Methods>
 		? () => Promise<xMeta>
 		: xApi[P] extends Api
-			? MetaMap<xApi[P]>
+			? RenrakuMetaMap<xApi[P]>
 			: never
 }
 
@@ -68,7 +68,7 @@ export interface RenrakuRequest {
 	meta: any
 	method: string
 	params: any[]
-	headers?: HttpHeaders
+	headers?: RenrakuHttpHeaders
 }
 
 export interface RenrakuResponse {
