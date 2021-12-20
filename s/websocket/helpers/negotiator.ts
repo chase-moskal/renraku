@@ -82,7 +82,10 @@ export function negotiator() {
 				const response = <JsonRpcResponse>incoming
 				if ((<JsonRpcErrorResponse>response).error) {
 					const {id, error: {code, message}} = <JsonRpcErrorResponse>response
-					rejectPendingResponse(id, new RenrakuError(code, message))
+					if (id === -1)
+						throw new RenrakuError(code, message)
+					else
+						rejectPendingResponse(id, new RenrakuError(code, message))
 				}
 				else {
 					const {id, result} = <JsonRpcSuccessResponse>response
