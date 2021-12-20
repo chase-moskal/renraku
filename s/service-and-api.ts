@@ -1,8 +1,8 @@
 
-import {Policy, Methods, Expose, Api, Service, is_renraku_service} from "./types.js"
+import {RenrakuPolicy, Methods, Expose, Api, Service, is_renraku_service} from "./types.js"
 
 export const renrakuService = () => ({
-	policy<xMeta, xAuth>(p: Policy<xMeta, xAuth>) {
+	policy<xMeta, xAuth>(p: RenrakuPolicy<xMeta, xAuth>) {
 		return {
 			expose<xMethods extends Methods>(e: Expose<xAuth, xMethods>): Service<xMeta, xAuth, xMethods> {
 				return {

@@ -9,7 +9,7 @@ export interface Methods {
 	[key: string]: (...args: any[]) => Promise<any>
 }
 
-export interface Policy<xMeta, xAuth> {
+export interface RenrakuPolicy<xMeta, xAuth> {
 	(meta: xMeta): Promise<xAuth>
 }
 
@@ -21,7 +21,7 @@ export const is_renraku_service = Symbol("is_renraku_service")
 
 export interface Service<xMeta, xAuth, xMethods extends Methods> {
 	[is_renraku_service]: symbol
-	policy: Policy<xMeta, xAuth>
+	policy: RenrakuPolicy<xMeta, xAuth>
 	expose: Expose<xAuth, xMethods>
 }
 
