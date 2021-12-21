@@ -20,11 +20,12 @@ export function remoteWithMetaMap<xApi extends RenrakuApi>(
 					},
 					get: (t, property: string) => (
 						overrides[key] ?? (async(...params: any[]) => {
-							const method = "." + [...newPath, property].join(".")
+							const joinedPath = [...newPath, property].join(".")
+							const method = "." + joinedPath
 							const meta = await getMeta()
 							return options.spike
 								? options.spike(
-									method,
+									joinedPath,
 									async(...params2) => requester({
 										meta, method, params: params2
 									}),
