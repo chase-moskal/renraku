@@ -10,7 +10,7 @@ export function servelet(api: Api): Servelet {
 		const service: Service<any, any, Methods> = obtain(servicePath.join("."), api)
 		if (!service)
 			throw new ApiError(400, `renraku service not found "${servicePath}"`)
-		const auth = await service.policy(request.meta)
+		const auth = await service.policy(request.meta, request.headers)
 		const methods = service.expose(auth)
 		const executor = methods[methodName]
 		if (!executor)
