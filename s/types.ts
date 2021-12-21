@@ -120,3 +120,12 @@ export interface Requester {
 export interface RenrakuConnectionControls {
 	close(): void
 }
+
+export interface RenrakuMockLatency {
+	min: number
+	max: number
+}
+
+export interface MockOptions {
+	getMockLatency?: () => undefined | RenrakuMockLatency
+}

@@ -1,10 +1,13 @@
 
 import {RenrakuError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
-import {RenrakuApi, RenrakuMetaMap, ApiRemote, AuthMap, RenrakuService, Methods, is_renraku_service, RenrakuHttpHeaders} from "./types.js"
+import {waitForMockLatency} from "./tools/wait-for-mock-latency.js"
+import {RenrakuApi, RenrakuMetaMap, ApiRemote, AuthMap, RenrakuService, Methods, is_renraku_service, RenrakuHttpHeaders, MockOptions} from "./types.js"
 
-export const renrakuMock = () => ({
-	forService,
+export const renrakuMock = (options: MockOptions = {}) => ({
+	forService: <xService extends RenrakuService<any, any, Methods>>(
+			service: xService
+		) => mockService(service, options),
 	forApi<xApi extends RenrakuApi>(api: xApi) {
 		return {
 			withMetaMap(
@@ -12,13 +15,13 @@ export const renrakuMock = () => ({
 					getHeaders: () => Promise<RenrakuHttpHeaders> = async() => undefined
 				): ApiRemote<xApi> {
 				const recurse2 = prepareRecursiveMapping(
-					(service, getter) => forService(service).withMeta(getter, getHeaders)
+					(service, getter) => mockService(service, options).withMeta(getter, getHeaders)
 				)
 				return <ApiRemote<xApi>>recurse2(api, map)
 			},
 			withAuthMap(map: AuthMap<xApi>): ApiRemote<xApi> {
 				const recurse2 = prepareRecursiveMapping(
-					(service, getter) => forService(service).withAuth(getter)
+					(service, getter) => mockService(service, options).withAuth(getter)
 				)
 				return <ApiRemote<xApi>>recurse2(api, map)
 			},
@@ -26,7 +29,7 @@ export const renrakuMock = () => ({
 	},
 })
 
-function forService<xService extends RenrakuService<any, any, Methods>>(service: xService) {
+function mockService<xService extends RenrakuService<any, any, Methods>>(service: xService, options: MockOptions) {
 	type xMeta = xService extends RenrakuService<infer X, any, Methods>
 		? X
 		: never
@@ -37,17 +40,29 @@ function forService<xService extends RenrakuService<any, any, Methods>>(service:
 		? X
 		: never
 	function prepareProxy(getAuth: () => Promise<xAuth>): xMethods {
+		const overrides: {[key: string]: any} = {}
 		return new Proxy(<xMethods>{}, {
-			set: () => { throw new RenrakuError(400, "renraku remote is readonly") },
-			get: (t, property: string) => async(...args: any[]) => {
-				const auth = await getAuth()
-				const methods = service.expose(auth)
-				const method = methods[property]
-				if (method)
-					return method(...args)
-				else
-					throw new RenrakuError(400, `renraku remote method "${property}" not found`)
+			set: (t, key: string, value: any) => {
+				overrides[key] = async(...args: any[]) => {
+					if (options.getMockLatency)
+						await waitForMockLatency(options.getMockLatency())
+					return value(...args)
+				}
+				return true
 			},
+			get: (t, key: string) => (
+				overrides[key] ?? (async(...args: any[]) => {
+					const auth = await getAuth()
+					const method = service.expose(auth)[key]
+					if (method) {
+						if (options.getMockLatency)
+							await waitForMockLatency(options.getMockLatency())
+						return method(...args)
+					}
+					else
+						throw new RenrakuError(400, `renraku remote method "${key}" not found`)
+				})
+			),
 		})
 	}
 	return {
