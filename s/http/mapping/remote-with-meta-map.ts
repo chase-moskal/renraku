@@ -1,8 +1,12 @@
 
 import {objectMap} from "../../tools/object-map.js"
-import {RenrakuApi, ApiRemote, RenrakuMetaMap, Requester} from "../../types.js"
+import {RenrakuApi, ApiRemote, RenrakuMetaMap, Requester, RenrakuServiceOptions} from "../../types.js"
 
-export function remoteWithMetaMap<xApi extends RenrakuApi>(requester: Requester, map: RenrakuMetaMap<xApi>) {
+export function remoteWithMetaMap<xApi extends RenrakuApi>(
+		requester: Requester,
+		map: RenrakuMetaMap<xApi>,
+		options: RenrakuServiceOptions = {}
+	) {
 	function recurse(mapGroup: RenrakuMetaMap<xApi>, path: string[] = []): ApiRemote<xApi> {
 		return objectMap(mapGroup, (value, key) => {
 			const newPath = [...path, key]
@@ -18,7 +22,15 @@ export function remoteWithMetaMap<xApi extends RenrakuApi>(requester: Requester,
 						overrides[key] ?? (async(...params: any[]) => {
 							const method = "." + [...newPath, property].join(".")
 							const meta = await getMeta()
-							return requester({meta, method, params})
+							return options.spike
+								? options.spike(
+									method,
+									async(...params2) => requester({
+										meta, method, params: params2
+									}),
+									...params
+								)
+								: requester({meta, method, params})
 						})
 					),
 				})

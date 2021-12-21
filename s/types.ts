@@ -129,3 +129,11 @@ export interface RenrakuMockLatency {
 export interface MockOptions {
 	getMockLatency?: () => undefined | RenrakuMockLatency
 }
+
+export interface RenrakuSpike {
+	(methodName: string, func: (...params: any[]) => Promise<any>, ...params: any): Promise<any>
+}
+
+export interface RenrakuServiceOptions {
+	spike?: RenrakuSpike
+}

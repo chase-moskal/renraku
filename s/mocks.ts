@@ -1,10 +1,9 @@
 
 import {RenrakuError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
-import {waitForMockLatency} from "./tools/wait-for-mock-latency.js"
-import {RenrakuApi, RenrakuMetaMap, ApiRemote, AuthMap, RenrakuService, Methods, is_renraku_service, RenrakuHttpHeaders, MockOptions} from "./types.js"
+import {RenrakuApi, RenrakuMetaMap, ApiRemote, AuthMap, RenrakuService, Methods, is_renraku_service, RenrakuHttpHeaders, RenrakuServiceOptions} from "./types.js"
 
-export const renrakuMock = (options: MockOptions = {}) => ({
+export const renrakuMock = (options: RenrakuServiceOptions = {}) => ({
 	forService: <xService extends RenrakuService<any, any, Methods>>(
 			service: xService
 		) => mockService(service, options),
@@ -29,7 +28,7 @@ export const renrakuMock = (options: MockOptions = {}) => ({
 	},
 })
 
-function mockService<xService extends RenrakuService<any, any, Methods>>(service: xService, options: MockOptions) {
+function mockService<xService extends RenrakuService<any, any, Methods>>(service: xService, options: RenrakuServiceOptions) {
 	type xMeta = xService extends RenrakuService<infer X, any, Methods>
 		? X
 		: never
@@ -43,21 +42,17 @@ function mockService<xService extends RenrakuService<any, any, Methods>>(service
 		const overrides: {[key: string]: any} = {}
 		return new Proxy(<xMethods>{}, {
 			set: (t, key: string, value: any) => {
-				overrides[key] = async(...args: any[]) => {
-					if (options.getMockLatency)
-						await waitForMockLatency(options.getMockLatency())
-					return value(...args)
-				}
+				overrides[key] = value
 				return true
 			},
 			get: (t, key: string) => (
-				overrides[key] ?? (async(...args: any[]) => {
+				overrides[key] ?? (async(...params: any[]) => {
 					const auth = await getAuth()
 					const method = service.expose(auth)[key]
 					if (method) {
-						if (options.getMockLatency)
-							await waitForMockLatency(options.getMockLatency())
-						return method(...args)
+						return options.spike
+							? options.spike(key, method, ...params)
+							: method(...params)
 					}
 					else
 						throw new RenrakuError(400, `renraku remote method "${key}" not found`)
