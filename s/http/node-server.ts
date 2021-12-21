@@ -26,13 +26,7 @@ export function nodeServer({
 	let listener: RequestListener = async(req, res) => {
 		let body: string
 		try {
-			const contentLength = parseInt(req.headers["content-length"])
-			if (contentLength <= maxPayloadSize) {
-				body = await readStream(req, maxPayloadSize)
-			}
-			else {
-				throw new ApiError(413, "exceeded maximum content-length")
-			}
+			body = await readStream(req, maxPayloadSize)
 		}
 		catch (error) {
 			return respondWithError({
