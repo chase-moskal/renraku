@@ -3,13 +3,13 @@
 
 `npm install renraku`
 
-&nbsp; &nbsp; 🔆 **make smart typescript apis**  
-&nbsp; &nbsp; 🛎️ simply expose async functions  
-&nbsp; &nbsp; 🛡 you set auth policies for groups of functions  
-&nbsp; &nbsp; 🎭 easy mocks for testing and development  
-&nbsp; &nbsp; 🧠 designed for good typescript types  
-&nbsp; &nbsp; 🌐 make http json-rpc apis  
-&nbsp; &nbsp; 🔁 make bidirectional websocket json-rpc apis  
+🔆 **make smart typescript apis**  
+🛎️ simply expose async functions  
+🛡 you set auth policies for groups of functions  
+🎭 easy mocks for testing and development  
+🧠 designed for good typescript types  
+🌐 make http json-rpc apis  
+🔁 make bidirectional websocket json-rpc apis  
 
 <br/>
 
@@ -144,13 +144,13 @@
 
 ## ⛩️ RENRAKU error handling
 
-- *~ readme docs coming soon lol ~*
+&nbsp; &nbsp; ~ readme docs coming soon lol ~
 
 <br/>
 
 ## ⛩️ RENRAKU also lets you build two-way websocket systems
 
-- *~ readme docs coming soon lol ~*
+&nbsp; &nbsp; ~ readme docs coming soon lol ~
 
 <br/>
 
