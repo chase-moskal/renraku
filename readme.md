@@ -17,12 +17,12 @@
 
 1. *let's make an example api*
     ```ts
-    import {renrakuApi, renrakuService} from "renraku"
+    import * as renraku from "renraku"
 
-    export const exampleApi = renrakuApi({
+    export const exampleApi = renraku.api({
 
       // we organize functions into services.
-      greeter: renrakuService()
+      greeter: renraku.service()
 
         // each service has its own auth policy.
         // a policy processes a "meta" object into an "auth" object.
@@ -48,14 +48,14 @@
 
 1. *now let's run our api on a node server*
     ```ts
-    import {megabytes} from "renraku"
+    import * as renraku from "renraku"
+    import {nodeServer} from "renraku/http/node-server.js"
     import {exampleApi} from "./example-api.js"
-    import {renrakuNodeServer} from "renraku/http/node-server.js"
 
-    const server = renrakuNodeServer({
+    const server = nodeServer({
       api: exampleApi,
       exposeErrors: false,
-      maxPayloadSize: megabytes(10),
+      maxPayloadSize: renraku.megabytes(10),
     })
 
     server.listen(8000)
@@ -63,14 +63,14 @@
 
 1. *now let's call that function from a browser*
     ```ts
-    import {renrakuBrowserClient} from "renraku"
+    import * as renraku from "renraku"
     import type {exampleApi} from "./example-api.js"
 
     // let's start as a doctor
     let meta = {token: "doctor"}
 
     // we create a browser client
-    const {greeter} = renrakuBrowserClient({
+    const {greeter} = renraku.browserClient({
       url: "http://localhost:8000/",
       metaMap: {
         // on the service, we specify which meta to use for api calls
@@ -99,14 +99,14 @@
 
 1. *let's test our example-api, locally, in our test suite*
     ```ts
-    import {renrakuMock} from "renraku"
+    import * as renraku from "renraku"
     import {exampleApi} from "./example-api.js"
 
     // okay, let's start with a valid doctor token
     let meta = {token: "doctor"}
 
     // create a mock remote of our api
-    const {greeter} = renrakuMock()
+    const {greeter} = renraku.mock()
       .forApi(exampleApi)
       .withMetaMap({
         greeter: async() => meta,
@@ -128,7 +128,7 @@
 
 1. *when making our mocks, we may choose to skip the auth policy logic*
     ```ts
-    const {greeter} = renrakuMock()
+    const {greeter} = renraku.mock()
       .forApi(exampleApi)
 
       // 👇 an auth map overrides auth policies

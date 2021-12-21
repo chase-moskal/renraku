@@ -1,9 +1,9 @@
 
 import {megabytes} from "../../renraku.js"
-import {renrakuWebSocketServer} from "../socket-server.js"
+import {webSocketServer} from "../socket-server.js"
 import {clientsideApi, makeServersideApi} from "./example-socket-apis.js"
 
-renrakuWebSocketServer({
+webSocketServer({
 	port: 8001,
 	exposeErrors: false,
 	maxPayloadSize: megabytes(10),

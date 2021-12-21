@@ -1,6 +1,6 @@
 
 import {ServerResponse} from "http"
-import {RenrakuError} from "../../error.js"
+import {ApiError} from "../../error.js"
 import {JsonRpcResponse} from "../../types.js"
 
 export function respondWithError({
@@ -12,7 +12,7 @@ export function respondWithError({
 		exposeErrors: boolean
 	}) {
 
-	if (error instanceof RenrakuError) {
+	if (error instanceof ApiError) {
 		const {code, message} = error
 		res.statusCode = code
 		res.end(<JsonRpcResponse>{

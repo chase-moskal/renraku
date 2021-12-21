@@ -1,16 +1,16 @@
 
-import {RenrakuError} from "../error.js"
+import {ApiError} from "../error.js"
 import {remoteWithMetaMap} from "./mapping/remote-with-meta-map.js"
-import {RenrakuApi, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, RenrakuMetaMap, RenrakuRequest} from "../types.js"
+import {Api, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, MetaMap, Request} from "../types.js"
 
-export function renrakuBrowserClient<xApi extends RenrakuApi>({url, metaMap}: {
+export function browserClient<xApi extends Api>({url, metaMap}: {
 		url: string
-		metaMap: RenrakuMetaMap<xApi>
+		metaMap: MetaMap<xApi>
 	}) {
 
 	let count = 0
 
-	async function requester({meta, method, params}: RenrakuRequest) {
+	async function requester({meta, method, params}: Request) {
 		const response: JsonRpcResponse = await fetch(url, {
 			method: "POST",
 			mode: "cors",
@@ -35,7 +35,7 @@ export function renrakuBrowserClient<xApi extends RenrakuApi>({url, metaMap}: {
 		const {error} = <JsonRpcErrorResponse>response
 		const {result} = <JsonRpcSuccessResponse>response
 		if (error)
-			throw new RenrakuError(error.code, `remote call error: ${error.code} ${error.message} (from "${url}")`)
+			throw new ApiError(error.code, `remote call error: ${error.code} ${error.message} (from "${url}")`)
 		else
 			return result
 	}

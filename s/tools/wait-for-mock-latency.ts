@@ -1,7 +1,7 @@
 
-import {RenrakuMockLatency} from "../types.js"
+import {MockLatency} from "../types.js"
 
-export async function waitForMockLatency(mockLatency: undefined | RenrakuMockLatency) {
+export async function waitForMockLatency(mockLatency: undefined | MockLatency) {
 	if (mockLatency) {
 		const {min, max} = mockLatency
 

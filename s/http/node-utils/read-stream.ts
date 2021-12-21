@@ -1,6 +1,6 @@
 
 import {Readable} from "stream"
-import {RenrakuError} from "../../error.js"
+import {ApiError} from "../../error.js"
 
 export async function readStream(stream: Readable, maxBytes: number): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -14,7 +14,7 @@ export async function readStream(stream: Readable, maxBytes: number): Promise<st
 				chunks.push(chunk)
 			}
 			else {
-				reject(new RenrakuError(413, "exceeded maximum request size"))
+				reject(new ApiError(413, "exceeded maximum request size"))
 				stream.destroy()
 			}
 		})

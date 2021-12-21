@@ -1,8 +1,6 @@
 
 import {expect, Suite} from "cynic"
-
-import {renrakuMock} from "./mocks.js"
-import {renrakuApi, renrakuService} from "./service-and-api.js"
+import * as renraku from "./renraku.js"
 
 export default <Suite>{
 
@@ -10,7 +8,7 @@ export default <Suite>{
 
 		async "mock service"() {
 			function setup() {
-				const calculator = renrakuService()
+				const calculator = renraku.service()
 					.policy(async() => {})
 					.expose(() => ({
 						async sum(a: number, b: number) {
@@ -18,7 +16,7 @@ export default <Suite>{
 						},
 					}))
 				return {
-					calculator: renrakuMock()
+					calculator: renraku.mock()
 						.forService(calculator)
 						.withMeta(async() => {})
 				}
@@ -35,17 +33,17 @@ export default <Suite>{
 					await expect(async() => (<any>calculator).lol()).throws()
 				},
 				async "meta is processed into auth"() {
-					const lottoService = renrakuService()
+					const lottoService = renraku.service()
 						.policy(async(meta: number) => ({win: meta === 1}))
 						.expose(auth => ({
 							async isWinner() {
 								return auth.win
 							},
 						}))
-					const lotto0 = renrakuMock()
+					const lotto0 = renraku.mock()
 						.forService(lottoService)
 						.withMeta(async() => 0)
-					const lotto1 = renrakuMock()
+					const lotto1 = renraku.mock()
 						.forService(lottoService)
 						.withMeta(async() => 1)
 					expect(await lotto0.isWinner()).equals(false)
@@ -56,8 +54,8 @@ export default <Suite>{
 
 		async "mock api"() {
 			function setup() {
-				const api = renrakuApi({
-					greeter: renrakuService()
+				const api = renraku.api({
+					greeter: renraku.service()
 						.policy(async() => {})
 						.expose(() => ({
 							async sayHello() {
@@ -65,7 +63,7 @@ export default <Suite>{
 							},
 						})),
 					math: {
-						calculator: renrakuService()
+						calculator: renraku.service()
 							.policy(async() => {})
 							.expose(() => ({
 								async sum(a: number, b: number) {
@@ -75,7 +73,7 @@ export default <Suite>{
 					},
 				})
 				return {
-					api: renrakuMock()
+					api: renraku.mock()
 						.forApi(api)
 						.withMetaMap({
 							greeter: async() => {},
@@ -104,15 +102,15 @@ export default <Suite>{
 					await expect(async() => (<any>api).math.calculator.lol()).throws()
 				},
 				async "metas are processed into auth"() {
-					const lottoApi = renrakuApi({
-						winnerIs1: renrakuService()
+					const lottoApi = renraku.api({
+						winnerIs1: renraku.service()
 							.policy(async(meta: number) => ({win: meta === 1}))
 							.expose(auth => ({
 								async isWinner() {
 									return auth.win
 								},
 							})),
-						winnerIs2: renrakuService()
+						winnerIs2: renraku.service()
 							.policy(async(meta: number) => ({win: meta === 2}))
 							.expose(auth => ({
 								async isWinner() {
@@ -120,19 +118,19 @@ export default <Suite>{
 								},
 							}))
 					})
-					const lotto0 = renrakuMock()
+					const lotto0 = renraku.mock()
 						.forApi(lottoApi)
 						.withMetaMap({
 							winnerIs1: async() => 0,
 							winnerIs2: async() => 0,
 						})
-					const lotto1 = renrakuMock()
+					const lotto1 = renraku.mock()
 						.forApi(lottoApi)
 						.withMetaMap({
 							winnerIs1: async() => 1,
 							winnerIs2: async() => 1,
 						})
-					const lotto2 = renrakuMock()
+					const lotto2 = renraku.mock()
 						.forApi(lottoApi)
 						.withMetaMap({
 							winnerIs1: async() => 2,

@@ -1,6 +1,6 @@
 
-import {RenrakuError} from "../../error.js"
-import {RenrakuHttpHeaders, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Servelet} from "../../types.js"
+import {ApiError} from "../../error.js"
+import {HttpHeaders, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Servelet} from "../../types.js"
 
 export function negotiator() {
 
@@ -39,7 +39,7 @@ export function negotiator() {
 
 		async acceptIncoming({servelet, headers, exposeErrors, incoming, respond}: {
 				servelet: Servelet
-				headers: RenrakuHttpHeaders
+				headers: HttpHeaders
 				exposeErrors: boolean
 				incoming: JsonRpcRequestWithMeta | JsonRpcResponse
 				respond: (response: JsonRpcResponse) => void
@@ -60,8 +60,8 @@ export function negotiator() {
 					})
 				}
 				catch (error) {
-					if (!(error instanceof RenrakuError)) {
-						error = new RenrakuError(
+					if (!(error instanceof ApiError)) {
+						error = new ApiError(
 							500,
 							exposeErrors
 								? error.message
@@ -83,9 +83,9 @@ export function negotiator() {
 				if ((<JsonRpcErrorResponse>response).error) {
 					const {id, error: {code, message}} = <JsonRpcErrorResponse>response
 					if (id === -1)
-						throw new RenrakuError(code, message)
+						throw new ApiError(code, message)
 					else
-						rejectPendingResponse(id, new RenrakuError(code, message))
+						rejectPendingResponse(id, new ApiError(code, message))
 				}
 				else {
 					const {id, result} = <JsonRpcSuccessResponse>response

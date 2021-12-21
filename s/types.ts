@@ -11,72 +11,72 @@ export interface Methods {
 	[key: string]: (...args: any[]) => Promise<any>
 }
 
-export interface RenrakuHttpHeaders extends IncomingHttpHeaders {}
+export interface HttpHeaders extends IncomingHttpHeaders {}
 
-export interface RenrakuPolicy<xMeta, xAuth> {
-	(meta: xMeta, headers?: RenrakuHttpHeaders): Promise<xAuth>
+export interface Policy<xMeta, xAuth> {
+	(meta: xMeta, headers?: HttpHeaders): Promise<xAuth>
 }
 
 export interface Expose<xAuth, xMethods extends Methods> {
 	(auth: xAuth): xMethods
 }
 
-export const is_renraku_service = Symbol("is_renraku_service")
+export const is_service = Symbol("is_service")
 
-export interface RenrakuService<xMeta, xAuth, xMethods extends Methods> {
-	[is_renraku_service]: symbol
-	policy: RenrakuPolicy<xMeta, xAuth>
+export interface Service<xMeta, xAuth, xMethods extends Methods> {
+	[is_service]: symbol
+	policy: Policy<xMeta, xAuth>
 	expose: Expose<xAuth, xMethods>
 }
 
-export interface RenrakuApi {
-	[key: string]: RenrakuApi | RenrakuService<any, any, Methods>
+export interface Api {
+	[key: string]: Api | Service<any, any, Methods>
 }
 
-export type RenrakuMetaMap<xApi extends RenrakuApi> = {
-	[P in keyof xApi]: xApi[P] extends RenrakuService<infer xMeta, any, Methods>
+export type MetaMap<xApi extends Api> = {
+	[P in keyof xApi]: xApi[P] extends Service<infer xMeta, any, Methods>
 		? () => Promise<xMeta>
-		: xApi[P] extends RenrakuApi
-			? RenrakuMetaMap<xApi[P]>
+		: xApi[P] extends Api
+			? MetaMap<xApi[P]>
 			: never
 }
 
-export type AuthMap<xApi extends RenrakuApi> = {
-	[P in keyof xApi]: xApi[P] extends RenrakuService<any, infer xAuth, Methods>
+export type AuthMap<xApi extends Api> = {
+	[P in keyof xApi]: xApi[P] extends Service<any, infer xAuth, Methods>
 		? () => Promise<xAuth>
-		: xApi[P] extends RenrakuApi
+		: xApi[P] extends Api
 			? AuthMap<xApi[P]>
 			: never
 }
 
-export type ApiRemote<xApi extends RenrakuApi> = {
-	[P in keyof xApi]: xApi[P] extends RenrakuService<any, any, infer xMethods>
+export type ApiRemote<xApi extends Api> = {
+	[P in keyof xApi]: xApi[P] extends Service<any, any, infer xMethods>
 		? xMethods
-		: xApi[P] extends RenrakuApi
+		: xApi[P] extends Api
 			? ApiRemote<xApi[P]>
 			: never
 }
 
-export type RenrakuRemote<X extends RenrakuService<any, any, any> | RenrakuApi> =
-	X extends RenrakuService<any, any, infer xMethods>
+export type Remote<X extends Service<any, any, any> | Api> =
+	X extends Service<any, any, infer xMethods>
 		? xMethods
-		: X extends RenrakuApi
+		: X extends Api
 			? ApiRemote<X>
 			: never
 
-export interface RenrakuRequest {
+export interface Request {
 	meta: any
 	method: string
 	params: any[]
-	headers?: RenrakuHttpHeaders
+	headers?: HttpHeaders
 }
 
-export interface RenrakuResponse {
+export interface Response {
 	result: any
 }
 
 export interface Requester {
-	(request: RenrakuRequest): Promise<any>
+	(request: Request): Promise<any>
 }
 
 export interface JsonRpcRequest {
@@ -110,30 +110,30 @@ export interface JsonRpcErrorResponse extends JsonRpcResponseCommon {
 export type JsonRpcResponse = JsonRpcSuccessResponse | JsonRpcErrorResponse
 
 export interface Servelet {
-	(request: RenrakuRequest): Promise<any>
+	(request: Request): Promise<any>
 }
 
 export interface Requester {
-	(request: RenrakuRequest): Promise<any>
+	(request: Request): Promise<any>
 }
 
-export interface RenrakuConnectionControls {
+export interface ConnectionControls {
 	close(): void
 }
 
-export interface RenrakuMockLatency {
+export interface MockLatency {
 	min: number
 	max: number
 }
 
 export interface MockOptions {
-	getMockLatency?: () => undefined | RenrakuMockLatency
+	getMockLatency?: () => undefined | MockLatency
 }
 
-export interface RenrakuSpike {
+export interface Spike {
 	(methodName: string, func: (...params: any[]) => Promise<any>, ...params: any): Promise<any>
 }
 
-export interface RenrakuServiceOptions {
-	spike?: RenrakuSpike
+export interface ServiceOptions {
+	spike?: Spike
 }

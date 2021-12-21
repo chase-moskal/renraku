@@ -1,5 +1,5 @@
 
-export class RenrakuError extends Error {
+export class ApiError extends Error {
 	readonly name = this.constructor.name
 	readonly code: number
 

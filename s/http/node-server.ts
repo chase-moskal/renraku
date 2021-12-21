@@ -1,27 +1,27 @@
 
 import {createServer, RequestListener} from "http"
 
-import {RenrakuError} from "../error.js"
-import {renrakuServelet} from "../servelet.js"
+import {ApiError} from "../error.js"
+import {servelet} from "../servelet.js"
 import {allowCors} from "./node-utils/allow-cors.js"
 import {readStream} from "./node-utils/read-stream.js"
 import {healthCheck} from "./node-utils/health-check.js"
 import {respondWithError} from "./node-utils/respond-with-error.js"
-import {RenrakuApi, JsonRpcRequestWithMeta, JsonRpcResponse} from "../types.js"
+import {Api, JsonRpcRequestWithMeta, JsonRpcResponse} from "../types.js"
 
-export function renrakuNodeServer({
+export function nodeServer({
 		api,
 		exposeErrors,
 		maxPayloadSize,
 		processListener = (listener: RequestListener) => listener,
 	}: {
-		api: RenrakuApi
+		api: Api
 		maxPayloadSize: number
 		exposeErrors: boolean
 		processListener?: (listener: RequestListener) => RequestListener
 	}) {
 
-	const servelet = renrakuServelet(api)
+	const execute = servelet(api)
 
 	let listener: RequestListener = async(req, res) => {
 		let body: string
@@ -31,7 +31,7 @@ export function renrakuNodeServer({
 				body = await readStream(req, maxPayloadSize)
 			}
 			else {
-				throw new RenrakuError(413, "exceeded maximum content-length")
+				throw new ApiError(413, "exceeded maximum content-length")
 			}
 		}
 		catch (error) {
@@ -45,7 +45,7 @@ export function renrakuNodeServer({
 		const {method, params, id, meta} = <JsonRpcRequestWithMeta>JSON.parse(body)
 		res.setHeader("Content-Type", "application/json; charset=utf-8")
 		try {
-			const result = await servelet({
+			const result = await execute({
 				meta,
 				method,
 				params,

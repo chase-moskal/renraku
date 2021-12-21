@@ -1,13 +1,13 @@
 
 import {objectMap} from "../../tools/object-map.js"
-import {RenrakuApi, ApiRemote, RenrakuMetaMap, Requester, RenrakuServiceOptions} from "../../types.js"
+import {Api, ApiRemote, MetaMap, Requester, ServiceOptions} from "../../types.js"
 
-export function remoteWithMetaMap<xApi extends RenrakuApi>(
+export function remoteWithMetaMap<xApi extends Api>(
 		requester: Requester,
-		map: RenrakuMetaMap<xApi>,
-		options: RenrakuServiceOptions = {}
+		map: MetaMap<xApi>,
+		options: ServiceOptions = {}
 	) {
-	function recurse(mapGroup: RenrakuMetaMap<xApi>, path: string[] = []): ApiRemote<xApi> {
+	function recurse(mapGroup: MetaMap<xApi>, path: string[] = []): ApiRemote<xApi> {
 		return objectMap(mapGroup, (value, key) => {
 			const newPath = [...path, key]
 			if (typeof value === "function") {

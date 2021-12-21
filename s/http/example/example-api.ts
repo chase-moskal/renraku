@@ -1,8 +1,8 @@
 
-import {renrakuApi, renrakuService} from "../../renraku.js"
+import {api, service} from "../../renraku.js"
 
-export const exampleApi = renrakuApi({
-	greeter: (renrakuService()
+export const exampleApi = api({
+	greeter: (service()
 		.policy(async() => {})
 		.expose(auth => ({
 			async sayHello() {
@@ -11,7 +11,7 @@ export const exampleApi = renrakuApi({
 		}))
 	),
 	math: {
-		calculator: (renrakuService()
+		calculator: (service()
 			.policy(async(meta: {lotto: number}) => ({winner: meta.lotto === 9}))
 			.expose(auth => ({
 				async sum(a: number, b: number) {

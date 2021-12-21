@@ -1,17 +1,17 @@
 
-import {RenrakuError} from "./error.js"
+import {ApiError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
-import {RenrakuApi, RenrakuMetaMap, ApiRemote, AuthMap, RenrakuService, Methods, is_renraku_service, RenrakuHttpHeaders, RenrakuServiceOptions} from "./types.js"
+import {Api, MetaMap, ApiRemote, AuthMap, Service, Methods, is_service, HttpHeaders, ServiceOptions} from "./types.js"
 
-export const renrakuMock = (options: RenrakuServiceOptions = {}) => ({
-	forService: <xService extends RenrakuService<any, any, Methods>>(
+export const mock = (options: ServiceOptions = {}) => ({
+	forService: <xService extends Service<any, any, Methods>>(
 			service: xService
 		) => mockService(service, [], options),
-	forApi<xApi extends RenrakuApi>(api: xApi) {
+	forApi<xApi extends Api>(api: xApi) {
 		return {
 			withMetaMap(
-					map: RenrakuMetaMap<xApi>,
-					getHeaders: () => Promise<RenrakuHttpHeaders> = async() => undefined
+					map: MetaMap<xApi>,
+					getHeaders: () => Promise<HttpHeaders> = async() => undefined
 				): ApiRemote<xApi> {
 				const recurse2 = prepareRecursiveMapping(
 					(service, getter, path) => mockService(service, path, options).withMeta(getter, getHeaders)
@@ -28,14 +28,14 @@ export const renrakuMock = (options: RenrakuServiceOptions = {}) => ({
 	},
 })
 
-function mockService<xService extends RenrakuService<any, any, Methods>>(service: xService, path: string[], options: RenrakuServiceOptions) {
-	type xMeta = xService extends RenrakuService<infer X, any, Methods>
+function mockService<xService extends Service<any, any, Methods>>(service: xService, path: string[], options: ServiceOptions) {
+	type xMeta = xService extends Service<infer X, any, Methods>
 		? X
 		: never
-	type xAuth = xService extends RenrakuService<any, infer X, Methods>
+	type xAuth = xService extends Service<any, infer X, Methods>
 		? X
 		: never
-	type xMethods = xService extends RenrakuService<any, any, infer X>
+	type xMethods = xService extends Service<any, any, infer X>
 		? X
 		: never
 	function prepareProxy(getAuth: () => Promise<xAuth>): xMethods {
@@ -55,7 +55,7 @@ function mockService<xService extends RenrakuService<any, any, Methods>>(service
 							: method(...params)
 					}
 					else
-						throw new RenrakuError(400, `renraku remote method "${key}" not found`)
+						throw new ApiError(400, `renraku remote method "${key}" not found`)
 				})
 			),
 		})
@@ -63,7 +63,7 @@ function mockService<xService extends RenrakuService<any, any, Methods>>(service
 	return {
 		withMeta(
 				getMeta: () => Promise<xMeta>,
-				getHeaders: () => Promise<RenrakuHttpHeaders> = async() => undefined
+				getHeaders: () => Promise<HttpHeaders> = async() => undefined
 			): xMethods {
 			return prepareProxy(
 				async() => service.policy(
@@ -80,19 +80,19 @@ function mockService<xService extends RenrakuService<any, any, Methods>>(service
 
 function prepareRecursiveMapping(
 		handler: (
-			service: RenrakuService<any, any, Methods>,
+			service: Service<any, any, Methods>,
 			getter: () => Promise<any>,
 			path: string[]
 		) => Methods
 	) {
 	return function recursiveMapping(
-			apiGroup: RenrakuApi,
-			mapGroup: RenrakuMetaMap<RenrakuApi> | AuthMap<RenrakuApi>,
+			apiGroup: Api,
+			mapGroup: MetaMap<Api> | AuthMap<Api>,
 			path: string[] = []
-		): ApiRemote<RenrakuApi> {
+		): ApiRemote<Api> {
 		return objectMap(apiGroup, (value, key) => {
 			const newPath = [...path, key]
-			if (value[is_renraku_service]) {
+			if (value[is_service]) {
 				const service = value
 				return handler(service, mapGroup[key], newPath)
 			}

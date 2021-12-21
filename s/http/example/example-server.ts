@@ -1,9 +1,9 @@
 
 import {exampleApi} from "./example-api.js"
-import {renrakuNodeServer} from "../node-server.js"
+import {nodeServer} from "../node-server.js"
 import {megabytes} from "../../renraku.js"
 
-const server = renrakuNodeServer({
+const server = nodeServer({
 	api: exampleApi,
 	exposeErrors: true,
 	maxPayloadSize: megabytes(10),

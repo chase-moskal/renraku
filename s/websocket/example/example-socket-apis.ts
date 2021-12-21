@@ -1,9 +1,9 @@
 
-import {renrakuApi, renrakuService} from "../../service-and-api.js"
-import {RenrakuConnectionControls, RenrakuRemote} from "../../types.js"
+import {api, service} from "../../service-and-api.js"
+import {ConnectionControls, Remote} from "../../types.js"
 
-export const clientsideApi = renrakuApi({
-	clientService: renrakuService()
+export const clientsideApi = api({
+	clientService: service()
 		.policy(async() => {})
 		.expose(() => ({
 			async getClientTime() {
@@ -13,11 +13,11 @@ export const clientsideApi = renrakuApi({
 })
 
 export const makeServersideApi = (
-		controls: RenrakuConnectionControls,
-		clientside: RenrakuRemote<typeof clientsideApi>
+		controls: ConnectionControls,
+		clientside: Remote<typeof clientsideApi>
 	) => (
-	renrakuApi({
-		serverService: renrakuService()
+	api({
+		serverService: service()
 			.policy(async() => {})
 			.expose(() => ({
 				async getServerTime() {
