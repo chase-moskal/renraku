@@ -1,7 +1,7 @@
 
 import {ServerResponse} from "http"
 import {ApiError} from "../../error.js"
-import {JsonRpcErrorResponse} from "../../types.js"
+import {JsonRpcErrorResponse, Logger} from "../../types.js"
 
 export function respondWithError({
 		id, error, res, exposeErrors,

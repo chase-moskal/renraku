@@ -1,7 +1,7 @@
 
 import {Logger} from "../../types.js"
 
-export function coloredLogger(logger: Logger): Logger {
+export function colorfulLogger(logger: Logger): Logger {
 
 	const codes = {
 		reset: "\u001b[0m",

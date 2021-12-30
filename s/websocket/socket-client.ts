@@ -1,6 +1,7 @@
 
 import {servelet} from "../servelet.js"
 import {negotiator} from "./helpers/negotiator.js"
+import {noLogger} from "../tools/fancy-logging/no-logger.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {Api, JsonRpcRequestWithMeta, MetaMap, Requester} from "../types.js"
 
@@ -15,7 +16,10 @@ export async function webSocketClient<xServerApi extends Api>({
 
 	const clientServelet = servelet(clientApi)
 	const socket = await connectWebSocket(link)
-	const {startWaitingForResponse, acceptIncoming} = negotiator()
+	const {startWaitingForResponse, acceptIncoming} = negotiator({
+		exposeErrors: true,
+		logger: noLogger(),
+	})
 
 	const requester: Requester = async({meta, method, params}) => {
 		const {id, response} = startWaitingForResponse()
@@ -38,7 +42,6 @@ export async function webSocketClient<xServerApi extends Api>({
 	socket.onmessage = async event => acceptIncoming({
 		servelet: clientServelet,
 		headers: undefined,
-		exposeErrors: true,
 		incoming: JSON.parse(event.data.toString()),
 		respond: response => socket.send(JSON.stringify(response)),
 	})

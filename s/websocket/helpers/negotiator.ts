@@ -1,8 +1,12 @@
 
 import {ApiError} from "../../error.js"
-import {HttpHeaders, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Servelet} from "../../types.js"
+import {stopwatch} from "../../tools/stopwatch.js"
+import {HttpHeaders, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Logger, Servelet} from "../../types.js"
 
-export function negotiator() {
+export function negotiator({logger, exposeErrors}: {
+		logger: Logger
+		exposeErrors: boolean
+	}) {
 
 	let requestCount = 0
 
@@ -37,27 +41,29 @@ export function negotiator() {
 			}
 		},
 
-		async acceptIncoming({servelet, headers, exposeErrors, incoming, respond}: {
+		async acceptIncoming({servelet, headers, incoming, respond}: {
 				servelet: Servelet
 				headers: HttpHeaders
-				exposeErrors: boolean
 				incoming: JsonRpcRequestWithMeta | JsonRpcResponse
 				respond: (response: JsonRpcResponse) => void
 			}) {
 			if ((<JsonRpcRequestWithMeta>incoming).method) {
 				const {id, meta, method, params} = <JsonRpcRequestWithMeta>incoming
 				try {
+					const timer = stopwatch()
 					const result = await servelet({
 						meta,
 						method,
 						params,
 						headers,
 					})
+					const duration = timer()
 					respond(<JsonRpcSuccessResponse>{
 						jsonrpc: "2.0",
 						id,
 						result,
 					})
+					logger.log(`🔻 ${method}() - ${duration}ms`)
 				}
 				catch (error) {
 					if (!(error instanceof ApiError)) {
@@ -76,6 +82,7 @@ export function negotiator() {
 							message: error.message,
 						},
 					})
+					logger.error(`🚨 ${error.code ?? 500}`, error.stack)
 				}
 			}
 			else {

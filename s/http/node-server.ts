@@ -1,50 +1,47 @@
 
 import {createServer, RequestListener} from "http"
 
-import {ApiError} from "../error.js"
 import {servelet} from "../servelet.js"
+import {stopwatch} from "../tools/stopwatch.js"
 import {allowCors} from "./node-utils/allow-cors.js"
 import {readStream} from "./node-utils/read-stream.js"
 import {healthCheck} from "./node-utils/health-check.js"
 import {respondWithError} from "./node-utils/respond-with-error.js"
-import {Api, JsonRpcRequestWithMeta, JsonRpcResponse} from "../types.js"
+import {colorfulLogger} from "../tools/fancy-logging/colorful-logger.js"
+import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"
+import {Api, JsonRpcRequestWithMeta, JsonRpcResponse, Logger} from "../types.js"
 
 export function nodeServer({
 		api,
 		exposeErrors,
 		maxPayloadSize,
+		logger = timestampedLogger(colorfulLogger(console)),
 		processListener = (listener: RequestListener) => listener,
 	}: {
 		api: Api
-		maxPayloadSize: number
+		logger?: Logger
 		exposeErrors: boolean
+		maxPayloadSize: number
 		processListener?: (listener: RequestListener) => RequestListener
 	}) {
 
 	const execute = servelet(api)
 
 	let listener: RequestListener = async(req, res) => {
-		let body: string
+		let id = -1
 		try {
-			body = await readStream(req, maxPayloadSize)
-		}
-		catch (error) {
-			return respondWithError({
-				id: -1,
-				error,
-				res,
-				exposeErrors,
-			})
-		}
-		const {method, params, id, meta} = <JsonRpcRequestWithMeta>JSON.parse(body)
-		res.setHeader("Content-Type", "application/json; charset=utf-8")
-		try {
+			const body = await readStream(req, maxPayloadSize)
+			const request: JsonRpcRequestWithMeta = JSON.parse(body)
+			id = request.id
+			res.setHeader("Content-Type", "application/json; charset=utf-8")
+			const timer = stopwatch()
 			const result = await execute({
-				meta,
-				method,
-				params,
+				meta: request.meta,
+				method: request.method,
+				params: request.params,
 				headers: req.headers,
 			})
+			const duration = timer()
 			res.statusCode = 200
 			res.end(
 				JSON.stringify(<JsonRpcResponse>{
@@ -53,8 +50,10 @@ export function nodeServer({
 					result,
 				})
 			)
+			logger.log(`🔔 ${request.method}() - ${duration.toFixed(0)}ms`)
 		}
 		catch (error) {
+			logger.error(`🚨 ${error.code ?? 500}`, error.stack)
 			return respondWithError({
 				id,
 				error,
