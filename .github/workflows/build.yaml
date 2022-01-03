@@ -23,4 +23,4 @@ jobs:
 
     - name: 📦 npm install and build
       shell: bash
-      run: npm ci && npm run build
+      run: npm ci

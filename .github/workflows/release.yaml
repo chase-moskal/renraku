@@ -21,7 +21,7 @@ jobs:
 
     - name: 📦 npm install and build
       shell: bash
-      run: npm ci && npm run build
+      run: npm ci
 
     - name: 🚀 npm publish
       uses: JS-DevTools/npm-publish@v1
