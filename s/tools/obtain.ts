@@ -1,10 +1,10 @@
 
 export function obtain<xResult>(
-		specifier: string,
+		path: string[],
 		object: {[key: string]: any},
 	): xResult {
 
-	return specifier.split(".").reduce(
+	return path.reduce(
 		(x, y) => x && x[y] || undefined,
 		object,
 	)

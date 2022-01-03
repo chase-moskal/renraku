@@ -21,6 +21,6 @@ export const exampleApi = api({
 					return auth.winner
 				},
 			}))
-		)
+		),
 	},
 })

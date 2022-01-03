@@ -14,6 +14,5 @@ export async function runTests() {
 
 		"greeter.isWinner": async() =>
 			expect(await example.math.calculator.isWinner()).equals(true),
-
 	})
 }

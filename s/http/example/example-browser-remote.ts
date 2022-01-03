@@ -8,7 +8,7 @@ export function makeBrowserRemoteForExample() {
 		metaMap: {
 			greeter: async() => {},
 			math: {
-				calculator: async() => ({lotto: 9})
+				calculator: async() => ({lotto: 9}),
 			},
 		},
 	})
