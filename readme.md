@@ -49,7 +49,7 @@
 1. *now let's run our api on a node server*
     ```ts
     import * as renraku from "renraku"
-    import {nodeServer} from "renraku/http/node-server.js"
+    import {nodeServer} from "renraku/x/http/node-server.js"
     import {exampleApi} from "./example-api.js"
 
     const server = nodeServer({
