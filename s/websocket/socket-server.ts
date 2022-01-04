@@ -45,6 +45,9 @@ export function webSocketServer({
 		})
 		const {api, handleConnectionClosed} = acceptConnection({
 			controls: {
+				ping() {
+					socket.ping()
+				},
 				close() {
 					socket.close()
 					handleConnectionClosed()

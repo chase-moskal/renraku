@@ -118,6 +118,7 @@ export interface Requester {
 }
 
 export interface ConnectionControls {
+	ping(): void
 	close(): void
 }
 
