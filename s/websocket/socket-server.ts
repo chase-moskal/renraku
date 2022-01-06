@@ -6,7 +6,7 @@ import {negotiator} from "./helpers/negotiator.js"
 import {colorfulLogger} from "../tools/fancy-logging/colorful-logger.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"
-import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, ConnectionControls, Requester, Logger} from "../types.js"
+import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, ConnectionControls, Requester, Logger, HttpHeaders} from "../types.js"
 
 export function webSocketServer({
 		port,
@@ -20,6 +20,7 @@ export function webSocketServer({
 		exposeErrors: boolean
 		maxPayloadSize: number
 		acceptConnection({}: {
+			headers: HttpHeaders
 			controls: ConnectionControls
 			prepareClientApi: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
 		}): {
@@ -44,6 +45,7 @@ export function webSocketServer({
 			exposeErrors,
 		})
 		const {api, handleConnectionClosed} = acceptConnection({
+			headers: req.headers,
 			controls: {
 				ping() {
 					socket.ping()
