@@ -1,6 +1,6 @@
 
 import {servelet} from "../servelet.js"
-import {negotiator} from "./helpers/negotiator.js"
+import {negotiator} from "./negotiator/negotiator.js"
 import {noLogger} from "../tools/fancy-logging/no-logger.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {Api, JsonRpcRequestWithMeta, MetaMap, Requester} from "../types.js"

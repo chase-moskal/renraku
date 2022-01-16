@@ -2,7 +2,7 @@
 import {WebSocketServer} from "ws"
 
 import {servelet} from "../servelet.js"
-import {negotiator} from "./helpers/negotiator.js"
+import {negotiator} from "./negotiator/negotiator.js"
 import {colorfulLogger} from "../tools/fancy-logging/colorful-logger.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"

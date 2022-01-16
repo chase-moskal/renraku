@@ -1,5 +1,5 @@
 
-import {TimeoutError} from "../../error.js"
+import {TimeoutError} from "../../../error.js"
 
 export function responseWaiter({timeout}: {timeout: number}) {
 	let requestCount = 0
