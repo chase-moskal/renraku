@@ -5,6 +5,7 @@ import {clientsideApi, makeServersideApi} from "./example-socket-apis.js"
 
 webSocketServer({
 	port: 8001,
+	timeout: 60_000,
 	exposeErrors: false,
 	maxPayloadSize: megabytes(10),
 	acceptConnection: ({controls, prepareClientApi}) => ({

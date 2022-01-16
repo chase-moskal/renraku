@@ -10,15 +10,17 @@ import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, ConnectionControls, Req
 
 export function webSocketServer({
 		port,
+		timeout,
 		exposeErrors,
 		maxPayloadSize,
-		acceptConnection,
 		logger = timestampedLogger(colorfulLogger(console)),
+		acceptConnection,
 	}: {
 		port: number
-		logger?: Logger
+		timeout: number
 		exposeErrors: boolean
 		maxPayloadSize: number
+		logger?: Logger
 		acceptConnection({}: {
 			headers: HttpHeaders
 			controls: ConnectionControls
@@ -42,6 +44,7 @@ export function webSocketServer({
 		const logDisconnect = () => logger.log(`📕 disconnected ${clientCount}`)
 		const {startWaitingForResponse, acceptIncoming} = negotiator({
 			logger,
+			timeout,
 			exposeErrors,
 		})
 		const {api, handleConnectionClosed} = acceptConnection({

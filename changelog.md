@@ -1,4 +1,6 @@
 
+- (breaking) added required parameter `timeout` to websocket server and client
+
 ### v0.0.0-dev.45
 
 - (breaking) mass renames

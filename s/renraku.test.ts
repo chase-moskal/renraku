@@ -1,6 +1,10 @@
 
 import {expect, Suite} from "cynic"
 import * as renraku from "./renraku.js"
+import {noLogger} from "./renraku.js"
+import {nap} from "./tools/nap.js"
+import {JsonRpcResponse} from "./types.js"
+import {negotiator} from "./websocket/helpers/negotiator.js"
 
 export default <Suite>{
 
@@ -146,6 +150,45 @@ export default <Suite>{
 					expect(await lotto2.winnerIs2.isWinner()).equals(true)
 				},
 			}
+		},
+	},
+
+	"renraku websocket negotiator": {
+		async "timeout works"() {
+			const {startWaitingForResponse} = negotiator({
+				exposeErrors: true,
+				logger: noLogger(),
+				timeout: 100,
+			})
+			const {response} = startWaitingForResponse()
+			let error: any
+			response.catch(err => error = err)
+			await nap(101)
+			expect(error).ok()
+		},
+		async "timeout isn't thrown when a response comes in"() {
+			const {startWaitingForResponse, acceptIncoming} = negotiator({
+				exposeErrors: true,
+				logger: noLogger(),
+				timeout: 100,
+			})
+			const {id, response} = startWaitingForResponse()
+			let error: any
+			response.catch(err => error = err)
+			acceptIncoming({
+				headers: {},
+				incoming: {
+					id,
+					jsonrpc: "2.0",
+					result: undefined,
+					meta: undefined,
+					params: [],
+				},
+				respond() {},
+				servelet: async() => {},
+			})
+			await nap(101)
+			expect(error).not.ok()
 		},
 	},
 }

@@ -6,9 +6,10 @@ import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {Api, JsonRpcRequestWithMeta, MetaMap, Requester} from "../types.js"
 
 export async function webSocketClient<xServerApi extends Api>({
-		link, metaMap, clientApi, handleConnectionClosed,
+		link, timeout, metaMap, clientApi, handleConnectionClosed,
 	}: {
 		link: string
+		timeout: number,
 		metaMap: MetaMap<xServerApi>
 		clientApi: Api
 		handleConnectionClosed(): void
@@ -17,6 +18,7 @@ export async function webSocketClient<xServerApi extends Api>({
 	const clientServelet = servelet(clientApi)
 	const socket = await connectWebSocket(link)
 	const {startWaitingForResponse, acceptIncoming} = negotiator({
+		timeout,
 		exposeErrors: true,
 		logger: noLogger(),
 	})

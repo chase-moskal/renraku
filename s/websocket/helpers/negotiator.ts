@@ -1,45 +1,84 @@
 
 import {ApiError} from "../../error.js"
+import {isRequest} from "./is-request.js"
 import {stopwatch} from "../../tools/stopwatch.js"
+import {responseWaiter} from "./response-waiter.js"
 import {HttpHeaders, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Logger, Servelet} from "../../types.js"
 
-export function negotiator({logger, exposeErrors}: {
+export function negotiator({logger, timeout, exposeErrors}: {
 		logger: Logger
+		timeout: number
 		exposeErrors: boolean
 	}) {
 
-	let requestCount = 0
+	const {
+		startWaitingForResponse,
+		resolvePendingResponse,
+		rejectPendingResponse,
+	} = responseWaiter({timeout})
 
-	const pendingResponses = new Map<number, {
-		resolve: (result: any) => void
-		reject: (reason?: any) => void
-	}>()
-
-	function resolvePendingResponse(id: number, result: any) {
-		const waiter = pendingResponses.get(id)
-		if (waiter)
-			waiter.resolve(result)
-		pendingResponses.delete(id)
+	async function acceptIncomingRequest({servelet, headers, request, respond}: {
+			servelet: Servelet
+			headers: HttpHeaders
+			request: JsonRpcRequestWithMeta
+			respond: (response: JsonRpcResponse) => void
+		}) {
+		const {id, meta, method, params} = <JsonRpcRequestWithMeta>request
+		try {
+			const timer = stopwatch()
+			const result = await servelet({
+				meta,
+				method,
+				params,
+				headers,
+			})
+			const duration = timer()
+			respond(<JsonRpcSuccessResponse>{
+				jsonrpc: "2.0",
+				id,
+				result,
+			})
+			logger.log(`🔻 ${method}() - ${duration}ms`)
+		}
+		catch (error) {
+			if (!(error instanceof ApiError)) {
+				error = new ApiError(
+					500,
+					exposeErrors
+						? error.message
+						: "hidden error",
+				)
+			}
+			respond(<JsonRpcErrorResponse>{
+				jsonrpc: "2.0",
+				id,
+				error: {
+					code: error.code,
+					message: error.message,
+				},
+			})
+			logger.error(`🚨 ${error.code ?? 500}`, error.stack)
+		}
 	}
 
-	function rejectPendingResponse(id: number, reason: any) {
-		const waiter = pendingResponses.get(id)
-		if (waiter)
-			waiter.reject(reason)
-		pendingResponses.delete(id)
+	async function acceptIncomingResponse({response}: {
+			response: JsonRpcResponse
+		}) {
+		if ((<JsonRpcErrorResponse>response).error) {
+			const {id, error: {code, message}} = <JsonRpcErrorResponse>response
+			if (id === -1)
+				logger.error(`🚨 ${code ?? 500} ${message}`)
+			else
+				rejectPendingResponse(id, new ApiError(code, message))
+		}
+		else {
+			const {id, result} = <JsonRpcSuccessResponse>response
+			resolvePendingResponse(id, result)
+		}
 	}
 
 	return {
-
-		startWaitingForResponse() {
-			const id = requestCount++
-			return {
-				id,
-				response: new Promise<any>((resolve, reject) => {
-					pendingResponses.set(id, {resolve, reject})
-				}),
-			}
-		},
+		startWaitingForResponse,
 
 		async acceptIncoming({servelet, headers, incoming, respond}: {
 				servelet: Servelet
@@ -47,58 +86,15 @@ export function negotiator({logger, exposeErrors}: {
 				incoming: JsonRpcRequestWithMeta | JsonRpcResponse
 				respond: (response: JsonRpcResponse) => void
 			}) {
-			if ((<JsonRpcRequestWithMeta>incoming).method) {
-				const {id, meta, method, params} = <JsonRpcRequestWithMeta>incoming
-				try {
-					const timer = stopwatch()
-					const result = await servelet({
-						meta,
-						method,
-						params,
-						headers,
-					})
-					const duration = timer()
-					respond(<JsonRpcSuccessResponse>{
-						jsonrpc: "2.0",
-						id,
-						result,
-					})
-					logger.log(`🔻 ${method}() - ${duration}ms`)
-				}
-				catch (error) {
-					if (!(error instanceof ApiError)) {
-						error = new ApiError(
-							500,
-							exposeErrors
-								? error.message
-								: "hidden error",
-						)
-					}
-					respond(<JsonRpcErrorResponse>{
-						jsonrpc: "2.0",
-						id,
-						error: {
-							code: error.code,
-							message: error.message,
-						},
-					})
-					logger.error(`🚨 ${error.code ?? 500}`, error.stack)
-				}
-			}
-			else {
-				const response = <JsonRpcResponse>incoming
-				if ((<JsonRpcErrorResponse>response).error) {
-					const {id, error: {code, message}} = <JsonRpcErrorResponse>response
-					if (id === -1)
-						throw new ApiError(code, message)
-					else
-						rejectPendingResponse(id, new ApiError(code, message))
-				}
-				else {
-					const {id, result} = <JsonRpcSuccessResponse>response
-					resolvePendingResponse(id, result)
-				}
-			}
+			if (isRequest(incoming))
+				acceptIncomingRequest({
+					request: <JsonRpcRequestWithMeta>incoming,
+					headers,
+					respond,
+					servelet,
+				})
+			else
+				acceptIncomingResponse({response: <JsonRpcResponse>incoming})
 		},
 	}
 }
