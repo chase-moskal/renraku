@@ -63,7 +63,7 @@ export function nodeServer({
 		}
 	}
 
-	listener = healthCheck("/health", listener)
+	listener = healthCheck("/health", logger, listener)
 	listener = allowCors(listener)
 	listener = processListener(listener)
 	return createServer(listener)

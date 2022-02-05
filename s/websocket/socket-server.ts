@@ -97,7 +97,7 @@ export function webSocketServer({
 		})
 	})
 
-	server.prependListener("request", healthCheck("/health", () => {}))
+	server.prependListener("request", healthCheck("/health", logger, () => {}))
 
 	server.on("upgrade", (request, socket, head) => {
 		wss.handleUpgrade(request, socket, head, ws => {
