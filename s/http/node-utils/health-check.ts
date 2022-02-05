@@ -6,7 +6,7 @@ export function healthCheck(path: string, listener: RequestListener): RequestLis
 		if (request.url === path) {
 			response.setHeader("Content-Type", "text/plain; charset=utf-8")
 			response.statusCode = 200
-			response.end()
+			response.end(Date.now().toString())
 		}
 		else
 			return listener(request, response)

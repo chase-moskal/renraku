@@ -1,4 +1,5 @@
 
+import {createServer} from "http"
 import {WebSocketServer} from "ws"
 
 import {servelet} from "../servelet.js"
@@ -7,6 +8,7 @@ import {colorfulLogger} from "../tools/fancy-logging/colorful-logger.js"
 import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"
 import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, ConnectionControls, Requester, Logger, HttpHeaders} from "../types.js"
+import {healthCheck} from "../http/node-utils/health-check.js"
 
 export function webSocketServer({
 		port,
@@ -31,14 +33,15 @@ export function webSocketServer({
 		}
 	}) {
 
-	const server = new WebSocketServer({
-		port,
+	const server = createServer()
+	const wss = new WebSocketServer({
+		noServer: true,
 		maxPayload: maxPayloadSize,
 	})
 
 	let count = 1
 
-	server.on("connection", async(socket, req) => {
+	wss.on("connection", async(socket, req) => {
 		const clientCount = count++
 		logger.log(`📖 connected ${clientCount}`)
 		const logDisconnect = () => logger.log(`📕 disconnected ${clientCount}`)
@@ -94,10 +97,20 @@ export function webSocketServer({
 		})
 	})
 
+	server.prependListener("request", healthCheck("/health", () => {}))
+
+	server.on("upgrade", (request, socket, head) => {
+		wss.handleUpgrade(request, socket, head, ws => {
+			wss.emit("connection", ws, request)
+		})
+	})
+
+	server.listen(port)
 	logger.log(`💡 started web socket server ${port}`)
 
 	return {
 		close: () => {
+			wss.close()
 			server.close()
 			logger.log(`🛑 stopped web socket server`)
 		},
