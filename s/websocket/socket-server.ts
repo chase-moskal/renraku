@@ -39,6 +39,14 @@ export function webSocketServer({
 		maxPayload: maxPayloadSize,
 	})
 
+	{
+		const log_error = (err: Error) => (
+			logger.error(`${err.name}: ${err.message}`)
+		)
+		wss.on("error", log_error)
+		server.on("error", log_error)
+	}
+
 	let count = 1
 
 	wss.on("connection", async(socket, req) => {
