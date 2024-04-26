@@ -21,6 +21,15 @@ jobs:
       with:
         node-version: '17'
 
-    - name: 📦 npm install and build
+    - name: 📦 npm install
       shell: bash
       run: npm ci
+
+    - name: 📦 build
+      shell: bash
+      run: npm run build
+
+    - name: 📦 test
+      shell: bash
+      run: npm test
+

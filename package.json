@@ -11,7 +11,7 @@
 		"s"
 	],
 	"scripts": {
-		"prepare": "run-s clean && run-p importmap compile && run-s test",
+		"build": "run-s clean && run-p importmap compile",
 		"clean": "rimraf x *.pem && mkdirp x",
 		"importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"compile": "tsc",
@@ -20,7 +20,7 @@
 		"start-example-server-debug": "node inspect x/http/example/example-server.js",
 		"start-websocket-server": "node x/websocket/example/example-socket-server.js",
 		"start-http": "serve -l 8080",
-		"start": "run-p start-example-server start-websocket-server start-http",
+		"start": "run-p watch start-example-server start-websocket-server start-http",
 		"generate-keys": "./node_modules/redcrypto/generate-keys",
 		"test": "cynic node x/renraku.test.js",
 		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/renraku.test.js"
