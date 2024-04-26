@@ -3,12 +3,12 @@ import {createServer} from "http"
 import {WebSocketServer} from "ws"
 
 import {servelet} from "../servelet.js"
+import {remote} from "../general/remote.js"
 import {negotiator} from "./negotiator/negotiator.js"
 import {healthCheck} from "../http/node-utils/health-check.js"
 import {colorfulLogger} from "../tools/fancy-logging/colorful-logger.js"
-import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
 import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"
-import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, ConnectionControls, Requester, Logger, HttpHeaders} from "../types.js"
+import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, ConnectionControls, Servelet, Logger, HttpHeaders} from "../types.js"
 
 export function webSocketServer({
 		port,
@@ -71,7 +71,7 @@ export function webSocketServer({
 				},
 			},
 			prepareClientApi(map) {
-				const requester: Requester = async({meta, method, params}) => {
+				const requester: Servelet = async({meta, method, params}) => {
 					const {id, response} = startWaitingForResponse()
 					socket.send(JSON.stringify(<JsonRpcRequestWithMeta>{
 						id,
@@ -83,7 +83,7 @@ export function webSocketServer({
 					logger.log(`🔺 ${method}()`)
 					return response
 				}
-				return remoteWithMetaMap(requester, map)
+				return remote(requester, map)
 			},
 		})
 		const serversideServelet = servelet(api)

@@ -1,9 +1,9 @@
 
 import {servelet} from "../servelet.js"
+import {remote} from "../general/remote.js"
 import {negotiator} from "./negotiator/negotiator.js"
 import {noLogger} from "../tools/fancy-logging/no-logger.js"
-import {remoteWithMetaMap} from "../http/mapping/remote-with-meta-map.js"
-import {Api, JsonRpcRequestWithMeta, MetaMap, Requester} from "../types.js"
+import {Api, JsonRpcRequestWithMeta, MetaMap, Servelet} from "../types.js"
 
 export async function webSocketClient<xServerApi extends Api>({
 		link, timeout, metaMap, clientApi, handleConnectionClosed,
@@ -23,7 +23,7 @@ export async function webSocketClient<xServerApi extends Api>({
 		logger: noLogger(),
 	})
 
-	const requester: Requester = async({meta, method, params}) => {
+	const requester: Servelet = async({meta, method, params}) => {
 		const {id, response} = startWaitingForResponse()
 		socket.send(JSON.stringify(<JsonRpcRequestWithMeta>{
 			jsonrpc: "2.0",
@@ -49,7 +49,7 @@ export async function webSocketClient<xServerApi extends Api>({
 	})
 
 	return {
-		remote: remoteWithMetaMap(requester, metaMap),
+		remote: remote(requester, metaMap),
 		close: () => socket.close(),
 	}
 }

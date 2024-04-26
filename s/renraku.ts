@@ -5,6 +5,8 @@ export * from "./servelet.js"
 export * from "./service-and-api.js"
 export * from "./types.js"
 
+export * from "./general/remote.js"
+
 export * from "./http/browser-client.js"
 export * from "./websocket/socket-client.js"
 

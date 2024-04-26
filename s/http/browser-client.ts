@@ -1,6 +1,6 @@
 
 import {ApiError} from "../error.js"
-import {remoteWithMetaMap} from "./mapping/remote-with-meta-map.js"
+import {remote} from "../general/remote.js"
 import {Api, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, MetaMap, Request} from "../types.js"
 
 export function browserClient<xApi extends Api>({url, metaMap}: {
@@ -40,5 +40,5 @@ export function browserClient<xApi extends Api>({url, metaMap}: {
 			return result
 	}
 
-	return remoteWithMetaMap(requester, metaMap)
+	return remote(requester, metaMap)
 }

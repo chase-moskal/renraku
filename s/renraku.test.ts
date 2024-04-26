@@ -3,7 +3,6 @@ import {expect, Suite} from "cynic"
 import * as renraku from "./renraku.js"
 import {noLogger} from "./renraku.js"
 import {nap} from "./tools/nap.js"
-import {JsonRpcResponse} from "./types.js"
 import {negotiator} from "./websocket/negotiator/negotiator.js"
 
 export default <Suite>{

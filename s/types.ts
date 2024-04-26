@@ -75,7 +75,7 @@ export interface Response {
 	result: any
 }
 
-export interface Requester {
+export interface Servelet {
 	(request: Request): Promise<any>
 }
 
@@ -110,10 +110,6 @@ export interface JsonRpcErrorResponse extends JsonRpcResponseCommon {
 export type JsonRpcResponse = JsonRpcSuccessResponse | JsonRpcErrorResponse
 
 export interface Servelet {
-	(request: Request): Promise<any>
-}
-
-export interface Requester {
 	(request: Request): Promise<any>
 }
 

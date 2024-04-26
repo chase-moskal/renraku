@@ -13,7 +13,7 @@ export const clientsideApi = api({
 })
 
 export const makeServersideApi = (
-		controls: ConnectionControls,
+		_controls: ConnectionControls,
 		clientside: Remote<typeof clientsideApi>
 	) => (
 	api({

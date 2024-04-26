@@ -1,9 +1,9 @@
 
-import {objectMap} from "../../tools/object-map.js"
-import {Api, ApiRemote, MetaMap, Requester, ServiceOptions} from "../../types.js"
+import {objectMap} from "../tools/object-map.js"
+import {Api, ApiRemote, MetaMap, Servelet, ServiceOptions} from "../types.js"
 
-export function remoteWithMetaMap<xApi extends Api>(
-		requester: Requester,
+export function remote<xApi extends Api>(
+		requester: Servelet,
 		map: MetaMap<xApi>,
 		options: ServiceOptions = {}
 	) {
@@ -14,11 +14,11 @@ export function remoteWithMetaMap<xApi extends Api>(
 				const getMeta: () => Promise<any> = value
 				const overrides: {[key: string]: any} = {}
 				return new Proxy({}, {
-					set: (t, key: string, value: any) => {
+					set: (_t, key: string, value: any) => {
 						overrides[key] = value
 						return true
 					},
-					get: (t, property: string) => (
+					get: (_t, property: string) => (
 						overrides[key] ?? (async(...params: any[]) => {
 							const joinedPath = [...newPath, property].join(".")
 							const method = "." + joinedPath
@@ -43,3 +43,4 @@ export function remoteWithMetaMap<xApi extends Api>(
 	}
 	return recurse(map)
 }
+
