@@ -134,3 +134,15 @@ export interface Spike {
 export interface ServiceOptions {
 	spike?: Spike
 }
+
+export interface SocketConnection {
+	headers: HttpHeaders
+	controls: ConnectionControls
+	prepareClientApi: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
+}
+
+export interface SocketResult {
+	api: Api
+	handleConnectionClosed(): void
+}
+
