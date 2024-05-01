@@ -44,10 +44,10 @@
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/isomorphic-fetch": "^0.0.39",
-		"@types/node": "^20.12.7",
+		"@types/node": "^20.12.8",
 		"@types/ws": "^8.5.10",
 		"cynic": "^0.2.1",
-		"es-module-shims": "^1.9.0",
+		"es-module-shims": "^1.10.0",
 		"importly": "^0.2.3",
 		"isomorphic-fetch": "^3.0.0",
 		"mkdirp": "^3.0.1",
@@ -57,6 +57,6 @@
 		"typescript": "^5.4.5"
 	},
 	"dependencies": {
-		"ws": "^8.16.0"
+		"ws": "^8.17.0"
 	}
 }
