@@ -6,7 +6,7 @@ export const service = () => ({
 		return {
 			expose<xMethods extends Methods>(e: Expose<xAuth, xMethods>): Service<xMeta, xAuth, xMethods> {
 				return {
-					[is_service]: is_service,
+					[is_service]: true,
 					expose: e,
 					policy: p,
 				}

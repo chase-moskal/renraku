@@ -24,7 +24,7 @@ export interface Expose<xAuth, xMethods extends Methods> {
 export const is_service = Symbol("is_service")
 
 export interface Service<xMeta, xAuth, xMethods extends Methods> {
-	[is_service]: symbol
+	[is_service]: true
 	policy: Policy<xMeta, xAuth>
 	expose: Expose<xAuth, xMethods>
 }
