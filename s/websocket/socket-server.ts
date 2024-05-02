@@ -8,7 +8,7 @@ import {negotiator} from "./negotiator/negotiator.js"
 import {healthCheck} from "../http/node-utils/health-check.js"
 import {colorfulLogger} from "../tools/fancy-logging/colorful-logger.js"
 import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"
-import {JsonRpcRequestWithMeta, Servelet, Logger, SocketConnection, SocketResult} from "../types.js"
+import {JsonRpcRequestWithMeta, Servelet, Logger, SocketConnection, SocketHandling} from "../types.js"
 
 export function webSocketServer({
 		port,
@@ -23,7 +23,7 @@ export function webSocketServer({
 		exposeErrors: boolean
 		maxPayloadSize: number
 		logger?: Logger
-		acceptConnection({}: SocketConnection): SocketResult
+		acceptConnection({}: SocketConnection): SocketHandling
 	}) {
 
 	const server = createServer()

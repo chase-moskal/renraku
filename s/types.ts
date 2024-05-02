@@ -141,7 +141,7 @@ export interface SocketConnection {
 	prepareClientApi: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
 }
 
-export interface SocketResult {
+export interface SocketHandling {
 	api: Api
 	handleConnectionClosed(): void
 }
