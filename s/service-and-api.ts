@@ -15,6 +15,10 @@ export const service = () => ({
 	},
 })
 
+/** declare a service with no auth policy */
+export const serviette = service().policy(async() => {}).expose
+
 export function api<xApi extends Api>(api: xApi): xApi {
 	return api
 }
+
