@@ -22,7 +22,7 @@ export function api<xApi extends Api>(api: xApi): xApi {
 /** declare a service with no auth policy */
 export const serviette = service().policy(async() => {}).expose
 
-export function metaMap<xApi extends Api>(m: MetaMap<xApi>) {
+export function metas<xApi extends Api>(m: MetaMap<xApi>) {
 	return m
 }
 
