@@ -3,19 +3,18 @@ import {servelet} from "../servelet.js"
 import {remote} from "../general/remote.js"
 import {negotiator} from "./negotiator/negotiator.js"
 import {noLogger} from "../tools/fancy-logging/no-logger.js"
-import {Api, JsonRpcRequestWithMeta, MetaMap, Servelet} from "../types.js"
+import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, Servelet} from "../types.js"
 
 export async function webSocketClient<xServerApi extends Api>({
-		link, timeout, metaMap, clientApi, handleConnectionClosed,
+		link, timeout, serverMetas, clientApi, handleConnectionClosed,
 	}: {
 		link: string
 		timeout: number,
-		metaMap: MetaMap<xServerApi>
-		clientApi: Api
+		serverMetas: MetaMap<xServerApi>
+		clientApi: (serverRemote: ApiRemote<xServerApi>) => Api
 		handleConnectionClosed(): void
 	}) {
 
-	const clientServelet = servelet(clientApi)
 	const socket = await connectWebSocket(link)
 	const {startWaitingForResponse, acceptIncoming} = negotiator({
 		timeout,
@@ -34,6 +33,7 @@ export async function webSocketClient<xServerApi extends Api>({
 		}))
 		return response
 	}
+	const serverRemote = remote(requester, serverMetas)
 
 	socket.onclose = () => handleConnectionClosed()
 	socket.onerror = event => {
@@ -42,14 +42,14 @@ export async function webSocketClient<xServerApi extends Api>({
 		handleConnectionClosed()
 	}
 	socket.onmessage = async event => acceptIncoming({
-		servelet: clientServelet,
+		servelet: servelet(clientApi(serverRemote)),
 		headers: undefined,
 		incoming: JSON.parse(event.data.toString()),
 		respond: response => socket.send(JSON.stringify(response)),
 	})
 
 	return {
-		remote: remote(requester, metaMap),
+		remote: serverRemote,
 		close: () => socket.close(),
 	}
 }

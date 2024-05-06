@@ -6,9 +6,9 @@ export function makeExampleSocketClient() {
 	return webSocketClient<ReturnType<typeof makeServersideApi>>({
 		timeout: 60_000,
 		link: "ws://localhost:8001",
-		clientApi: clientsideApi,
+		clientApi: () =>clientsideApi,
 		handleConnectionClosed() {},
-		metaMap: {
+		serverMetas: {
 			serverService: async() => {},
 		},
 	})
