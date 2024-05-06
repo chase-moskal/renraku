@@ -72,7 +72,7 @@
     // we create a browser client
     const {greeter} = renraku.browserClient({
       url: "http://localhost:8000/",
-      metaMap: {
+      metas: {
         // on the service, we specify which meta to use for api calls
         calculator: async() => meta,
       },
@@ -108,7 +108,7 @@
     // create a mock remote of our api
     const {greeter} = renraku.mock()
       .forApi(exampleApi)
-      .withMetaMap({
+      .withMetas({
         greeter: async() => meta,
       })
 
@@ -132,7 +132,7 @@
       .forApi(exampleApi)
 
       // 👇 an auth map overrides auth policies
-      .withAuthMap({
+      .withAuths({
 
         //          we're forcing this auth result
         //                    👇

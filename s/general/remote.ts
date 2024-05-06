@@ -1,14 +1,14 @@
 
 import {objectMap} from "../tools/object-map.js"
-import {Api, ApiRemote, MetaMap, Servelet, ServiceOptions} from "../types.js"
+import {Api, ApiRemote, Metas, Servelet, ServiceOptions} from "../types.js"
 
 export function remote<xApi extends Api>(
 		requester: Servelet,
-		map: MetaMap<xApi>,
+		metas: Metas<xApi>,
 		options: ServiceOptions = {}
 	) {
-	function recurse(mapGroup: MetaMap<xApi>, path: string[] = []): ApiRemote<xApi> {
-		return objectMap(mapGroup, (value, key) => {
+	function recurse(group: Metas<xApi>, path: string[] = []): ApiRemote<xApi> {
+		return objectMap(group, (value, key) => {
 			const newPath = [...path, key]
 			if (typeof value === "function") {
 				const getMeta: () => Promise<any> = value
@@ -41,6 +41,6 @@ export function remote<xApi extends Api>(
 			}
 		})
 	}
-	return recurse(map)
+	return recurse(metas)
 }
 

@@ -1,7 +1,7 @@
 
 import {ApiError} from "./error.js"
 import {objectMap} from "./tools/object-map.js"
-import {Api, MetaMap, ApiRemote, AuthMap, Service, Methods, is_service, HttpHeaders, ServiceOptions} from "./types.js"
+import {Api, Metas, ApiRemote, Auths, Service, Methods, is_service, HttpHeaders, ServiceOptions} from "./types.js"
 
 export const mock = (options: ServiceOptions = {}) => ({
 	forService: <xService extends Service<any, any, Methods>>(
@@ -9,20 +9,20 @@ export const mock = (options: ServiceOptions = {}) => ({
 		) => mockService(service, [], options),
 	forApi<xApi extends Api>(api: xApi) {
 		return {
-			withMetaMap(
-					map: MetaMap<xApi>,
+			withMetas(
+					metas: Metas<xApi>,
 					getHeaders: () => Promise<HttpHeaders> = async() => undefined
 				): ApiRemote<xApi> {
 				const recurse2 = prepareRecursiveMapping(
 					(service, getter, path) => mockService(service, path, options).withMeta(getter, getHeaders)
 				)
-				return <ApiRemote<xApi>>recurse2(api, map)
+				return <ApiRemote<xApi>>recurse2(api, metas)
 			},
-			withAuthMap(map: AuthMap<xApi>): ApiRemote<xApi> {
+			withAuths(auths: Auths<xApi>): ApiRemote<xApi> {
 				const recurse2 = prepareRecursiveMapping(
 					(service, getter, path) => mockService(service, path, options).withAuth(getter)
 				)
-				return <ApiRemote<xApi>>recurse2(api, map)
+				return <ApiRemote<xApi>>recurse2(api, auths)
 			},
 		}
 	},
@@ -87,7 +87,7 @@ function prepareRecursiveMapping(
 	) {
 	return function recursiveMapping(
 			apiGroup: Api,
-			mapGroup: MetaMap<Api> | AuthMap<Api>,
+			mapGroup: Metas<Api> | Auths<Api>,
 			path: string[] = []
 		): ApiRemote<Api> {
 		return objectMap(apiGroup, (value, key) => {

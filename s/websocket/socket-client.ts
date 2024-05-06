@@ -3,14 +3,14 @@ import {servelet} from "../servelet.js"
 import {remote} from "../general/remote.js"
 import {negotiator} from "./negotiator/negotiator.js"
 import {noLogger} from "../tools/fancy-logging/no-logger.js"
-import {Api, ApiRemote, JsonRpcRequestWithMeta, MetaMap, Servelet} from "../types.js"
+import {Api, ApiRemote, JsonRpcRequestWithMeta, Metas, Servelet} from "../types.js"
 
 export async function webSocketClient<xServerApi extends Api>({
 		link, timeout, serverMetas, clientApi, handleConnectionClosed,
 	}: {
 		link: string
 		timeout: number,
-		serverMetas: MetaMap<xServerApi>
+		serverMetas: Metas<xServerApi>
 		clientApi: (serverRemote: ApiRemote<xServerApi>) => Api
 		handleConnectionClosed(): void
 	}) {

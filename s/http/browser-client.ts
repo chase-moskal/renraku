@@ -1,11 +1,11 @@
 
 import {ApiError} from "../error.js"
 import {remote} from "../general/remote.js"
-import {Api, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, MetaMap, Request} from "../types.js"
+import {Api, JsonRpcErrorResponse, JsonRpcRequestWithMeta, JsonRpcResponse, JsonRpcSuccessResponse, Metas, Request} from "../types.js"
 
-export function browserClient<xApi extends Api>({url, metaMap}: {
+export function browserClient<xApi extends Api>({url, metas}: {
 		url: string
-		metaMap: MetaMap<xApi>
+		metas: Metas<xApi>
 	}) {
 
 	let count = 0
@@ -40,5 +40,5 @@ export function browserClient<xApi extends Api>({url, metaMap}: {
 			return result
 	}
 
-	return remote(requester, metaMap)
+	return remote(requester, metas)
 }

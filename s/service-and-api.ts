@@ -1,5 +1,5 @@
 
-import {Policy, Methods, Expose, Api, Service, is_service, MetaMap} from "./types.js"
+import {Policy, Methods, Expose, Api, Service, is_service, Metas} from "./types.js"
 
 export const service = () => ({
 	policy<xMeta, xAuth>(p: Policy<xMeta, xAuth>) {
@@ -22,7 +22,7 @@ export function api<xApi extends Api>(api: xApi): xApi {
 /** declare a service with no auth policy */
 export const serviette = service().policy(async() => {}).expose
 
-export function metas<xApi extends Api>(m: MetaMap<xApi>) {
+export function metas<xApi extends Api>(m: Metas<xApi>) {
 	return m
 }
 

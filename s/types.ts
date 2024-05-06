@@ -33,19 +33,19 @@ export interface Api {
 	[key: string]: Api | Service<any, any, Methods>
 }
 
-export type MetaMap<xApi extends Api> = {
+export type Metas<xApi extends Api> = {
 	[P in keyof xApi]: xApi[P] extends Service<infer xMeta, any, Methods>
 		? () => Promise<xMeta>
 		: xApi[P] extends Api
-			? MetaMap<xApi[P]>
+			? Metas<xApi[P]>
 			: never
 }
 
-export type AuthMap<xApi extends Api> = {
+export type Auths<xApi extends Api> = {
 	[P in keyof xApi]: xApi[P] extends Service<any, infer xAuth, Methods>
 		? () => Promise<xAuth>
 		: xApi[P] extends Api
-			? AuthMap<xApi[P]>
+			? Auths<xApi[P]>
 			: never
 }
 
@@ -138,7 +138,7 @@ export interface ServiceOptions {
 export interface SocketConnection {
 	headers: HttpHeaders
 	controls: ConnectionControls
-	prepareClientApi: <xApi extends Api>(map: MetaMap<xApi>) => ApiRemote<xApi>,
+	prepareClientApi: <xApi extends Api>(metas: Metas<xApi>) => ApiRemote<xApi>,
 }
 
 export interface SocketHandling {

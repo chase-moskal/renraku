@@ -78,7 +78,7 @@ export default <Suite>{
 				return {
 					api: renraku.mock()
 						.forApi(api)
-						.withMetaMap({
+						.withMetas({
 							greeter: async() => {},
 							math: {
 								calculator: async() => {},
@@ -123,19 +123,19 @@ export default <Suite>{
 					})
 					const lotto0 = renraku.mock()
 						.forApi(lottoApi)
-						.withMetaMap({
+						.withMetas({
 							winnerIs1: async() => 0,
 							winnerIs2: async() => 0,
 						})
 					const lotto1 = renraku.mock()
 						.forApi(lottoApi)
-						.withMetaMap({
+						.withMetas({
 							winnerIs1: async() => 1,
 							winnerIs2: async() => 1,
 						})
 					const lotto2 = renraku.mock()
 						.forApi(lottoApi)
-						.withMetaMap({
+						.withMetas({
 							winnerIs1: async() => 2,
 							winnerIs2: async() => 2,
 						})
