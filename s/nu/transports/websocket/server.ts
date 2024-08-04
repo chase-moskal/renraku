@@ -1,6 +1,6 @@
 
-import {Api} from "./api.js"
-import {HttpHeaders, Logger} from "./types.js"
+import {Api} from "../../core/api.js"
+import {HttpHeaders, Logger} from "../../core/types.js"
 
 type Options = {
 	port: number

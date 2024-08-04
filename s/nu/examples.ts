@@ -1,7 +1,7 @@
 
-import {Api} from "./api.js"
-import {Remote} from "./remote.js"
-import {Service} from "./service.js"
+import {Api} from "./core/api.js"
+import {Remote} from "./core/remote.js"
+import {Service} from "./core/service.js"
 
 const cool = new Service({
 	policy: async(_msg: string) => 123,

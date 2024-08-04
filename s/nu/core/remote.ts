@@ -1,6 +1,6 @@
 
 import {Api} from "./api.js"
-import {objectMap} from "../tools/object-map.js"
+import {objectMap} from "../../tools/object-map.js"
 import {Actualize, Endpoint, GetServices, RemoteConfig} from "./types.js"
 
 export class Remote<A extends Api<any>> {

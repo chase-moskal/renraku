@@ -1,6 +1,6 @@
 
 import {Service} from "./service.js"
-import {obtain} from "../tools/obtain.js"
+import {obtain} from "../../tools/obtain.js"
 import {Endpoint, NestedServices} from "./types.js"
 
 export class Api<Services extends NestedServices> {
