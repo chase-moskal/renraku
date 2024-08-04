@@ -1,5 +1,5 @@
 
-import {Fn} from "./types.js"
+import {Fn, HttpHeaders, Policy} from "./types.js"
 
 export class Service<
 		PreAuth,
@@ -7,11 +7,11 @@ export class Service<
 		Fns extends Record<string, Fn>,
 	> {
 
-	policy: (preAuth: PreAuth) => Promise<Auth>
+	policy: Policy<PreAuth, Auth>
 	expose: (auth: Auth) => Fns
 
 	constructor({policy, expose}: {
-			policy: (preAuth: PreAuth) => Promise<Auth>
+			policy: (preAuth: PreAuth, headers?: HttpHeaders) => Promise<Auth>
 			expose: (auth: Auth) => Fns
 		}) {
 		this.policy = policy

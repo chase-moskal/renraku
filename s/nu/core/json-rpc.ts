@@ -1,27 +1,38 @@
 
 export namespace JsonRpc {
+	export type Incoming = Request | Request[]
+	export type Outgoing = Response | Response[]
 
-	export type Request<PreAuth = any, Args extends any[] = any[]> = {
-		jsonrpc: "2.0"
-		id?: Id
-		method: string
-		params: {
-			preAuth: PreAuth
-			args: Args
-		}
-	}
+	////////////////////////////////////// ////////////////////////////////////
+
+	export const version = "2.0"
+
+	export type Request<P extends [] | {} = any> = (
+		| Query<P>
+		| Notification<P>
+	)
 
 	export type Response<Result = any> = (
 		| Success<Result>
 		| Failure
 	)
 
-	export type Incoming = Request | Request[]
-	export type Outgoing = Response | Response[]
-
 	////////////////////////////////////// ////////////////////////////////////
 
 	export type Id = number | string | null
+
+	export type Notification<P extends [] | {}> = {
+		jsonrpc: string
+		method: string
+		params: P
+	}
+
+	export type Query<P extends [] | {}> = {
+		id: Id
+		jsonrpc: string
+		method: string
+		params: P
+	}
 
 	export type Error = {
 		code: number
@@ -29,7 +40,7 @@ export namespace JsonRpc {
 		data?: any
 	}
 
-	export type Success<Result = any> = {
+	export type Success<Result> = {
 		jsonrpc: "2.0"
 		id: Id
 		result: Result

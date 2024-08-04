@@ -2,6 +2,8 @@
 import {Api} from "../../core/api.js"
 import {HttpHeaders, Logger} from "../../core/types.js"
 
+/////////////////////////////////////////////////
+
 type Options = {
 	port: number
 	timeout: number
@@ -11,9 +13,13 @@ type Options = {
 	acceptConnection({}: WebSocketConnection): SocketHandling
 }
 
+/////////////////////////////////////////////////
+
 export class WebSocketServer {
 	constructor(private options: Options) {}
 }
+
+/////////////////////////////////////////////////
 
 export interface SocketHandling {
 	serverApi: Api<any>

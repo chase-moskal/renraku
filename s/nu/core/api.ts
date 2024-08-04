@@ -1,10 +1,11 @@
 
 import {Service} from "./service.js"
+import {JsonRpc} from "./json-rpc.js"
 import {obtain} from "../../tools/obtain.js"
-import {Endpoint, NestedServices} from "./types.js"
+import {Endpoint, Services} from "./types.js"
 
-export class Api<Services extends NestedServices> {
-	constructor(public services: Services) {}
+export class Api<S extends Services> {
+	constructor(public services: S) {}
 
 	endpoint: Endpoint = async request => {
 
@@ -17,7 +18,7 @@ export class Api<Services extends NestedServices> {
 		const fnName = path.pop()!
 		const service = obtain(this.services, path)
 
-		try {
+		return await respond(request, async() => {
 			if (!(service instanceof Service))
 				throw new Error(`unknown method ${request.method}`)
 
@@ -26,21 +27,42 @@ export class Api<Services extends NestedServices> {
 			if (typeof fn !== "function")
 				throw new Error(`invalid method ${fnName}`)
 
-			return {
-				jsonrpc: "2.0",
-				id: request.id,
-				result: await fn(...request.params.args),
-			}
+			return await fn(...request.params.args)
+		})
+	}
+}
+
+async function respond(
+		request: JsonRpc.Request,
+		fn: () => Promise<any>,
+	): Promise<JsonRpc.Response | null> {
+
+	try {
+		const result = await fn()
+
+		if (!("id" in request))
+			return null
+
+		return {
+			result,
+			id: request.id,
+			jsonrpc: JsonRpc.version,
 		}
-		catch (error) {
-			return {
-				jsonrpc: "2.0",
-				id: request.id,
-				error: {
-					code: -32000,
-					message: error?.message ?? "unknown error",
-				},
-			}
+	}
+
+	catch (error) {
+		if (!("id" in request))
+			return null
+
+		return {
+			id: request.id,
+			jsonrpc: JsonRpc.version,
+			error: {
+				code: -32000,
+				message: error instanceof Error
+					? error.message
+					: "unknown error",
+			},
 		}
 	}
 }

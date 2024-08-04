@@ -5,9 +5,10 @@ import {JsonRpc} from "./json-rpc.js"
 import type {IncomingHttpHeaders} from "http"
 
 export type Fn = (...args: any[]) => Promise<any>
+export type Policy<PreAuth, Auth> = (preAuth: PreAuth) => Promise<Auth>
 
-export type NestedServices = Service<any, any, any> | {
-	[key: string]: NestedServices
+export type Services = Service<any, any, any> | {
+	[key: string]: Services
 }
 
 export type RemoteServiceConfig<PreAuth> = {
@@ -15,29 +16,34 @@ export type RemoteServiceConfig<PreAuth> = {
 	notification?: boolean
 }
 
-export type RemoteConfig<Services extends NestedServices> = (
-	Services extends Service<infer PreAuth, any, any>
+export type RemoteConfig<S extends Services> = (
+	S extends Service<infer PreAuth, any, any>
 		? () => Promise<RemoteServiceConfig<PreAuth>>
-		: Services extends {[key: string]: NestedServices}
-			? {[K in keyof Services]: RemoteConfig<Services[K]>}
+		: S extends {[key: string]: Services}
+			? {[K in keyof S]: RemoteConfig<S[K]>}
 			: never
 )
 
-export type Actualize<Services extends NestedServices> = {
-	[P in keyof Services]: Services[P] extends Service<any, any, infer Fns>
+export type Actualize<S extends Services> = {
+	[P in keyof S]: S[P] extends Service<any, any, infer Fns>
 		? Fns
-		: Services[P] extends NestedServices
-			? Actualize<Services[P]>
+		: S[P] extends Services
+			? Actualize<S[P]>
 			: never
 }
 
-export type Endpoint = (incoming: JsonRpc.Request) => Promise<JsonRpc.Response>
+export type Endpoint = (incoming: JsonRpc.Request) => Promise<JsonRpc.Response | null>
 
 export type GetServices<A extends Api<any>> = (
 	A extends Api<infer S>
 		? S
 		: never
 )
+
+export type RpcParams<PreAuth = any, Args extends any[] = any[]> = {
+	preAuth: PreAuth
+	args: Args
+}
 
 export interface HttpHeaders extends IncomingHttpHeaders {}
 
