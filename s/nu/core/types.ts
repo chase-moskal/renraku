@@ -32,7 +32,15 @@ export type Actualize<S extends Services> = {
 			: never
 }
 
-export type Endpoint = (incoming: JsonRpc.Request) => Promise<JsonRpc.Response | null>
+export type EndpointDetails = {
+	headers: HttpHeaders
+	exposeErrors: boolean
+}
+
+export type Endpoint = (
+	(incoming: JsonRpc.Request, details?: EndpointDetails) =>
+		Promise<JsonRpc.Response | null>
+)
 
 export type GetServices<A extends Api<any>> = (
 	A extends Api<infer S>
