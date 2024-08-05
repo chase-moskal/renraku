@@ -6,8 +6,8 @@ import {Api, Logger} from "../types.js"
 import {allowCors} from "./node-utils/allow-cors.js"
 import {healthCheck} from "./node-utils/health-check.js"
 import {colorfulLogger} from "../tools/fancy-logging/colorful-logger.js"
-import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"
 import {makeRequestListener} from "./node-utils/make-request-listener.js"
+import {timestampedLogger} from "../tools/fancy-logging/timestamped-logger.js"
 
 export function nodeServer({
 		api,

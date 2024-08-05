@@ -3,18 +3,18 @@ import * as ws from "ws"
 import * as http from "http"
 
 import {Api} from "../../core/api.js"
-import {HttpHeaders, Logger} from "../../core/types.js"
+import {Endpoint, HttpHeaders} from "../../core/types.js"
+import {allowCors} from "../http/utils/listener-transforms/allow-cors.js"
+import {EndpointListenerOptions} from "../http/utils/endpoint-listener.js"
+import {healthCheck} from "../http/utils/listener-transforms/health-check.js"
 
 /////////////////////////////////////////////////
 
 type Options = {
-	port: number
-	logger: Logger
+	endpoint: Endpoint
 	timeout: number
-	exposeErrors: boolean
-	maxPayloadSize: number
 	acceptConnection({}: WebSocketConnection): SocketHandling
-}
+} & EndpointListenerOptions
 
 /////////////////////////////////////////////////
 
@@ -22,8 +22,11 @@ export class WebSocketServer {
 	wsServer: ws.Server
 	httpServer: http.Server
 
+	listen: http.Server["listen"]
+
 	constructor(private options: Options) {
 		const httpServer = this.httpServer = http.createServer()
+		this.listen = httpServer.listen.bind(httpServer)
 
 		const wsServer = this.wsServer = new ws.WebSocketServer({
 			noServer: true,
@@ -36,15 +39,14 @@ export class WebSocketServer {
 
 		httpServer
 			.on("error", this.#log_error)
-			// .prependListener("request", healthCheck("/health"), options.logger, () => {})
+			.prependListener("request", allowCors(
+				healthCheck("/health", options.logger, () => {})
+			))
 			.on("upgrade", (request, socket, head) => {
 				wsServer.handleUpgrade(request, socket, head, ws => {
 					wsServer.emit("connection", ws, request)
 				})
 			})
-			.listen(options.port)
-
-		options.logger.log(`💡 started web socket server ${options.port}`)
 	}
 
 	#log_error = (err: Error) => {

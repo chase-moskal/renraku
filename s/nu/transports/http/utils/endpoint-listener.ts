@@ -5,14 +5,14 @@ import {readStream} from "./read-stream.js"
 import {JsonRpc} from "../../../core/json-rpc.js"
 import {Endpoint, Logger} from "../../../core/types.js"
 
-type Options = {
+export type EndpointListenerOptions = {
 	logger: Logger
 	exposeErrors: boolean
 	maxPayloadSize: number
 	endpoint: Endpoint
 }
 
-export function makeRequestListener(options: Options): RequestListener {
+export function makeEndpointListener(options: EndpointListenerOptions): RequestListener {
 	const {logger, exposeErrors, maxPayloadSize, endpoint} = options
 
 	return async(req, res) => {

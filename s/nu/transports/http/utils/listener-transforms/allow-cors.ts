@@ -1,7 +1,7 @@
 
 import {RequestListener} from "http"
 
-export function allowCors(requestListener: RequestListener): RequestListener {
+export function allowCors(listener: RequestListener): RequestListener {
 	return async(request, response) => {
 		response.setHeader("Access-Control-Allow-Origin", "*")
 		response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -11,7 +11,7 @@ export function allowCors(requestListener: RequestListener): RequestListener {
 			response.end()
 		}
 		else
-			return requestListener(request, response)
+			return listener(request, response)
 	}
 }
 
