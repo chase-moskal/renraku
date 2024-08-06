@@ -4,9 +4,9 @@ import * as http from "http"
 
 import {Api} from "../../core/api.js"
 import {Endpoint, HttpHeaders} from "../../core/types.js"
-import {allowCors} from "../http/utils/listener-transforms/allow-cors.js"
-import {EndpointListenerOptions} from "../http/utils/endpoint-listener.js"
-import {healthCheck} from "../http/utils/listener-transforms/health-check.js"
+import {EndpointListenerOptions} from "../http/node-utils/endpoint-listener.js"
+import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
+import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 /////////////////////////////////////////////////
 

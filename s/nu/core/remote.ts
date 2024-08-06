@@ -3,7 +3,7 @@ import {Api} from "./api.js"
 import {objectMap} from "../../tools/object-map.js"
 import {Actualize, Endpoint, GetServices, RemoteConfig} from "./types.js"
 
-export class Remote<A extends Api<any>> {
+export class Remote<A extends Api> {
 	fns: Actualize<GetServices<A>>
 
 	constructor(
@@ -56,6 +56,9 @@ export class Remote<A extends Api<any>> {
 				? notification
 				: {...notification, id: this.#getId()}
 		)
+
+		if (notify && !response)
+			return response
 
 		if ("error" in response)
 			throw new Error(response.error.message)

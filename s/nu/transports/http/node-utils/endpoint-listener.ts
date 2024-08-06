@@ -24,7 +24,7 @@ export function makeEndpointListener(options: EndpointListenerOptions): RequestL
 			const execute = async(request: JsonRpc.Request) => {
 				logger.log(`🔔 ${request.method}()`)
 				const response = await endpoint(request, {headers, exposeErrors})
-				if ("error" in response)
+				if (response && "error" in response)
 					logger.error(`🚨 ${response.error.message} ${response.error.data ?? ""}`)
 				return response
 			}
@@ -41,8 +41,8 @@ export function makeEndpointListener(options: EndpointListenerOptions): RequestL
 			res.statusCode = 500
 			res.end()
 			logger.error(
-				(exposeErrors && error instanceof Error)
-					? `🚨 ${error.name}: ${error.message}`
+				(error instanceof Error)
+					? "🚨 " + error.stack ?? `${error.name}: ${error.message}`
 					: "error"
 			)
 		}
