@@ -2,13 +2,12 @@
 import * as ws from "ws"
 import * as http from "http"
 
-import {Api} from "../../core/api.js"
-import {Endpoint, HttpHeaders} from "../../core/types.js"
-import {EndpointListenerOptions} from "../http/node-utils/endpoint-listener.js"
-import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
-import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
-import {ResponseWaiter} from "./utils/response-waiter.js"
 import {JsonRpc} from "../../core/json-rpc.js"
+import {ResponseWaiter} from "./utils/response-waiter.js"
+import {Endpoint, HttpHeaders} from "../../core/types.js"
+import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
+import {EndpointListenerOptions} from "../http/node-utils/endpoint-listener.js"
+import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 /////////////////////////////////////////////////
 
@@ -19,7 +18,6 @@ export type WebSocketServerOptions = {
 } & EndpointListenerOptions
 
 export interface SocketHandling {
-	serverApi: Api<any>
 	handleConnectionClosed: () => void
 }
 
@@ -33,7 +31,7 @@ export type WebSocketConnection = {
 /////////////////////////////////////////////////
 
 export class WebSocketServer {
-	wsServer: ws.Server
+	wsServer: ws.WebSocketServer
 	httpServer: http.Server
 
 	listen: http.Server["listen"]
@@ -53,7 +51,7 @@ export class WebSocketServer {
 
 		httpServer
 			.on("error", this.#log_error)
-			.prependListener("request", allowCors(
+			.on("request", allowCors(
 				healthCheck("/health", options.logger, () => {})
 			))
 			.on("upgrade", (request, socket, head) => {
@@ -74,7 +72,7 @@ export class WebSocketServer {
 			req: http.IncomingMessage,
 		) => {
 
-		const {logger, timeout, exposeErrors, acceptConnection} = this.options
+		const {logger, timeout, exposeErrors, endpoint, acceptConnection} = this.options
 		const clientCount = this.#count++
 
 		logger.log(`📖 connected ${clientCount}`)
@@ -82,7 +80,7 @@ export class WebSocketServer {
 
 		const waiter = new ResponseWaiter(timeout)
 
-		const {serverApi, handleConnectionClosed} = acceptConnection({
+		const {handleConnectionClosed} = acceptConnection({
 			headers: req.headers,
 			ping: () => {
 				socket.ping()
@@ -112,35 +110,28 @@ export class WebSocketServer {
 			logDisconnect()
 		}
 
-		const handleInboundRequest = (request: JsonRpc.Request) => {
-		}
-
-		const handleInboundResponse = (response: JsonRpc.Response) => {
+		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
+			if ("method" in message)
+				return await endpoint(message, {exposeErrors, headers: req.headers})
+			else
+				waiter.deliverResponse(message)
 		}
 
 		socket.onmessage = async event => {
 			const bi: JsonRpc.Bidirectional = JSON.parse(event.data.toString())
 
-			const array: (JsonRpc.Request | JsonRpc.Response)[] = (
-				Array.isArray(bi)
-					? bi
-					: [bi]
-			)
-
-			for (const message of array) {
-				if ("method" in message)
-					handleInboundRequest(message)
-				else
-					handleInboundResponse(message)
+			if (Array.isArray(bi)) {
+				const responses = (await Promise.all(bi.map(processMessage)))
+					.filter(r => !!r)
+				if (responses.length > 0)
+					socket.send(JSON.stringify(responses))
+			}
+			else {
+				const response = await processMessage(bi)
+				if (response)
+					socket.send(JSON.stringify(response))
 			}
 		}
-
-		// socket.onmessage = async event => acceptIncoming({
-		// 	servelet: serversideServelet,
-		// 	headers: req.headers,
-		// 	incoming: JSON.parse(event.data.toString()),
-		// 	respond: response => socket.send(JSON.stringify(response)),
-		// })
 	}
 
 	close() {

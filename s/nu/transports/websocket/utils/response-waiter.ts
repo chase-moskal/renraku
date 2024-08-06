@@ -24,21 +24,14 @@ export class ResponseWaiter {
 		return deferred.promise
 	}
 
-	resolveResponse(id: JsonRpc.Id, response: JsonRpc.Response) {
-		const pend = this.pending.get(id)
+	deliverResponse(response: JsonRpc.Response) {
+		const pend = this.pending.get(response.id)
 		if (pend) {
 			clearTimeout(pend.timeoutId)
-			pend.deferred.resolve(response)
-			this.pending.delete(id)
-		}
-	}
-
-	rejectResponse(id: number, reason: any) {
-		const pend = this.pending.get(id)
-		if (pend) {
-			clearTimeout(pend.timeoutId)
-			pend.deferred.reject(reason)
-			this.pending.delete(id)
+			if ("result" in response)
+				pend.deferred.resolve(response.result)
+			else
+				pend.deferred.reject(new Error(response.error.message))
 		}
 	}
 }
