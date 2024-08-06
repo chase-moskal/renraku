@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"author": "Chase Moskal <chasemoskal@gmail.com>",
 	"type": "module",
-	"main": "x/renraku.js",
+	"main": "x/index.js",
 	"files": [
 		"x",
 		"s"
@@ -16,11 +16,11 @@
 		"importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"compile": "tsc",
 		"watch": "npm run compile -s -- --watch",
-		"start-example-server": "node x/http/example/example-server.js",
-		"start-example-server-debug": "node inspect x/http/example/example-server.js",
-		"start-websocket-server": "node x/websocket/example/example-socket-server.js",
-		"start-http": "serve -l 8080",
-		"start": "run-p watch start-example-server start-websocket-server start-http",
+		"start": "run-p watch start-static-http",
+		"start-static-http": "serve -l 8080",
+		"api": "run-p api-http",
+		"api-http": "node x/examples/http/example-server.js",
+		"api-http-debug": "node inspect x/examples/http/example-server.js",
 		"generate-keys": "./node_modules/redcrypto/generate-keys",
 		"test": "cynic node x/renraku.test.js",
 		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/renraku.test.js"

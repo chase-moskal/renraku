@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+	<head>
+		<title>renraku test</title>
+		<script defer type=importmap-shim src="x/importmap.json"></script>
+		<script type=module-shim>
+			import {runTests} from "./x/http/example/run-tests.js"
+			import {runSocketTests} from "./x/websocket/example/run-socket-tests.js"
+
+			function renderTestResults(suite, results) {
+				const output = document.querySelector(`output[data-suite="${suite}"]`)
+				output.textContent = results.report
+				if (results.failed)
+					output.setAttribute("data-failed", "")
+			}
+
+			void async function main() {
+				renderTestResults("http", await runTests())
+				renderTestResults("websocket", await runSocketTests())
+			}()
+		</script>
+		<script defer src="node_modules/es-module-shims/dist/es-module-shims.js"></script>
+		<style>
+			html {
+				background: #000;
+				color: #444;
+			}
+			output {
+				white-space: pre-wrap;
+				color: #280;
+			}
+			output[data-failed] {
+				color: #820;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>renraku http tests</h1>
+		<output data-suite=http></output>
+		<h1>renraku websocket tests</h1>
+		<output data-suite=websocket></output>
+	</body>
+</html>
