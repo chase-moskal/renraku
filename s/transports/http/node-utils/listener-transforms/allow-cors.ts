@@ -6,7 +6,7 @@ export function allowCors(listener: RequestListener): RequestListener {
 		response.setHeader("Access-Control-Allow-Origin", "*")
 		response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		if (request.method.toUpperCase() === "OPTIONS") {
+		if (request.method?.toUpperCase() === "OPTIONS") {
 			response.statusCode = 200
 			response.end()
 		}

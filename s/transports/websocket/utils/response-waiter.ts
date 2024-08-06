@@ -1,7 +1,7 @@
 
 import {JsonRpc} from "../../../core/json-rpc.js"
 import {TimeoutError} from "../../../core/errors.js"
-import {deferPromise, DeferredPromise} from "../../../../tools/defer-promise.js"
+import {deferPromise, DeferredPromise} from "../../../tools/defer-promise.js"
 
 type Pend = {
 	deferred: DeferredPromise<JsonRpc.Response>

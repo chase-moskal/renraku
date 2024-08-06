@@ -1,6 +1,6 @@
 
 import {Api} from "./api.js"
-import {objectMap} from "../../tools/object-map.js"
+import {objectMap} from "../tools/object-map.js"
 import {Actualize, Endpoint, GetServices, RemoteConfig} from "./types.js"
 
 export class Remote<A extends Api> {
@@ -44,7 +44,13 @@ export class Remote<A extends Api> {
 		return () => count++
 	})()
 
-	async #request(notify: boolean, preAuth: any, method: string, args: any): Promise<any> {
+	async #request(
+			notify: boolean,
+			preAuth: any,
+			method: string,
+			args: any,
+		): Promise<any> {
+
 		const notification = {
 			jsonrpc: "2.0" as const,
 			method,
@@ -59,6 +65,9 @@ export class Remote<A extends Api> {
 
 		if (notify && !response)
 			return response
+
+		if (!response)
+			throw new Error("response was null, but shouldn't be, because the request was not a notification")
 
 		if ("error" in response)
 			throw new Error(response.error.message)

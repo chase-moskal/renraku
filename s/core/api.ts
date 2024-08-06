@@ -1,7 +1,7 @@
 
 import {Service} from "./service.js"
 import {JsonRpc} from "./json-rpc.js"
-import {obtain} from "../../tools/obtain.js"
+import {obtain} from "../tools/obtain.js"
 import {Endpoint, Services} from "./types.js"
 
 export class Api<S extends Services = any> {

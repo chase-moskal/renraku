@@ -55,9 +55,3 @@ export type RpcParams<PreAuth = any, Args extends any[] = any[]> = {
 
 export interface HttpHeaders extends IncomingHttpHeaders {}
 
-export interface Logger {
-	log(...data: any[]): void
-	warn(...data: any[]): void
-	error(...data: any[]): void
-}
-

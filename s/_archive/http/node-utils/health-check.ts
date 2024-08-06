@@ -1,13 +1,12 @@
 
 import {RequestListener} from "http"
-import {Logger} from "../../../../core/types.js"
+import {Logger} from "../../../tools/logging/logger.js"
 
 export function healthCheck(
 		path: string,
 		logger: Logger,
 		listener: RequestListener,
 	): RequestListener {
-
 	return async(request, response) => {
 		if (request.url === path) {
 			logger.log(`⚕️ health check`)
@@ -19,4 +18,3 @@ export function healthCheck(
 			return listener(request, response)
 	}
 }
-

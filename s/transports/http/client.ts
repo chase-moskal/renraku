@@ -23,6 +23,7 @@ export function httpEndpoint(url: string): Endpoint {
 			// sent as plain text, to avoid cors "options" preflight requests,
 			// by qualifying as a cors "simple request"
 			"Content-Type": "text/plain; charset=utf-8",
+
 		},
 	}).then(r => r.json())
 }

@@ -1,5 +1,5 @@
 
-import {Logger} from "./logging/logger.js"
+import {Logger} from "../types.js"
 
 export type Signal =
 	| "SIGINT"

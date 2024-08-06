@@ -2,8 +2,9 @@
 import {RequestListener} from "http"
 
 import {readStream} from "./read-stream.js"
+import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../core/json-rpc.js"
-import {Endpoint, Logger} from "../../../core/types.js"
+import {Logger} from "../../../tools/logging/logger.js"
 
 export type EndpointListenerOptions = {
 	logger: Logger
@@ -19,7 +20,7 @@ export function makeEndpointListener(options: EndpointListenerOptions): RequestL
 		try {
 			const {headers} = req
 			const body = await readStream(req, maxPayloadSize)
-			const incoming = JSON.parse(body) as JsonRpc.Incoming
+			const requestish = JSON.parse(body) as JsonRpc.Requestish
 
 			const execute = async(request: JsonRpc.Request) => {
 				logger.log(`🔔 ${request.method}()`)
@@ -29,13 +30,23 @@ export function makeEndpointListener(options: EndpointListenerOptions): RequestL
 				return response
 			}
 
-			const outgoing: JsonRpc.Outgoing = Array.isArray(incoming)
-				? await Promise.all(incoming.map(execute))
-				: await execute(incoming)
+			const send = (respondish: null | JsonRpc.Respondish) => {
+				res.statusCode = 200
+				res.setHeader("Content-Type", "application/json")
+				res.end(JSON.stringify(respondish))
+			}
 
-			res.statusCode = 200
-			res.setHeader("Content-Type", "application/json")
-			res.end(JSON.stringify(outgoing))
+			if (Array.isArray(requestish)) {
+				const responses = (await Promise.all(requestish.map(execute)))
+					.filter(r => !!r)
+				send(
+					(responses.length > 0)
+						? responses
+						: null
+				)
+			}
+			else
+				send(await execute(requestish))
 		}
 		catch (error) {
 			res.statusCode = 500
