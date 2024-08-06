@@ -2,6 +2,7 @@
 export namespace JsonRpc {
 	export type Incoming = Request | Request[]
 	export type Outgoing = Response | Response[]
+	export type Bidirectional = Incoming | Outgoing
 
 	/////////////////////////////////////////////////////////////
 
