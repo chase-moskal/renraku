@@ -6,8 +6,7 @@ export * from "./core/service.js"
 export * from "./core/types.js"
 
 export * from "./tools/logging/logger.js"
-export * from "./tools/logging/no-logger.js"
-export * from "./tools/logging/colorful-logger.js"
-export * from "./tools/logging/timestamped-logger.js"
-export * from "./tools/logging/double-space-logger.js"
+export * from "./tools/logging/coloring.js"
+export * from "./tools/logging/pretty-logger.js"
+export * from "./tools/logging/disabled-logger.js"
 
