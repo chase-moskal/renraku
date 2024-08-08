@@ -1,6 +1,6 @@
 
-import {Api} from "../../core/api.js"
-import {Service} from "../../core/service.js"
+import {Api} from "../../../core/api.js"
+import {Service} from "../../../core/service.js"
 
 export type ExampleApi = ReturnType<typeof exampleApi>
 

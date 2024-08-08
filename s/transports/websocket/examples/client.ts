@@ -1,6 +1,6 @@
 
-import {exampleClientsideApi, ExampleServersideApi} from "./example-apis.js"
-import {WebSocketRemote} from "../../transports/websocket/client.js"
+import {WebSocketRemote} from "../client.js"
+import {exampleClientsideApi, ExampleServersideApi} from "./apis.js"
 
 const logger = console
 const api = exampleClientsideApi()

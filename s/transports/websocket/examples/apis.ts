@@ -1,6 +1,6 @@
 
-import {Api} from "../../core/api.js"
-import {Service} from "../../core/service.js"
+import {Api} from "../../../core/api.js"
+import {Service} from "../../../core/service.js"
 
 export type ExampleServersideApi = ReturnType<typeof exampleServersideApi>
 export type ExampleClientsideApi = ReturnType<typeof exampleClientsideApi>

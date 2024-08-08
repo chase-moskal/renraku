@@ -1,7 +1,7 @@
 
-import {exampleApi} from "./example-api.js"
-import {HttpServer} from "../../transports/http/server.js"
-import {PrettyLogger} from "../../tools/logging/pretty-logger.js"
+import {exampleApi} from "./api.js"
+import {HttpServer} from "../server.js"
+import {PrettyLogger} from "../../../tools/logging/pretty-logger.js"
 
 const {endpoint} = exampleApi()
 

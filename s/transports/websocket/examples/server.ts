@@ -1,8 +1,8 @@
 
-import {Remote} from "../../core/remote.js"
-import {PrettyLogger} from "../../tools/logging/pretty-logger.js"
-import {WebSocketServer} from "../../transports/websocket/server.js"
-import {ExampleClientsideApi, exampleServersideApi} from "./example-apis.js"
+import {WebSocketServer} from "../server.js"
+import {Remote} from "../../../core/remote.js"
+import {PrettyLogger} from "../../../tools/logging/pretty-logger.js"
+import {ExampleClientsideApi, exampleServersideApi} from "./apis.js"
 
 const logger = new PrettyLogger()
 const serversideApi = exampleServersideApi()

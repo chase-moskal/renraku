@@ -29,7 +29,7 @@ export class ResponseWaiter {
 		if (pend) {
 			clearTimeout(pend.timeoutId)
 			if ("result" in response)
-				pend.deferred.resolve(response.result)
+				pend.deferred.resolve(response)
 			else
 				pend.deferred.reject(new Error(response.error.message))
 		}

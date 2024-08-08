@@ -1,6 +1,6 @@
 
-import type {ExampleApi} from "./example-api.js"
-import {HttpRemote} from "../../transports/http/client.js"
+import {HttpRemote} from "../client.js"
+import type {ExampleApi} from "./api.js"
 
 const url = "http://localhost:8000"
 
