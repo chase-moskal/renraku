@@ -13,6 +13,6 @@ const server = new HttpServer({
 })
 
 server.listen(8000, () => {
-	console.log("example renraku server is now listening")
+	console.log("example renraku http server is now listening")
 })
 

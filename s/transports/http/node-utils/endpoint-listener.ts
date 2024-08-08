@@ -5,6 +5,7 @@ import {readStream} from "./read-stream.js"
 import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../core/json-rpc.js"
 import {Logger} from "../../../tools/logging/logger.js"
+import {errorString, rpcErrorString} from "../../../tools/error-string.js"
 
 export type EndpointListenerOptions = {
 	logger: Logger
@@ -26,7 +27,7 @@ export function makeEndpointListener(options: EndpointListenerOptions): RequestL
 				logger.log(`🔔 ${request.method}()`)
 				const response = await endpoint(request, {headers, exposeErrors})
 				if (response && "error" in response)
-					logger.error(`🚨 ${response.error.message} ${response.error.data ?? ""}`)
+					logger.error(rpcErrorString(response.error))
 				return response
 			}
 
@@ -51,11 +52,7 @@ export function makeEndpointListener(options: EndpointListenerOptions): RequestL
 		catch (error) {
 			res.statusCode = 500
 			res.end()
-			logger.error(
-				(error instanceof Error)
-					? "🚨 " + error.stack ?? `${error.name}: ${error.message}`
-					: "error"
-			)
+			logger.error(errorString(error))
 		}
 	}
 }

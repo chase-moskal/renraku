@@ -7,7 +7,10 @@ import {Endpoint, Services} from "./types.js"
 export class Api<S extends Services = any> {
 	constructor(public services: S) {}
 
-	endpoint: Endpoint = async(request, options = {headers: {}, exposeErrors: false}) => {
+	endpoint: Endpoint = async(
+			request,
+			options = {exposeErrors: false, headers: {}},
+		) => {
 
 		// remove leading dot
 		const method = request.method.startsWith(".")

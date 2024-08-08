@@ -2,8 +2,7 @@
 import * as ws from "ws"
 import * as http from "http"
 
-import {JsonRpc} from "../../core/json-rpc.js"
-import {ResponseWaiter} from "./utils/response-waiter.js"
+import {Socketry} from "./utils/socketry.js"
 import {Endpoint, HttpHeaders} from "../../core/types.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {EndpointListenerOptions} from "../http/node-utils/endpoint-listener.js"
@@ -13,19 +12,18 @@ import {healthCheck} from "../http/node-utils/listener-transforms/health-check.j
 
 export type WebSocketServerOptions = {
 	timeout: number
-	endpoint: Endpoint
 	acceptConnection({}: WebSocketConnection): SocketHandling
 } & EndpointListenerOptions
 
 export interface SocketHandling {
-	handleConnectionClosed: () => void
+	closed: () => void
 }
 
 export type WebSocketConnection = {
 	headers: HttpHeaders
 	ping: () => void
 	close: () => void
-	endpoint: Endpoint
+	remoteEndpoint: Endpoint
 }
 
 /////////////////////////////////////////////////
@@ -72,66 +70,36 @@ export class WebSocketServer {
 			req: http.IncomingMessage,
 		) => {
 
-		const {logger, timeout, exposeErrors, endpoint, acceptConnection} = this.options
+		const {logger, timeout, endpoint, acceptConnection} = this.options
 		const clientCount = this.#count++
 
 		logger.log(`📖 connected ${clientCount}`)
 		const logDisconnect = () => logger.log(`📕 disconnected ${clientCount}`)
 
-		const waiter = new ResponseWaiter(timeout)
+		const socketry = new Socketry({
+			logger,
+			timeout,
+			localEndpoint: endpoint,
+			closed: () => closed(),
+			send: data => socket.send(data),
+		})
 
-		const {handleConnectionClosed} = acceptConnection({
+		socket.onerror = socketry.onerror
+		socket.onclose = socketry.onclose
+		socket.onmessage = socketry.onmessage
+
+		const {closed} = acceptConnection({
 			headers: req.headers,
 			ping: () => {
 				socket.ping()
 			},
 			close: () => {
 				socket.close()
-				handleConnectionClosed()
+				closed()
 				logDisconnect()
 			},
-			endpoint: async request => {
-				socket.send(JSON.stringify(request))
-				return "id" in request
-					? await waiter.wait(request.id)
-					: null
-			},
+			remoteEndpoint: socketry.remoteEndpoint,
 		})
-
-		socket.onclose = () => {
-			handleConnectionClosed()
-			logDisconnect()
-		}
-
-		socket.onerror = event => {
-			logger.error(`🚨 socket error`, event.message, event.error)
-			socket.close()
-			handleConnectionClosed()
-			logDisconnect()
-		}
-
-		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
-			if ("method" in message)
-				return await endpoint(message, {exposeErrors, headers: req.headers})
-			else
-				waiter.deliverResponse(message)
-		}
-
-		socket.onmessage = async event => {
-			const bi: JsonRpc.Bidirectional = JSON.parse(event.data.toString())
-
-			if (Array.isArray(bi)) {
-				const responses = (await Promise.all(bi.map(processMessage)))
-					.filter(r => !!r)
-				if (responses.length > 0)
-					socket.send(JSON.stringify(responses))
-			}
-			else {
-				const response = await processMessage(bi)
-				if (response)
-					socket.send(JSON.stringify(response))
-			}
-		}
 	}
 
 	close() {

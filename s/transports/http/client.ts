@@ -3,7 +3,7 @@ import {Api} from "../../core/api.js"
 import {Remote} from "../../core/remote.js"
 import {Endpoint, GetServices, RemoteConfig} from "../../core/types.js"
 
-export class HttpClient<A extends Api> extends Remote<A> {
+export class HttpRemote<A extends Api> extends Remote<A> {
 	constructor(url: string, config: RemoteConfig<GetServices<A>>) {
 		super(httpEndpoint(url), config)
 	}
