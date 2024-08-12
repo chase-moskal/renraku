@@ -1,10 +1,10 @@
 
 import {Api} from "./api.js"
 import {objectMap} from "../tools/object-map.js"
-import {Actualize, Endpoint, GetServices, RemoteConfig} from "./types.js"
+import {Endpoint, Fns, GetServices, RemoteConfig} from "./types.js"
 
 export class Remote<A extends Api> {
-	fns: Actualize<GetServices<A>>
+	fns: Fns<A>
 
 	constructor(
 			public endpoint: Endpoint,
@@ -68,8 +68,6 @@ export class Remote<A extends Api> {
 
 		if (!response)
 			throw new Error("response was null, but shouldn't be, because the request was not a notification")
-
-		console.log("DEBUG", response)
 
 		if ("error" in response)
 			throw new Error(response.error.message)

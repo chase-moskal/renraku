@@ -26,6 +26,7 @@ const server = new WebSocketServer({
 			// close when test is done
 			close()
 		})
+
 		return {
 			closed: () => {
 				logger.log("client disconnected")

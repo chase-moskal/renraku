@@ -17,6 +17,7 @@ export type WebSocketServerOptions = {
 
 export interface SocketHandling {
 	closed: () => void
+	localEndpoint: Endpoint
 }
 
 export type WebSocketConnection = {

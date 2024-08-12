@@ -1,10 +1,10 @@
 
-import {Endpoint, GetServices, RemoteConfig} from "../../core/types.js"
+import {Api} from "../../core/api.js"
+import {Remote} from "../../core/remote.js"
 import {Socketry} from "./utils/socketry.js"
 import {Logger} from "../../tools/logging/logger.js"
 import {connectWebSocket} from "./utils/connect-web-socket.js"
-import {Remote} from "../../core/remote.js"
-import {Api} from "../../core/api.js"
+import {Endpoint, GetServices, RemoteConfig} from "../../core/types.js"
 
 export type WebSocketClientOptions = {
 	logger: Logger

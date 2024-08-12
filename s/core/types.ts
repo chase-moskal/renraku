@@ -6,6 +6,7 @@ import type {IncomingHttpHeaders} from "http"
 
 export type Fn = (...args: any[]) => Promise<any>
 export type Policy<PreAuth, Auth> = (preAuth: PreAuth) => Promise<Auth>
+export type Fns<A extends Api> = Actualize<GetServices<A>>
 
 export type Services = Service<any, any, any> | {
 	[key: string]: Services
