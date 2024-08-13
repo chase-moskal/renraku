@@ -3,11 +3,9 @@ import {exampleApi} from "./api.js"
 import {HttpServer} from "../server.js"
 import {PrettyLogger} from "../../../tools/logging/pretty-logger.js"
 
-const {endpoint} = exampleApi()
-
 const server = new HttpServer({
-	endpoint,
 	exposeErrors: false,
+	localApi: exampleApi(),
 	maxPayloadSize: 1_000_000,
 	logger: new PrettyLogger(),
 })

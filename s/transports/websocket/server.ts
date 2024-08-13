@@ -5,8 +5,8 @@ import * as http from "http"
 import {Socketry} from "./utils/socketry.js"
 import {Logger} from "../../tools/logging/logger.js"
 import {errorString} from "../../tools/error-string.js"
-import {Endpoint, HttpHeaders} from "../../core/types.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
+import {Endpoint, endpointly, Endpointly, HttpHeaders} from "../../core/types.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 /////////////////////////////////////////////////
@@ -21,7 +21,7 @@ type Options = {
 
 type Handling = {
 	closed: () => void
-	localEndpoint: Endpoint | null
+	localApi: Endpointly | null
 }
 
 type Connection = {
@@ -88,7 +88,7 @@ export class WebSocketServer {
 			headers: req.headers,
 		})
 
-		const {localEndpoint, closed} = acceptConnection({
+		const {localApi, closed} = acceptConnection({
 			headers: req.headers,
 			ping: () => {
 				socket.ping()
@@ -101,7 +101,7 @@ export class WebSocketServer {
 			remoteEndpoint: socketry.remoteEndpoint,
 		})
 
-		socket.onmessage = socketry.prepareMessageHandler(localEndpoint)
+		socket.onmessage = socketry.prepareMessageHandler(localApi && endpointly(localApi))
 
 		socket.onerror = err => {
 			errorString("socket client", err.message)

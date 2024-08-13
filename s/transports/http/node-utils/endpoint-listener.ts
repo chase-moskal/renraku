@@ -2,20 +2,21 @@
 import {RequestListener} from "http"
 
 import {readStream} from "./read-stream.js"
-import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../core/json-rpc.js"
 import {Logger} from "../../../tools/logging/logger.js"
+import {endpointly, Endpointly} from "../../../core/types.js"
 import {errorString, rpcErrorString} from "../../../tools/error-string.js"
 
 export type EndpointListenerOptions = {
 	logger: Logger
+	localApi: Endpointly
 	exposeErrors: boolean
 	maxPayloadSize: number
-	endpoint: Endpoint
 }
 
 export function makeEndpointListener(options: EndpointListenerOptions): RequestListener {
-	const {logger, exposeErrors, maxPayloadSize, endpoint} = options
+	const {logger, exposeErrors, maxPayloadSize, localApi} = options
+	const endpoint = endpointly(localApi)
 
 	return async(req, res) => {
 		try {

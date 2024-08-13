@@ -19,7 +19,7 @@ const server = new WebSocketServer({
 		)
 
 		return {
-			localEndpoint: exampleServersideApi(remote.fns).endpoint,
+			localApi: exampleServersideApi(remote.fns),
 			closed: () => logger.log("client disconnected"),
 		}
 	},

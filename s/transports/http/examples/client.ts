@@ -4,11 +4,11 @@ import type {ExampleApi} from "./api.js"
 
 const url = "http://localhost:8000"
 
-const client = new HttpRemote<ExampleApi>(url, {
+const {fns: {time}} = new HttpRemote<ExampleApi>(url, {
 	time: async() => ({preAuth: undefined}),
 })
 
-const result = await client.fns.time.now()
+const result = await time.now()
 
 if (typeof result === "number")
 	console.log("✅ http call works", result)

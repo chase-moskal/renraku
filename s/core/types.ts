@@ -47,6 +47,14 @@ export type Endpoint = (
 		Promise<JsonRpc.Response | null>
 )
 
+export type Endpointly = Api | Endpoint
+
+export function endpointly(x: Endpointly): Endpoint {
+	return (x instanceof Api)
+		? x.endpoint
+		: x
+}
+
 export type GetServices<A extends Api<any>> = (
 	A extends Api<infer S>
 		? S
