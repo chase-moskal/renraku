@@ -7,11 +7,12 @@ let calls = 0
 const client = new WebSocketRemote<ExampleServersideApi>({
 	timeout: 10_000,
 	exposeErrors: true,
+	url: "http://localhost:8000",
 	remoteConfig: exampleServersideRemoteConfig(),
-	socket: await WebSocketRemote.connect("http://localhost:8000"),
 })
 
-client.attachClientside(exampleClientsideApi(client.fns, () => calls++))
+await client.finalize(exampleClientsideApi(client.fns, () => calls++))
+
 const result = await client.fns.time.now()
 
 if (typeof result === "number" && calls === 1)

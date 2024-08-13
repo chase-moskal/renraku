@@ -4,26 +4,27 @@ import * as http from "http"
 
 import {Socketry} from "./utils/socketry.js"
 import {Logger} from "../../tools/logging/logger.js"
+import {errorString} from "../../tools/error-string.js"
 import {Endpoint, HttpHeaders} from "../../core/types.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 /////////////////////////////////////////////////
 
-export type WebSocketServerOptions = {
+type Options = {
 	logger: Logger
 	timeout: number
 	exposeErrors: boolean
 	maxPayloadSize: number
-	acceptConnection({}: WebSocketConnection): SocketHandling
+	acceptConnection({}: Connection): Handling
 }
 
-export interface SocketHandling {
+type Handling = {
 	closed: () => void
-	localEndpoint: Endpoint
+	localEndpoint: Endpoint | null
 }
 
-export type WebSocketConnection = {
+type Connection = {
 	headers: HttpHeaders
 	ping: () => void
 	close: () => void
@@ -38,7 +39,7 @@ export class WebSocketServer {
 
 	listen: http.Server["listen"]
 
-	constructor(private options: WebSocketServerOptions) {
+	constructor(private options: Options) {
 		const httpServer = this.httpServer = http.createServer()
 		this.listen = httpServer.listen.bind(httpServer)
 
@@ -101,6 +102,15 @@ export class WebSocketServer {
 		})
 
 		socket.onmessage = socketry.prepareMessageHandler(localEndpoint)
+
+		socket.onerror = err => {
+			errorString("socket client", err.message)
+		}
+
+		socket.onclose = () => {
+			logDisconnect()
+			closed()
+		}
 	}
 
 	close() {

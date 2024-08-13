@@ -25,12 +25,14 @@ export class Socketry {
 			: null
 	}
 
-	prepareMessageHandler(localEndpoint: Endpoint) {
+	prepareMessageHandler(localEndpoint: Endpoint | null) {
 		const {socket, headers, exposeErrors} = this.options
 
 		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
-			if ("method" in message)
-				return await localEndpoint(message, {headers, exposeErrors})
+			if ("method" in message) {
+				if (localEndpoint)
+					return await localEndpoint(message, {headers, exposeErrors})
+			}
 			else
 				this.waiter.deliverResponse(message)
 		}
