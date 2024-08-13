@@ -8,6 +8,10 @@ export type Fn = (...args: any[]) => Promise<any>
 export type Policy<PreAuth, Auth> = (preAuth: PreAuth) => Promise<Auth>
 export type Fns<A extends Api> = Actualize<GetServices<A>>
 
+export function fns<F extends Record<string, Fn>>(f: F) {
+	return f
+}
+
 export type Services = Service<any, any, any> | {
 	[key: string]: Services
 }

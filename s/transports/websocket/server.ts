@@ -3,17 +3,20 @@ import * as ws from "ws"
 import * as http from "http"
 
 import {Socketry} from "./utils/socketry.js"
+import {Logger} from "../../tools/logging/logger.js"
 import {Endpoint, HttpHeaders} from "../../core/types.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
-import {EndpointListenerOptions} from "../http/node-utils/endpoint-listener.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 /////////////////////////////////////////////////
 
 export type WebSocketServerOptions = {
+	logger: Logger
 	timeout: number
+	exposeErrors: boolean
+	maxPayloadSize: number
 	acceptConnection({}: WebSocketConnection): SocketHandling
-} & EndpointListenerOptions
+}
 
 export interface SocketHandling {
 	closed: () => void
@@ -71,25 +74,18 @@ export class WebSocketServer {
 			req: http.IncomingMessage,
 		) => {
 
-		const {logger, timeout, endpoint, acceptConnection} = this.options
+		const {logger, timeout, exposeErrors, acceptConnection} = this.options
 		const clientCount = this.#count++
 
 		logger.log(`📖 connected ${clientCount}`)
 		const logDisconnect = () => logger.log(`📕 disconnected ${clientCount}`)
 
 		const socketry = new Socketry({
-			logger,
 			timeout,
-			localEndpoint: endpoint,
-			closed: () => closed(),
 			send: data => socket.send(data),
 		})
 
-		socket.onerror = socketry.onerror
-		socket.onclose = socketry.onclose
-		socket.onmessage = socketry.onmessage
-
-		const {closed} = acceptConnection({
+		const {localEndpoint, closed} = acceptConnection({
 			headers: req.headers,
 			ping: () => {
 				socket.ping()
@@ -100,6 +96,14 @@ export class WebSocketServer {
 				logDisconnect()
 			},
 			remoteEndpoint: socketry.remoteEndpoint,
+		})
+
+		socketry.applyToSocket(socket, {
+			logger,
+			exposeErrors,
+			headers: req.headers,
+			localEndpoint,
+			closed: () => closed(),
 		})
 	}
 

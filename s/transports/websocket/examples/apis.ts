@@ -1,32 +1,46 @@
 
 import {Api} from "../../../core/api.js"
-import {Service} from "../../../core/service.js"
 import {Fns} from "../../../core/types.js"
+import {Service} from "../../../core/service.js"
 
-export type ExampleServersideApi = ReturnType<typeof exampleServersideApi>
-export type ExampleClientsideApi = ReturnType<typeof exampleClientsideApi>
+export type ExampleServersideApi = Api<{
+	time: Service<null, null, {
+		now(): Promise<number>
+	}>
+}>
 
-export function exampleServersideApi(clientside: Fns<ExampleClientsideApi>) {
+export type ExampleClientsideApi = Api<{
+	maths: Service<null, null, {
+		sum(a: number, b: number): Promise<number>
+	}>
+}>
+
+export function exampleServersideApi(
+		clientside: Fns<ExampleClientsideApi>,
+	): ExampleServersideApi {
 	return new Api({
 		time: new Service({
-			policy: async() => {},
+			policy: async() => null,
 			expose: () => ({
 				async now() {
-					await clientside.testing.sum(1, 2)
+					await clientside.maths.sum(1, 2)
 					return Date.now()
 				},
 			}),
-		}),
+		})
 	})
 }
 
-export function exampleClientsideApi(serverside: Fns<ExampleServersideApi>, called = () => {}) {
+export function exampleClientsideApi(
+		_serverside: Fns<ExampleServersideApi>,
+		rememberCall: () => void
+	): ExampleClientsideApi {
 	return new Api({
-		testing: new Service({
-			policy: async() => {},
+		maths: new Service({
+			policy: async() => null,
 			expose: () => ({
-				async sum(a: number, b: number) {
-					called()
+				async sum(a, b) {
+					rememberCall()
 					return a + b
 				},
 			}),
