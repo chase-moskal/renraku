@@ -1,6 +1,7 @@
 
 import {Api} from "../../../core/api.js"
 import {Fns} from "../../../core/types.js"
+import {Remote} from "../../../core/remote.js"
 import {Service} from "../../../core/service.js"
 
 export type ExampleServersideApi = Api<{
@@ -45,6 +46,18 @@ export function exampleClientsideApi(
 				},
 			}),
 		}),
+	})
+}
+
+export function exampleClientsideRemoteConfig() {
+	return Remote.config<ExampleClientsideApi>({
+		maths: async() => ({preAuth: null}),
+	})
+}
+
+export function exampleServersideRemoteConfig() {
+	return Remote.config<ExampleServersideApi>({
+		time: async() => ({preAuth: null}),
 	})
 }
 

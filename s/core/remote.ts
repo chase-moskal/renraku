@@ -4,6 +4,7 @@ import {objectMap} from "../tools/object-map.js"
 import {Endpoint, Fns, GetServices, RemoteConfig} from "./types.js"
 
 export class Remote<A extends Api> {
+	static config = <A extends Api>(c: RemoteConfig<GetServices<A>>) => c
 	fns: Fns<A>
 
 	constructor(

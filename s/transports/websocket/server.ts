@@ -82,7 +82,9 @@ export class WebSocketServer {
 
 		const socketry = new Socketry({
 			timeout,
-			send: data => socket.send(data),
+			socket,
+			exposeErrors,
+			headers: req.headers,
 		})
 
 		const {localEndpoint, closed} = acceptConnection({
@@ -98,13 +100,7 @@ export class WebSocketServer {
 			remoteEndpoint: socketry.remoteEndpoint,
 		})
 
-		socketry.applyToSocket(socket, {
-			logger,
-			exposeErrors,
-			headers: req.headers,
-			localEndpoint,
-			closed: () => closed(),
-		})
+		socket.onmessage = socketry.prepareMessageHandler(localEndpoint)
 	}
 
 	close() {

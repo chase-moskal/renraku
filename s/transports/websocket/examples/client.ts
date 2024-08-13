@@ -1,22 +1,23 @@
 
-import {WebSocketClient} from "../client.js"
-import {exampleClientsideApi} from "./apis.js"
-
-const url = "http://localhost:8000"
-const logger = console
-const timeout = 10_000
+import {WebSocketRemote} from "../client.js"
+import {exampleClientsideApi, ExampleServersideApi, exampleServersideRemoteConfig} from "./apis.js"
 
 let calls = 0
 
-const client = await WebSocketClient.connect(url, {
-	logger,
-	timeout,
-	remoteConfig: {
-		time: async() => ({preAuth: null}),
-	},
-	setupLocalEndpoint: remote => (
-		exampleClientsideApi(remote.fns, () => calls++).endpoint
-	),
-	closed: () => {},
+const client = new WebSocketRemote<ExampleServersideApi>({
+	timeout: 10_000,
+	exposeErrors: true,
+	remoteConfig: exampleServersideRemoteConfig(),
+	socket: await WebSocketRemote.connect("http://localhost:8000"),
 })
+
+client.attachClientside(exampleClientsideApi(client.fns, () => calls++))
+const result = await client.fns.time.now()
+
+if (typeof result === "number" && calls === 1)
+	console.log("✅ websocket call works", result, calls)
+else
+	console.error("🟥 websocket call failed", result, calls)
+
+client.close()
 
