@@ -27,7 +27,7 @@ export class PrettyLogger implements Logger {
 			: data
 	}
 
-	#stamp(data: any[]) {
+	#stamp(...data: any[]) {
 		if (!this.options.timestamp)
 			return data
 
@@ -58,17 +58,17 @@ export class PrettyLogger implements Logger {
 	}
 
 	log(...data: any[]): void {
-		console.log(...this.#stamp(data))
+		console.log(...this.#stamp(...data))
 		this.#double()
 	}
 
 	warn(...data: any[]): void {
-		console.log(...this.#stamp(this.#colorize(color.yellow, data)))
+		console.log(...this.#stamp(...this.#colorize(color.yellow, ...data)))
 		this.#double()
 	}
 
 	error(...data: any[]): void {
-		console.log(...this.#stamp(this.#colorize(color.red, data)))
+		console.log(...this.#stamp(...this.#colorize(color.red, ...data)))
 		this.#double()
 	}
 }

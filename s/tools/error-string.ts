@@ -9,6 +9,8 @@ export function errorString(error?: any, prefix = "") {
 }
 
 export function rpcErrorString({message, data}: JsonRpc.Error) {
-	return `🚨 ${message} ${data ?? ""}`
+	return data
+		? `🚨 ${message}\n${data}`
+		: `🚨 ${message}`
 }
 

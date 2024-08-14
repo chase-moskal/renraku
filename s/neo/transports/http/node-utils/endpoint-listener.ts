@@ -30,8 +30,9 @@ export function makeEndpointListener(endpoint: Endpoint, options: EndpointListen
 			const execute = async(request: JsonRpc.Request) => {
 				logger.log(`🔔 ${request.method}()`)
 				const response = await endpoint(request, {headers, exposeErrors})
-				if (response && "error" in response)
+				if (response && "error" in response) {
 					logger.error(rpcErrorString(response.error))
+				}
 				return response
 			}
 
