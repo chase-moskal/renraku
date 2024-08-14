@@ -6,7 +6,7 @@ export function remoteProxy<N extends NestedFns>(
 	) {
 
 	function recurse(path: string[]) {
-		return new Proxy({} as any, {
+		return new Proxy((() => {}) as any, {
 			apply: (_, _this, args) => executor(path, args),
 			get: (target, key: string) => {
 				return target[key] ?? recurse([...path, key])

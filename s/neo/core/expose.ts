@@ -13,7 +13,7 @@ export function expose<A extends Api>(api: A): Endpoint {
 
 		const path = method.split(".")
 		const fn = obtain(api({headers: details.headers}), path) as Fn
-		const action = async() => await fn(...request.params.args)
+		const action = async() => await fn(...request.params)
 		return await respond(request, action, details.exposeErrors)
 	}
 }

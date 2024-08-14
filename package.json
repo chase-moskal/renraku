@@ -19,7 +19,7 @@
 		"start": "run-p watch start-static-http",
 		"start-static-http": "serve -l 8080",
 		"api": "run-p api-http",
-		"api-http": "node x/transports/http/examples/server.js",
+		"api-http": "node x/neo/transports/http/examples/server.js",
 		"api-http-debug": "node inspect x/transports/http/examples/server.js",
 		"api-ws": "node x/transports/websocket/examples/server.js",
 		"api-ws-debug": "node inspect x/transports/websocket/examples/server.js",
