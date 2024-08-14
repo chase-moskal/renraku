@@ -1,8 +1,8 @@
 
-import {JsonRpc} from "./core/json-rpc.js"
-import {HttpHeaders} from "./core/types.js"
-import {objectMap} from "./tools/object-map.js"
-import {obtain} from "./tools/obtain.js"
+import {JsonRpc} from "./json-rpc.js"
+import {HttpHeaders} from "./types.js"
+import {obtain} from "../tools/obtain.js"
+import {objectMap} from "../tools/object-map.js"
 
 export type Fn = (...p: any[]) => Promise<any>
 export type Fns = Record<string, Fn>
@@ -53,12 +53,6 @@ export function makeRemoteProxy(
 	}
 
 	return recurse([])
-}
-
-export function s2<A, Fs extends Fns>(
-		s: (auth: A, headers: HttpHeaders) => Promise<Fs>
-	) {
-	
 }
 
 export function service<A, Fs extends Fns>(s: (auth: A) => Promise<Fs>) {
