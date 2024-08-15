@@ -1,18 +1,18 @@
 
-# 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
+# 連絡 <br/> ⛩ ***R·E·N·R·A·K·U***
 
-`npm install renraku`
+> `npm install renraku`
 
-🔆 **make streamlined typescript json-rpc apis**  
+📡 **make beautiful typescript apis**  
 🛎️ simply expose async functions  
-🛡️ optional auth facilities  
-🚚 transport agnostic: http and websockets  
-🔧 nodejs and web browsers  
-🎭 easy mocks for testing  
+🛡️ elegant auth facilities  
+🚚 transport agnostic *(http and websockets)*  
+🔧 node and browser  
+🎭 easily testable  
 
 <br/>
 
-## *RENRAKU* http api
+## ⛩️ *RENRAKU* — http api
 
 1. `api.ts` — define your api, a bunch of async functions
     ```ts
@@ -45,18 +45,20 @@
 
     const service = httpRemote<typeof myApi>("http://localhost:8000/")
 
-    console.log(await service.now())
+    // call your remote api functions just like they were local
+
+    await service.now()
       // 1723701145176
 
-    console.log(await service.sum(1, 2))
+    await service.sum(1, 2)
       // 3
     ```
 
 <br/>
 
-## *RENRAKU* api details
+## ⛩ *RENRAKU* — api details
 
-- you can use object nesting to organize your api
+- you can use arbitrary object nesting to organize your api
   ```ts
   export const myApi = api(() => ({
 
@@ -77,8 +79,8 @@
   ```
 - your api can accept http headers
   ```ts
-  //                     http headers
-  //                          |
+    //                   http headers
+    //                        |
   export const myApi = api(({headers}) => ({
     async sum(a: number, b: number) {
       return a + b
@@ -88,7 +90,7 @@
 
 <br/>
 
-## *RENRAKU* auth
+## ⛩ *RENRAKU* — makes auth easy
 
 - declare that parts of your api requires auth
   ```ts
