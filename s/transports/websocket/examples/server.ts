@@ -17,8 +17,8 @@ const server = new WebSocketServer({
 	acceptConnection: ({remoteEndpoint}) => {
 		const clientside = remote<Api<ExampleClientsideFns>>(remoteEndpoint)
 		return {
+			closed: () => {},
 			localEndpoint: expose(exampleServersideApi(clientside)),
-			closed: () => logger.log("client disconnected"),
 		}
 	},
 })
