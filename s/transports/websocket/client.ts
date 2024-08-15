@@ -2,18 +2,28 @@
 import {remote} from "../../core/remote.js"
 import {Socketry} from "./utils/socketry.js"
 import {Api, Endpoint, GetFns} from "../../core/types.js"
-import {makeWebSocket} from "./utils/connect-web-socket.js"
 
 type Options<A extends Api> = {
 	url: string
-	timeout: number
-	exposeErrors: boolean
-	getLocalEndpoint: (remote: GetFns<A>) => Endpoint | null | undefined | void
+	timeout?: number
+	exposeErrors?: boolean
+	getLocalEndpoint?: (remote: GetFns<A>) => Endpoint | null
 }
 
 export async function webSocketRemote<A extends Api>(options: Options<A>) {
-	const {url, timeout, exposeErrors, getLocalEndpoint} = options
-	const {socket, ready} = makeWebSocket(url)
+	const {
+		url,
+		timeout = 10_000,
+		exposeErrors = true,
+		getLocalEndpoint = () => null,
+	} = options
+
+	const socket = new WebSocket(url)
+
+	const ready = new Promise<WebSocket>((resolve, reject) => {
+		socket.onopen = () => resolve(socket)
+		socket.onerror = error => reject(error)
+	})
 
 	const socketry = new Socketry({
 		socket,
@@ -25,7 +35,7 @@ export async function webSocketRemote<A extends Api>(options: Options<A>) {
 	const fns = remote<A>(socketry.remoteEndpoint)
 
 	socket.onmessage = socketry.prepareMessageHandler(
-		getLocalEndpoint(fns) ?? null
+		getLocalEndpoint(fns)
 	)
 
 	await ready

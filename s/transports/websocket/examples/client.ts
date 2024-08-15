@@ -8,10 +8,8 @@ let calls = 0
 let rememberCall = () => calls++
 
 const {socket, remote: serverside} = await webSocketRemote<Api<ExampleServersideFns>>({
-	timeout: 10_000,
-	exposeErrors: true,
 	url: "http://localhost:8000",
-	getLocalEndpoint: fns => expose(exampleClientsideApi(fns, rememberCall)),
+	getLocalEndpoint: serverside => expose(exampleClientsideApi(serverside, rememberCall)),
 })
 
 const result = await serverside.now()

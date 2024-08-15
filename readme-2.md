@@ -1,5 +1,5 @@
 
-# 連絡 <br/> ⛩ ***R·E·N·R·A·K·U***
+# ⛩ 連絡 <br/>  ***R·E·N·R·A·K·U***
 
 > `npm install renraku`
 
@@ -7,6 +7,7 @@
 🛎️ simply expose async functions  
 🛡️ elegant auth facilities  
 🚚 transport agnostic *(http and websockets)*  
+🏛️ bog-standard json-rpc  
 🔧 node and browser  
 🎭 easily testable  
 
@@ -56,7 +57,7 @@
 
 <br/>
 
-## ⛩ *RENRAKU* — api details
+## ⛩ *RENRAKU* — more api details
 
 - you can use arbitrary object nesting to organize your api
   ```ts
@@ -90,7 +91,7 @@
 
 <br/>
 
-## ⛩ *RENRAKU* — makes auth easy
+## ⛩ *RENRAKU* — auth is easy
 
 - declare that parts of your api requires auth
   ```ts
@@ -124,4 +125,108 @@
   const locked = provideAuth("hello", service.locked)
   await locked.sum(1, 2)
   ```
+
+<br/>
+
+## ⛩ *RENRAKU* — bidirectional websockets
+
+- `ws/apis.js` — define your serverside and clientside apis
+  ```ts
+  import {api, Api} from "renraku"
+
+  // first, we must declare our api types.
+  // (otherwise, typescript gets thrown through a loop
+  // due to the mutual cross-referencing)
+
+  export type Serverside = {
+    sum(a: number, b: number): Promise<number>
+  }
+
+  export type Clientside = {
+    now(): Promise<number>
+  }
+
+  // now we can define the api implementations.
+
+  export function makeServersideApi(clientside: Clientside) {
+    return api((): Serverside => ({
+      async sum(a, b) {
+
+        // remember, each side can call the other
+        await clientside.now()
+
+        return a + b
+      },
+    }))
+  }
+
+  export function makeClientsideApi(serverside: Serverside) {
+    return api((): Clientside => ({
+      async now() {
+        return Date.now()
+      },
+    }))
+  }
+  ```
+- `ws/server.js` — on the serverside, we create a websocket server
+  ```ts
+  import {WebSocketServer} from "renraku"
+  import {Clientside, makeServersideApi} from "./apis.js"
+
+  const server = new WebSocketServer({
+    acceptConnection: ({remoteEndpoint}) => {
+      const clientside = remote<Api<Clientside>>(remoteEndpoint)
+      return {
+        closed: () => {},
+        localEndpoint: expose(makeServersideApi(clientside)),
+      }
+    },
+  })
+
+  server.listen(8000)
+  ```
+- `ws/client.js` — on the clientside, we create a websocket remote
+  ```ts
+  import {webSocketRemote, Api} from "renraku"
+  import {Serverside, makeClientsideApi} from "./apis.js"
+
+  const {socket, remote: serverside} = await webSocketRemote<Api<Serverside>>({
+    url: "http://localhost:8000",
+    getLocalEndpoint: serverside => expose(
+      makeClientsideApi(serverside)
+    ),
+  })
+
+  const result = await serverside.now()
+  ```
+
+<br/>
+
+## ⛩ *RENRAKU* — more details about the core primitives
+
+- about the basics
+  ```ts
+  import {api, expose, remote} from "renraku"
+
+  // an api is a function that returns a bunch of async functions
+  const myApi = api(({headers}) => ({
+    async now() {
+      return Date.now()
+    },
+  }))
+
+  // expose will create an async endpoint function,
+  // which accepts json-rpc requests and returns json-rpc responses
+  const myEndpoint = expose(myApi)
+
+  // you can create a remote given any endpoint,
+  // and it doesn't matter if the endpoint is actually local or remote.
+  const myRemote = remote(myEndpoint)
+  ```
+- ***experimental*** "notification" mode
+  ```ts
+  const myRemote = remote(myEndpoint, {notification: true})
+  ```
+  - notifications do not elicit a response from the responder.
+  - this might help you make your apis marginally more efficient.
 
