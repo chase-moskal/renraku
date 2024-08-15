@@ -32,7 +32,7 @@
 1. `server.ts` — now let's expose this api on a node server
     ```ts
     import {myApi} from "./api.js"
-    import {HttpServer, expose} from "renraku/x/node.js"
+    import {HttpServer, expose} from "renraku"
 
     const server = new HttpServer(expose(myApi))
 
