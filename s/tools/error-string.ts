@@ -1,5 +1,5 @@
 
-import {JsonRpc} from "../core/json-rpc.js"
+import {JsonRpc} from "../comms/json-rpc.js"
 
 export function errorString(error?: any, prefix = "") {
 	const message = (error && error instanceof Error)

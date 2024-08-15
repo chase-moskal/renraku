@@ -4,9 +4,9 @@ import {RequestListener} from "http"
 import {readStream} from "./read-stream.js"
 import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
-import {Logger} from "../../../../tools/logging/logger.js"
-import {PrettyLogger} from "../../../../tools/logging/pretty-logger.js"
-import {errorString, rpcErrorString} from "../../../../tools/error-string.js"
+import {Logger} from "../../../tools/logging/logger.js"
+import {PrettyLogger} from "../../../tools/logging/pretty-logger.js"
+import {errorString, rpcErrorString} from "../../../tools/error-string.js"
 
 export type EndpointListenerOptions = {
 	logger?: Logger

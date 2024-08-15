@@ -1,7 +1,7 @@
 
 import {JsonRpc} from "../comms/json-rpc.js"
 import {remoteProxy} from "./remote-proxy.js"
-import {Api, Endpoint, GetNestedFns} from "./types.js"
+import {Api, Endpoint, GetFns} from "./types.js"
 
 export type RemoteOptions = {
 	notification?: boolean
@@ -14,7 +14,7 @@ export function remote<A extends Api>(
 		options: RemoteOptions = {notification: false},
 	) {
 
-	return remoteProxy<GetNestedFns<A>>(async(path, params) => {
+	return remoteProxy<GetFns<A>>(async(path, params) => {
 
 		// add leading dot
 		const method = "." + path.join(".")

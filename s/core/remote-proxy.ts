@@ -1,7 +1,7 @@
 
-import {NestedFns} from "./types.js"
+import {Fns} from "./types.js"
 
-export function remoteProxy<N extends NestedFns>(
+export function remoteProxy<N extends Fns>(
 		executor: (path: string[], args: any[]) => Promise<any>
 	) {
 

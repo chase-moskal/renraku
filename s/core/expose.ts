@@ -1,7 +1,7 @@
 
+import {obtain} from "../tools/obtain.js"
 import {respond} from "../comms/respond.js"
 import {Api, Endpoint, Fn} from "./types.js"
-import {obtain} from "../../tools/obtain.js"
 
 export function expose<A extends Api>(api: A): Endpoint {
 	return async(request, details = {exposeErrors: false, headers: {}}) => {

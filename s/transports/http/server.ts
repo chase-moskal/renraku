@@ -1,7 +1,7 @@
 
 import {Server} from "http"
 import {Endpoint} from "../../core/types.js"
-import {PrettyLogger} from "../../../tools/logging/pretty-logger.js"
+import {PrettyLogger} from "../../tools/logging/pretty-logger.js"
 import {allowCors} from "./node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "./node-utils/listener-transforms/health-check.js"
 import {EndpointListenerOptions, makeEndpointListener} from "./node-utils/endpoint-listener.js"

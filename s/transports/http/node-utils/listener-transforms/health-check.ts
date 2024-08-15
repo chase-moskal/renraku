@@ -1,6 +1,6 @@
 
 import {RequestListener} from "http"
-import {Logger} from "../../../../../tools/logging/logger.js"
+import {Logger} from "../../../../tools/logging/logger.js"
 
 export function healthCheck(
 		path: string,

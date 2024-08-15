@@ -1,5 +1,5 @@
 
-import {Fn, Fns} from "../core/types.js"
+import {Fn, Service} from "../core/types.js"
 
 export type AuthFn<A> = (a: A, ...p: any[]) => Promise<any>
 export type AuthFns<A> = Record<string, AuthFn<A>>
@@ -16,13 +16,13 @@ export type OtherParams<F extends Fn> = (
 		: never
 )
 
-export type AuthWrap<A, Fs extends Fns> = {
-	[K in keyof Fs]:
-		(auth: A, ...params: Parameters<Fs[K]>) => ReturnType<Fs[K]>
+export type AuthWrap<A, S extends Service> = {
+	[K in keyof S]:
+		(auth: A, ...params: Parameters<S[K]>) => ReturnType<S[K]>
 }
 
-export type AuthUnwrap<Fs extends Fns> = {
-	[K in keyof Fs]:
-		(...p: OtherParams<Fs[K]>) => ReturnType<Fs[K]>
+export type AuthUnwrap<S extends Service> = {
+	[K in keyof S]:
+		(...p: OtherParams<S[K]>) => ReturnType<S[K]>
 }
 
