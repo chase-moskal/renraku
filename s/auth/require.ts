@@ -2,7 +2,7 @@
 import {AuthWrap} from "./types.js"
 import {Service} from "../core/types.js"
 
-export function requireAuth<A, Fs extends Service>(s: (auth: A) => Promise<Fs>) {
+export function requireAuth<A, S extends Service>(s: (auth: A) => Promise<S>) {
 	const target: any = {}
 	return new Proxy(target, {
 
@@ -17,6 +17,6 @@ export function requireAuth<A, Fs extends Service>(s: (auth: A) => Promise<Fs>) 
 			return true
 		},
 
-	}) as AuthWrap<A, Fs>
+	}) as AuthWrap<A, S>
 }
 

@@ -7,7 +7,7 @@ export type Service = Record<string, Fn>
 
 export type Fns = {[key: string]: Fn | Fns}
 export type Meta = {headers: HttpHeaders}
-export type Api<N extends Fns = any> = (meta: Meta) => N
+export type Api<F extends Fns = any> = (meta: Meta) => F
 
 export type GetFns<A extends Api> = ReturnType<A>
 
