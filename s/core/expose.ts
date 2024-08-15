@@ -14,12 +14,6 @@ export function expose<A extends Api>(api: A): Endpoint {
 		const path = method.split(".")
 		const fns = api({headers: details.headers})
 		const fn = obtain(fns, path) as Fn
-		if (!fn) {
-			console.log("NO FN - EXPOSE!")
-			console.log(path)
-			console.log(fns)
-			debugger
-		}
 		const action = async() => await fn(...request.params)
 		return await respond(request, action, details.exposeErrors)
 	}
