@@ -1,4 +1,6 @@
 
+export class ExposedError extends Error {}
+
 export class HttpError extends Error {
 	readonly code: number
 
