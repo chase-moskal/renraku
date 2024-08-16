@@ -30,8 +30,8 @@
 		"api-http-debug": "node inspect x/transports/http/examples/server.js",
 		"api-ws": "node x/transports/websocket/examples/server.js",
 		"api-ws-debug": "node inspect x/transports/websocket/examples/server.js",
-		"test": "cynic node x/renraku.test.js",
-		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/renraku.test.js"
+		"test": "cynic node x/tests.test.js",
+		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/tests.test.js"
 	},
 	"keywords": [
 		"rpc",
@@ -52,7 +52,7 @@
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/isomorphic-fetch": "^0.0.39",
-		"@types/node": "^22.1.0",
+		"@types/node": "^22.3.0",
 		"@types/ws": "^8.5.12",
 		"cynic": "^0.2.1",
 		"es-module-shims": "^1.10.0",
