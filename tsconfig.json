@@ -2,21 +2,23 @@
 	"compilerOptions": {
 		"rootDir": "s",
 		"outDir": "x",
-		"target": "es2019",
-		"lib": ["es6", "dom"],
-		"module": "esnext",
-		"moduleResolution": "node",
-		"experimentalDecorators": true,
-		"allowSyntheticDefaultImports": true,
-		"noImplicitAny": true,
+
+		"lib": ["es2023", "dom"],
+		"module": "node16",
+		"target": "es2022",
+
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"moduleResolution": "node16",
+
 		"sourceMap": true,
-		"declaration": true,
-		"skipLibCheck": true
+		"declaration": true
 	},
 	"include": [
 		"s/**/*"
 	],
 	"exclude": [
-		"s/_archive/**/*"
+		"s/**/_*"
 	]
 }

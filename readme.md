@@ -1,159 +1,291 @@
 
-# 連絡 <br/> れんらく <br/> ***R·E·N·R·A·K·U***
+# 連絡 <br/> ***R·E·N·R·A·K·U***
 
-`npm install renraku`
+### 🎨 make beautiful typescript apis.
 
-🔆 **make smart typescript apis**  
-🛎️ simply expose async functions  
-🛡 you set auth policies for groups of functions  
-🎭 easy mocks for testing and development  
-🧠 designed for good typescript types  
-🌐 make http json-rpc apis  
-🔁 make bidirectional websocket json-rpc apis  
+📦 **`npm i renraku`**  
+💡 elegantly expose async functions  
+🌐 node and browser  
+🏛️ json-rpc 2.0  
+🔌 http and websockets  
+🚚 transport agnostic core  
+🛡️ auth helpers  
+🧪 testable  
+
+RENRAKU makes interacting with remote apis feel the same as interacting with local async functions.
 
 <br/>
 
-## ⛩️ RENRAKU teaches by example
+## ⛩️ *RENRAKU* — make a happy http api
 
-1. *let's make an example api*
-    ```ts
-    import * as renraku from "renraku"
-
-    export const exampleApi = renraku.api({
-
-      // we organize functions into services.
-      greeter: renraku.service()
-
-        // each service has its own auth policy.
-        // a policy processes a "meta" object into an "auth" object.
-        // this is where you might process access tokens, or verify permissions.
-        // here's our contrived example policy.
-        .policy(async(meta: {token: string}) => {
-          if (meta.token) return {doctorate: meta.token === "doctor"}
-          else throw new Error("invalid token")
-        })
-
-        // here's where our functions get access to our "auth" object.
-        .expose(auth => ({
-
-          // here's our silly example function.
-          async greet(name: string) {
-            return auth.doctorate   // if the user's doctorate is valid,
-              ? `hello dr. ${name}` // we greet them formally,
-              : `hi ${name}`        // otherwise, we greet them differently.
-          },
-        })),
-    })
+1. install renraku into your project
+    ```sh
+    npm i renraku
     ```
-
-1. *now let's run our api on a node server*
+1. `api.ts` — define your api, a bunch of async functions
     ```ts
-    import * as renraku from "renraku"
-    import {nodeServer} from "renraku/x/http/node-server.js"
-    import {exampleApi} from "./example-api.js"
+    import {api} from "renraku"
 
-    const server = nodeServer({
-      api: exampleApi,
-      exposeErrors: false,
-      maxPayloadSize: renraku.megabytes(10),
-    })
+    export const exampleApi = api(() => ({
+
+      async now() {
+        return Date.now()
+      },
+
+      async sum(a: number, b: number) {
+        return a + b
+      },
+    }))
+    ```
+1. `server.ts` — now let's expose this api on a node server
+    ```ts
+    import {exampleApi} from "./api.js"
+    import {HttpServer, expose} from "renraku"
+
+    const server = new HttpServer(expose(exampleApi))
 
     server.listen(8000)
     ```
-
-1. *now let's call that function from a browser*
+1. `client.ts` — finally, let's call this from a web browser
     ```ts
-    import * as renraku from "renraku"
-    import type {exampleApi} from "./example-api.js"
+    import type {exampleApi} from "./api.js"
+    import {httpRemote} from "renraku"
 
-    // let's start as a doctor
-    let meta = {token: "doctor"}
+    const example = httpRemote<typeof exampleApi>("http://localhost:8000/")
 
-    // we create a browser client
-    const {greeter} = renraku.browserClient({
-      url: "http://localhost:8000/",
-      metas: {
-        // on the service, we specify which meta to use for api calls
-        calculator: async() => meta,
+    // call your remote api functions just like they were local
+
+    await example.now()
+      // 1723701145176
+
+    await example.sum(1, 2)
+      // 3
+    ```
+
+<br/>
+
+## ⛩ *RENRAKU* — more about `api`
+
+- you can use arbitrary object nesting to organize your api
+  ```ts
+  export const exampleApi = api(() => ({
+
+    date: {
+      async now() {
+        return Date.now()
       },
-    })
+    },
 
-    // hey look, we're a doctor!
-    const result1 = await greeter.greet("chase")
-      //> "hello, dr. chase"
-
-    // okay let's stop being a doctor
-    meta = {token: "not a doctor"}
-    const result2 = await greeter.greet("chase")
-      //> "hi chase"
-
-    // now let's just fail to provide a valid meta
-    meta = {token: undefined}
-    const result3 = await greeter.greet("chase")
-      //> ERROR! "invalid token"
-    ```
-
-<br/>
-
-## ⛩️ RENRAKU mocks help you test your app
-
-1. *let's test our example-api, locally, in our test suite*
-    ```ts
-    import * as renraku from "renraku"
-    import {exampleApi} from "./example-api.js"
-
-    // okay, let's start with a valid doctor token
-    let meta = {token: "doctor"}
-
-    // create a mock remote of our api
-    const {greeter} = renraku.mock()
-      .forApi(exampleApi)
-      .withMetas({
-        greeter: async() => meta,
-      })
-
-    // now we can call and test our api's functionality,
-    // without running any servers, or clients, or any of that.
-
-    const result1 = await greeter.greet("chase")
-      //> "hello, dr. chase"
-
-    meta = {token: "not a doctor"}
-    const result2 = await greeter.greet("chase")
-      //> "hi chase"
-
-    // not only are we testing our api's business logic,
-    // but we are also testing the auth policies too!
-    ```
-
-1. *when making our mocks, we may choose to skip the auth policy logic*
-    ```ts
-    const {greeter} = renraku.mock()
-      .forApi(exampleApi)
-
-      // 👇 an auth map overrides auth policies
-      .withAuths({
-
-        //          we're forcing this auth result
-        //                    👇
-        greeter: async() => ({doctorate: true}),
-      })
-    ```
+    numbers: {
+      math: {
+        async sum(a: number, b: number) {
+          return a + b
+        },
+      },
+    },
+  }))
+  ```
+- your api can accept http headers
+  ```ts
+    //                   http headers
+    //                        ↓
+  export const exampleApi = api(({headers}) => ({
+    async sum(a: number, b: number) {
+      return a + b
+    },
+  }))
+  ```
 
 <br/>
 
-## ⛩️ RENRAKU error handling
+## ⛩ *RENRAKU* — amazing auth
 
-&nbsp; &nbsp; ~ readme docs coming soon lol ~
+- declare that parts of your api requires auth
+  ```ts
+  import {api, secure} from "renraku"
+
+  export const exampleApi = api(() => ({
+
+      //    declaring this area to require auth
+      //         |
+      //         |        can be any type you want
+      //         ↓                   ↓
+    locked: secure(async(auth: string) => {
+
+      // here you can do any auth work you need,
+      // (maybe get into bearer token crypto)
+      if (auth !== "hello")
+        throw new Error("failed fake authentication lol")
+
+      // finally, return the functionality for this
+      // authorized service
+      return {
+        async sum(a: number, b: number) {
+          return a + b
+        },
+      }
+    }),
+  }))
+  ```
+- now on the clientside, the `auth` param is required
+  ```ts
+  import type {exampleApi} from "./api.js"
+  import {httpRemote, authorize} from "renraku"
+
+  const example = httpRemote<typeof exampleApi>("http://localhost:8000/")
+
+  // you can provide the 'auth' as the first parameter
+  await example.locked.sum("hello", 1, 2)
+
+  // or authorize a whole group of functions
+  const locked = authorize(example.locked, async() => "hello")
+    // it's an async function so you could refresh
+    // tokens or whatever
+
+  // this call has been authorized
+  await locked.sum(1, 2)
+  ```
 
 <br/>
 
-## ⛩️ RENRAKU also lets you build two-way websocket systems
+## ⛩ *RENRAKU* — whimsical websockets
 
-&nbsp; &nbsp; ~ readme docs coming soon lol ~
+- here our example websocket setup is more complex because we're setting up two apis that can communicate bidirectionally.
+- `ws/apis.js` — define your serverside and clientside apis
+  ```ts
+  import {api, Api} from "renraku"
+
+  // first, we must declare our api types.
+  // (otherwise, typescript gets thrown through a loop
+  // due to the mutual cross-referencing)
+
+  export type Serverside = {
+    sum(a: number, b: number): Promise<number>
+  }
+
+  export type Clientside = {
+    now(): Promise<number>
+  }
+
+  // now we can define the api implementations.
+
+  export function makeServersideApi(clientside: Clientside) {
+    return api((): Serverside => ({
+      async sum(a, b) {
+
+        // remember, each side can call the other
+        await clientside.now()
+
+        return a + b
+      },
+    }))
+  }
+
+  export function makeClientsideApi(serverside: Serverside) {
+    return api((): Clientside => ({
+      async now() {
+        return Date.now()
+      },
+    }))
+  }
+  ```
+- `ws/server.js` — on the serverside, we create a websocket server
+  ```ts
+  import {WebSocketServer} from "renraku"
+  import {Clientside, makeServersideApi} from "./apis.js"
+
+  const server = new WebSocketServer({
+    acceptConnection: ({remoteEndpoint}) => {
+      const clientside = remote<Api<Clientside>>(remoteEndpoint)
+      return {
+        closed: () => {},
+        localEndpoint: expose(makeServersideApi(clientside)),
+      }
+    },
+  })
+
+  server.listen(8000)
+  ```
+- `ws/client.js` — on the clientside, we create a websocket remote
+  ```ts
+  import {webSocketRemote, Api} from "renraku"
+  import {Serverside, makeClientsideApi} from "./apis.js"
+
+  const {socket, remote: serverside} = await webSocketRemote<Api<Serverside>>({
+    url: "http://localhost:8000",
+    getLocalEndpoint: serverside => expose(
+      makeClientsideApi(serverside)
+    ),
+  })
+
+  const result = await serverside.now()
+  ```
 
 <br/>
 
-------
+## ⛩ *RENRAKU* — more about the core primitives
 
-&nbsp; &nbsp; &nbsp; *— RENRAKU means "contact" —*  
+### basics
+
+- **`api`** — helper function to declare a group of async functions
+  ```ts
+  import {api} from "renraku"
+
+  const timingApi = api(({headers}) => ({
+    async now() {
+      return Date.now()
+    },
+  }))
+  ```
+- **`expose`** — generate a json-rpc endpoint for an api
+  ```ts
+  import {expose} from "renraku"
+
+  const endpoint = expose(timingApi)
+  ```
+  - the endpoint is an async function that accepts a json-rpc request, calls the given api, and then returns the json-rpc response
+- **`remote`** — generate a proxy representation for the functions that utilize the json-rpc endpoint
+  ```ts
+  import {remote} from "renraku"
+
+  const timing = remote<typeof timingApi>(endpoint)
+
+  // calls like this magically work
+  await timing.now()
+  ```
+
+### advanced stuff
+
+- **`notification`** *(experimental)* — "notification" mode
+  - a `query` is a request which elicits a response
+    - this is the default
+  - a `notification` is a request which does not want a response
+    - this might help you make your apis marginally more efficient
+    - you can designate certain remote functions as notifications
+  - because of the way the json-rpc spec is designed, the requester actually decides whether they send a query or a notification -- so this behavior is not something the server decides -- and thus, it's a setting for our remote
+  ```ts
+  import {remote, settings} from "renraku"
+
+  const fns = remote(endpoint)
+
+  // so here's an ordinary query
+  await fns.hello.world()
+
+  // and now we change the setting
+  fns.hello.world[settings].notification = true
+
+  // from now on, this function operates as a notification
+  await fns.hello.world()
+  ```
+  - alternatively, you can set the whole remote to notifications-by-default like this:
+  ```ts
+  const fns = remote(endpoint, {notification: true})
+  ```
+
+<br/>
+
+## ⛩ *RENRAKU* means *contact*
+
+💖 free and open source just for you  
+🌟 gimme a star on github  
+

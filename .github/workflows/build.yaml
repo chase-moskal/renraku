@@ -1,35 +1,23 @@
 
-name: build
+name: 🛠️ build
+
 on:
   push:
     branches:
-      - master
+    - main
   pull_request:
     branches:
-      - master
+    - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
-    - name: 🛎️ checkout
-      uses: actions/checkout@v2
-
-    - name: 🔧 set up node
-      uses: actions/setup-node@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
-        node-version: '17'
-
-    - name: 📦 npm install
-      shell: bash
-      run: npm ci
-
-    - name: 📦 build
-      shell: bash
-      run: npm run build
-
-    - name: 📦 test
-      shell: bash
-      run: npm test
+        node-version: 22
+    - run: npm ci
+    - run: npm run build -s
+    - run: npm test
 

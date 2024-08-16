@@ -5,7 +5,14 @@
 	"license": "MIT",
 	"author": "Chase Moskal <chasemoskal@gmail.com>",
 	"type": "module",
-	"main": "x/renraku.js",
+	"main": "x/index.js",
+	"exports": {
+		".": {
+			"default": "./x/index.js",
+			"browser": "./x/index.js",
+			"node": "./x/node.js"
+		}
+	},
 	"files": [
 		"x",
 		"s"
@@ -16,14 +23,15 @@
 		"importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"compile": "tsc",
 		"watch": "npm run compile -s -- --watch",
-		"start-example-server": "node x/http/example/example-server.js",
-		"start-example-server-debug": "node inspect x/http/example/example-server.js",
-		"start-websocket-server": "node x/websocket/example/example-socket-server.js",
-		"start-http": "serve -l 8080",
-		"start": "run-p watch start-example-server start-websocket-server start-http",
-		"generate-keys": "./node_modules/redcrypto/generate-keys",
-		"test": "cynic node x/renraku.test.js",
-		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/renraku.test.js"
+		"start": "run-p watch start-static-http",
+		"start-static-http": "serve -l 8080",
+		"api": "run-p api-http",
+		"api-http": "node x/transports/http/examples/server.js",
+		"api-http-debug": "node inspect x/transports/http/examples/server.js",
+		"api-ws": "node x/transports/websocket/examples/server.js",
+		"api-ws-debug": "node inspect x/transports/websocket/examples/server.js",
+		"test": "cynic node x/tests.test.js",
+		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/tests.test.js"
 	},
 	"keywords": [
 		"rpc",
@@ -44,7 +52,7 @@
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/isomorphic-fetch": "^0.0.39",
-		"@types/node": "^22.1.0",
+		"@types/node": "^22.3.0",
 		"@types/ws": "^8.5.12",
 		"cynic": "^0.2.1",
 		"es-module-shims": "^1.10.0",
