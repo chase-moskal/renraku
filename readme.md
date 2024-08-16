@@ -50,9 +50,8 @@ this project is the result.
     import {exampleApi} from "./api.js"
     import {HttpServer, expose} from "renraku"
 
-    const server = new HttpServer(expose(exampleApi))
-
-    server.listen(8000)
+    new HttpServer(expose(exampleApi))
+      .listen(8000)
     ```
 1. `client.ts` — finally, let's call this from a web browser
     ```ts
