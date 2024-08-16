@@ -1,24 +1,27 @@
 
-# 連絡 <br/>  ***R·E·N·R·A·K·U***
+# 連絡 <br/> ***R·E·N·R·A·K·U***
 
-> `npm install renraku`
+### 🎨 make beautiful typescript apis.
 
-📡 **make beautiful typescript apis**  
-🛎️ simply expose async functions  
-🛡️ elegant auth facilities  
-🚚 transport agnostic *(http and websockets)*  
-🏛️ bog-standard json-rpc  
-🔧 node and browser  
-🎭 easily testable  
+📦 **`npm i renraku`**  
+💡 elegantly expose async functions  
+🌐 node and browser  
+🏛️ bog-standard json-rpc 2.0  
+🔌 http and websockets  
+🚚 transport agnostic core  
+🛡️ auth helpers  
+🧪 testable  
 
-### make beautiful typescript apis.
-
-*RENRAKU* makes interacting with remote apis feel the same as interacting with local async functions.. the goal is to provide you with a "remote" on which you can just call ordinary async functions, and you don't need to care whether it's over http, or a websocket, or is happening locally.
+RENRAKU makes interacting with remote apis feel the same as interacting with local async functions.
 
 <br/>
 
-## ⛩️ *RENRAKU* — http api
+## ⛩️ *RENRAKU* — make a happy http api
 
+1. install renraku into your project
+    ```sh
+    npm i renraku
+    ```
 1. `api.ts` — define your api, a bunch of async functions
     ```ts
     import {api} from "renraku"
@@ -61,7 +64,7 @@
 
 <br/>
 
-## ⛩ *RENRAKU* — more api details
+## ⛩ *RENRAKU* — details you should know about `api`
 
 - you can use arbitrary object nesting to organize your api
   ```ts
@@ -99,14 +102,23 @@
 
 - declare that parts of your api requires auth
   ```ts
-  import {api, requireAuth} from "renraku"
+  import {api, secure} from "renraku"
 
   export const myApi = api(() => ({
-    locked: requireAuth(async(auth: string) => {
 
+      //    declaring this area to require auth
+      //         |
+      //         |        can be any type you want
+      //         |                   |
+    locked: secure(async(auth: string) => {
+
+      // here you can do any auth work you need,
+      // (maybe get into bearer token crypto)
       if (auth !== "hello")
         throw new Error("failed fake authentication lol")
 
+      // finally, return the functionality for this
+      // authorized service
       return {
         async sum(a: number, b: number) {
           return a + b
@@ -115,18 +127,22 @@
     }),
   }))
   ```
-- now on the clientside, the auth param is required
+- now on the clientside, the `auth` param is required
   ```ts
   import type {myApi} from "./api.js"
-  import {httpRemote, provideAuth} from "renraku"
+  import {httpRemote, authorize} from "renraku"
 
   const service = httpRemote<typeof myApi>("http://localhost:8000/")
 
-  // so auth "hello" is required as a parameter
+  // you can provide the 'auth' as the first parameter
   await service.locked.sum("hello", 1, 2)
 
-  // or you can provide auth to a group of functions
-  const locked = provideAuth("hello", service.locked)
+  // or authorize a whole group of functions
+  const locked = authorize(service.locked, async() => "hello")
+    // it's an async function so you could refresh
+    // tokens or whatever
+
+  // this call has been authorized
   await locked.sum(1, 2)
   ```
 

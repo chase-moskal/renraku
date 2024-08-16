@@ -1,6 +1,6 @@
 
 import {api} from "../../../core/types.js"
-import {requireAuth} from "../../../auth/require.js"
+import {secure} from "../../../auth/secure.js"
 
 export type ExampleApi = typeof exampleApi
 
@@ -14,7 +14,7 @@ export const exampleApi = api(() => ({
 	},
 
 	// authenticated service
-	locked: requireAuth(async(auth: string) => {
+	locked: secure(async(auth: string) => {
 
 		if (auth !== "hello")
 			throw new Error("invalid auth")
