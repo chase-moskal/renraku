@@ -1,4 +1,20 @@
 
+## v0.2
+
+### v0.2.0-0
+
+- totally massive rewrite
+
+<br/>
+
+## v0.1
+
+- undocumented small tweaks and renames
+
+<br/>
+
+## v0.0
+
 ### v0.0.0-dev.53
 
 - (breaking) added required parameter `timeout` to websocket server and client
@@ -33,3 +49,4 @@
 ### v0.0.0-dev.39
 
 - start of changelog
+
