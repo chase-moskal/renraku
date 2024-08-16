@@ -6,7 +6,7 @@
 📦 **`npm i renraku`**  
 💡 elegantly expose async functions  
 🌐 node and browser  
-🏛️ bog-standard json-rpc 2.0  
+🏛️ json-rpc 2.0  
 🔌 http and websockets  
 🚚 transport agnostic core  
 🛡️ auth helpers  
@@ -26,7 +26,7 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
     ```ts
     import {api} from "renraku"
 
-    export const myApi = api(() => ({
+    export const exampleApi = api(() => ({
 
       async now() {
         return Date.now()
@@ -39,36 +39,36 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
     ```
 1. `server.ts` — now let's expose this api on a node server
     ```ts
-    import {myApi} from "./api.js"
+    import {exampleApi} from "./api.js"
     import {HttpServer, expose} from "renraku"
 
-    const server = new HttpServer(expose(myApi))
+    const server = new HttpServer(expose(exampleApi))
 
     server.listen(8000)
     ```
 1. `client.ts` — finally, let's call this from a web browser
     ```ts
-    import type {myApi} from "./api.js"
+    import type {exampleApi} from "./api.js"
     import {httpRemote} from "renraku"
 
-    const service = httpRemote<typeof myApi>("http://localhost:8000/")
+    const example = httpRemote<typeof exampleApi>("http://localhost:8000/")
 
     // call your remote api functions just like they were local
 
-    await service.now()
+    await example.now()
       // 1723701145176
 
-    await service.sum(1, 2)
+    await example.sum(1, 2)
       // 3
     ```
 
 <br/>
 
-## ⛩ *RENRAKU* — details you should know about `api`
+## ⛩ *RENRAKU* — more about `api`
 
 - you can use arbitrary object nesting to organize your api
   ```ts
-  export const myApi = api(() => ({
+  export const exampleApi = api(() => ({
 
     date: {
       async now() {
@@ -88,8 +88,8 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 - your api can accept http headers
   ```ts
     //                   http headers
-    //                        |
-  export const myApi = api(({headers}) => ({
+    //                        ↓
+  export const exampleApi = api(({headers}) => ({
     async sum(a: number, b: number) {
       return a + b
     },
@@ -98,18 +98,18 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
 <br/>
 
-## ⛩ *RENRAKU* — auth is easy
+## ⛩ *RENRAKU* — amazing auth
 
 - declare that parts of your api requires auth
   ```ts
   import {api, secure} from "renraku"
 
-  export const myApi = api(() => ({
+  export const exampleApi = api(() => ({
 
       //    declaring this area to require auth
       //         |
       //         |        can be any type you want
-      //         |                   |
+      //         ↓                   ↓
     locked: secure(async(auth: string) => {
 
       // here you can do any auth work you need,
@@ -129,16 +129,16 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
   ```
 - now on the clientside, the `auth` param is required
   ```ts
-  import type {myApi} from "./api.js"
+  import type {exampleApi} from "./api.js"
   import {httpRemote, authorize} from "renraku"
 
-  const service = httpRemote<typeof myApi>("http://localhost:8000/")
+  const example = httpRemote<typeof exampleApi>("http://localhost:8000/")
 
   // you can provide the 'auth' as the first parameter
-  await service.locked.sum("hello", 1, 2)
+  await example.locked.sum("hello", 1, 2)
 
   // or authorize a whole group of functions
-  const locked = authorize(service.locked, async() => "hello")
+  const locked = authorize(example.locked, async() => "hello")
     // it's an async function so you could refresh
     // tokens or whatever
 
@@ -148,8 +148,9 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
 <br/>
 
-## ⛩ *RENRAKU* — bidirectional websockets
+## ⛩ *RENRAKU* — whimsical websockets
 
+- here our example websocket setup is more complex because we're setting up two apis that can communicate bidirectionally.
 - `ws/apis.js` — define your serverside and clientside apis
   ```ts
   import {api, Api} from "renraku"
@@ -222,33 +223,45 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
 <br/>
 
-## ⛩ *RENRAKU* — more details about the core primitives
+## ⛩ *RENRAKU* — more about the core primitives
 
-- about the basics
+### basics
+
+- **`api`** — helper function to declare a group of async functions
   ```ts
-  import {api, expose, remote} from "renraku"
+  import {api} from "renraku"
 
-  // an api is a function that returns a bunch of async functions
-  const myApi = api(({headers}) => ({
+  const timingApi = api(({headers}) => ({
     async now() {
       return Date.now()
     },
   }))
-
-  // expose will create an async endpoint function,
-  // which accepts json-rpc requests and returns json-rpc responses
-  const myEndpoint = expose(myApi)
-
-  // you can create a remote given any endpoint,
-  // and it doesn't matter if the endpoint is actually local or remote.
-  const myRemote = remote(myEndpoint)
   ```
-- ***experimental*** "notification" mode
-  - a `query` is a request which elicits a response.
-    - this is the default.
-  - a `notification` is a request which does not get a response.
-    - this might help you make your apis marginally more efficient.
-    - now let's show you how to designate certain functions as notifications
+- **`expose`** — generate a json-rpc endpoint for an api
+  ```ts
+  import {expose} from "renraku"
+
+  const endpoint = expose(timingApi)
+  ```
+  - the endpoint is an async function that accepts a json-rpc request, calls the given api, and then returns the json-rpc response
+- **`remote`** — generate a proxy representation for the functions that utilize the json-rpc endpoint
+  ```ts
+  import {remote} from "renraku"
+
+  const timing = remote<typeof timingApi>(endpoint)
+
+  // calls like this magically work
+  await timing.now()
+  ```
+
+### advanced stuff
+
+- **`notification`** *(experimental)* — "notification" mode
+  - a `query` is a request which elicits a response
+    - this is the default
+  - a `notification` is a request which does not want a response
+    - this might help you make your apis marginally more efficient
+    - you can designate certain remote functions as notifications
   - because of the way the json-rpc spec is designed, the requester actually decides whether they send a query or a notification -- so this behavior is not something the server decides -- and thus, it's a setting for our remote
   ```ts
   import {remote, settings} from "renraku"
@@ -268,4 +281,11 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
   ```ts
   const fns = remote(endpoint, {notification: true})
   ```
+
+<br/>
+
+## ⛩ *RENRAKU* means *contact*
+
+💖 free and open source just for you  
+🌟 gimme a star on github  
 
