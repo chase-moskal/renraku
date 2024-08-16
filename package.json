@@ -1,6 +1,6 @@
 {
 	"name": "renraku",
-	"version": "0.1.0",
+	"version": "0.2.0-0",
 	"description": "expose async functions as an api",
 	"license": "MIT",
 	"author": "Chase Moskal <chasemoskal@gmail.com>",
