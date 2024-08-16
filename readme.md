@@ -12,11 +12,19 @@
 🛡️ auth helpers  
 🧪 testable  
 
-RENRAKU makes interacting with remote apis feel the same as interacting with local async functions.
+<br/>
+
+## ⛩️ *RENRAKU* — a simple idea
+
+***"an api should just be a bunch of async functions."***
+
+i had this idea in 2017, and ever since then i've been evolving the implementation and typescript ergonomics.
+
+this project is the result.
 
 <br/>
 
-## ⛩️ *RENRAKU* — make a happy http api
+## ⛩️ *RENRAKU* — let's make a happy http api
 
 1. install renraku into your project
     ```sh
@@ -50,8 +58,7 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
     ```ts
     import {httpRemote} from "renraku"
 
-      // we only import the *type* of the api,
-      // not the implementation
+      // note, we import the *type*
       //    ↓
     import type {exampleApi} from "./api.js"
 
@@ -103,7 +110,7 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
 <br/>
 
-## ⛩ *RENRAKU* — amazing auth
+## ⛩ *RENRAKU* — `secure` and `authorize`
 
 - secure parts of your api
   ```ts
@@ -228,9 +235,7 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
 <br/>
 
-## ⛩ *RENRAKU* — advanced details about the core primitives
-
-### core
+## ⛩ *RENRAKU* — more about the core primitives
 
 - **`api`** — helper function to declare a group of async functions
   ```ts
@@ -251,7 +256,9 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
   - the endpoint is an async function that accepts a json-rpc request and calls the given api, and then returns the result in a json-rpc response
   - basically, the endpoint's inputs and outputs can be serialized and sent over the network — this is the transport-agnostic aspect
   - you can make your own async function of type `Endpoint`, that sends requests across the wire to a server which feeds that request into its own exposed api endpoint
-- **`remote`** — generate a proxy representation for calling functions, which utilize the provided json-rpc endpoint when called
+- **`remote`** — generate a nested proxy tree of invokable functions
+  - you need to provide the api type as a generic for typescript autocomplete to work on your remote
+  - when you invoke an async function on a remote, under the hood, it's actually calling the async endpoint function, which may operate remote or local logic
   ```ts
   import {remote} from "renraku"
 
