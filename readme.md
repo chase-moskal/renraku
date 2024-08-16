@@ -18,7 +18,7 @@
 
 ***"an api should just be a bunch of async functions."***
 
-i had this idea in 2017, and ever since then i've been evolving the implementation and typescript ergonomics.
+i had this idea in 2017, and since then i've been evolving the concept's implementation and typescript ergonomics.
 
 this project is the result.
 
@@ -56,16 +56,15 @@ this project is the result.
     ```
 1. `client.ts` — finally, let's call this from a web browser
     ```ts
-    import {httpRemote} from "renraku"
-
-      // note, we import the *type*
+      // note, we import the *type* here
       //    ↓
     import type {exampleApi} from "./api.js"
+    import {httpRemote} from "renraku"
 
     const example = httpRemote<typeof exampleApi>("http://localhost:8000/")
 
-    // now you can call your remote api
-    // just like local async functions
+    // now you get a "natural" calling syntax,
+    // feels like ordinary async functions:
 
     await example.now()
       // 1723701145176
@@ -96,6 +95,10 @@ this project is the result.
       },
     },
   }))
+
+  // natural calling syntax
+  await example.date.now()
+  await example.numbers.math.sum(1, 2)
   ```
 - your api can accept http headers
   ```ts
@@ -122,7 +125,7 @@ this project is the result.
       //      |
       //      |   auth can be any type you want
       //      ↓                   ↓
-    locked: secure(async(auth: string) => {
+    math: secure(async(auth: string) => {
 
       // here you can do any auth work you need,
       // (maybe get into bearer token crypto)
@@ -147,15 +150,15 @@ this project is the result.
   const example = httpRemote<typeof exampleApi>("http://localhost:8000/")
 
   // you can provide the 'auth' as the first parameter
-  await example.locked.sum("hello", 1, 2)
+  await example.math.sum("hello", 1, 2)
 
   // or authorize a whole group of functions
-  const locked = authorize(example.locked, async() => "hello")
+  const math = authorize(example.math, async() => "hello")
     // it's an async function so you could refresh
     // tokens or whatever
 
   // this call has been authorized
-  await locked.sum(1, 2)
+  await math.sum(1, 2)
   ```
 
 <br/>
