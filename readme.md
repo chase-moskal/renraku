@@ -48,12 +48,17 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
     ```
 1. `client.ts` — finally, let's call this from a web browser
     ```ts
-    import type {exampleApi} from "./api.js"
     import {httpRemote} from "renraku"
+
+      // we only import the *type* of the api,
+      // not the implementation
+      //    ↓
+    import type {exampleApi} from "./api.js"
 
     const example = httpRemote<typeof exampleApi>("http://localhost:8000/")
 
-    // call your remote api functions just like they were local
+    // now you can call your remote api
+    // just like local async functions
 
     await example.now()
       // 1723701145176
@@ -100,16 +105,16 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
 ## ⛩ *RENRAKU* — amazing auth
 
-- declare that parts of your api requires auth
+- secure parts of your api
   ```ts
   import {api, secure} from "renraku"
 
   export const exampleApi = api(() => ({
 
-      //    declaring this area to require auth
-      //         |
-      //         |        can be any type you want
-      //         ↓                   ↓
+      // declaring this area requires auth
+      //      |
+      //      |   auth can be any type you want
+      //      ↓                   ↓
     locked: secure(async(auth: string) => {
 
       // here you can do any auth work you need,
@@ -127,7 +132,7 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
     }),
   }))
   ```
-- now on the clientside, the `auth` param is required
+- on the clientside, the `auth` param is required
   ```ts
   import type {exampleApi} from "./api.js"
   import {httpRemote, authorize} from "renraku"
@@ -223,9 +228,9 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
 <br/>
 
-## ⛩ *RENRAKU* — more about the core primitives
+## ⛩ *RENRAKU* — advanced details about the core primitives
 
-### basics
+### core
 
 - **`api`** — helper function to declare a group of async functions
   ```ts
@@ -243,8 +248,10 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
 
   const endpoint = expose(timingApi)
   ```
-  - the endpoint is an async function that accepts a json-rpc request, calls the given api, and then returns the json-rpc response
-- **`remote`** — generate a proxy representation for the functions that utilize the json-rpc endpoint
+  - the endpoint is an async function that accepts a json-rpc request and calls the given api, and then returns the result in a json-rpc response
+  - basically, the endpoint's inputs and outputs can be serialized and sent over the network — this is the transport-agnostic aspect
+  - you can make your own async function of type `Endpoint`, that sends requests across the wire to a server which feeds that request into its own exposed api endpoint
+- **`remote`** — generate a proxy representation for calling functions, which utilize the provided json-rpc endpoint when called
   ```ts
   import {remote} from "renraku"
 
@@ -254,9 +261,9 @@ RENRAKU makes interacting with remote apis feel the same as interacting with loc
   await timing.now()
   ```
 
-### advanced stuff
+### experimental details
 
-- **`notification`** *(experimental)* — "notification" mode
+- **`notification`**
   - a `query` is a request which elicits a response
     - this is the default
   - a `notification` is a request which does not want a response
