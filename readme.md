@@ -102,8 +102,8 @@ this project is the result.
   ```
 - your api can accept http headers
   ```ts
-    //                   http headers
-    //                        ↓
+    //                        http headers
+    //                              ↓
   export const exampleApi = api(({headers}) => ({
     async sum(a: number, b: number) {
       return a + b
@@ -122,9 +122,9 @@ this project is the result.
   export const exampleApi = api(() => ({
 
       // declaring this area requires auth
-      //      |
-      //      |   auth can be any type you want
-      //      ↓                   ↓
+      //    |
+      //    |   auth can be any type you want
+      //    ↓                  ↓
     math: secure(async(auth: string) => {
 
       // here you can do any auth work you need,
