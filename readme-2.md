@@ -1,5 +1,5 @@
 
-# ⛩ 連絡 <br/>  ***R·E·N·R·A·K·U***
+# 連絡 <br/>  ***R·E·N·R·A·K·U***
 
 > `npm install renraku`
 
@@ -10,6 +10,10 @@
 🏛️ bog-standard json-rpc  
 🔧 node and browser  
 🎭 easily testable  
+
+### make beautiful typescript apis.
+
+*RENRAKU* makes interacting with remote apis feel the same as interacting with local async functions.. the goal is to provide you with a "remote" on which you can just call ordinary async functions, and you don't need to care whether it's over http, or a websocket, or is happening locally.
 
 <br/>
 
@@ -224,9 +228,28 @@
   const myRemote = remote(myEndpoint)
   ```
 - ***experimental*** "notification" mode
+  - a `query` is a request which elicits a response.
+    - this is the default.
+  - a `notification` is a request which does not get a response.
+    - this might help you make your apis marginally more efficient.
+    - now let's show you how to designate certain functions as notifications
+  - because of the way the json-rpc spec is designed, the requester actually decides whether they send a query or a notification -- so this behavior is not something the server decides -- and thus, it's a setting for our remote
   ```ts
-  const myRemote = remote(myEndpoint, {notification: true})
+  import {remote, settings} from "renraku"
+
+  const fns = remote(endpoint)
+
+  // so here's an ordinary query
+  await fns.hello.world()
+
+  // and now we change the setting
+  fns.hello.world[settings].notification = true
+
+  // from now on, this function operates as a notification
+  await fns.hello.world()
   ```
-  - notifications do not elicit a response from the responder.
-  - this might help you make your apis marginally more efficient.
+  - alternatively, you can set the whole remote to notifications-by-default like this:
+  ```ts
+  const fns = remote(endpoint, {notification: true})
+  ```
 

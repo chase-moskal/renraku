@@ -14,7 +14,13 @@ export function remote<A extends Api>(
 		options: RemoteOptions = {notification: false},
 	) {
 
-	return remoteProxy<GetFns<A>>(async(path, params) => {
+	return remoteProxy<GetFns<A>>(async(
+			path,
+			params,
+			settings,
+		) => {
+
+		const notification = settings.notification ?? options.notification ?? false
 
 		// add leading dot
 		const method = "." + path.join(".")
@@ -26,12 +32,12 @@ export function remote<A extends Api>(
 		}
 
 		const response = await endpoint(
-			options.notification
+			notification
 				? base
 				: {...base, id: id++}
 		)
 
-		if (options.notification && !response)
+		if (notification && !response)
 			return response
 
 		if (!response)
