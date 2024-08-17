@@ -1,9 +1,9 @@
 
 import {remote} from "../../core/remote.js"
-import {Api, Endpoint} from "../../core/types.js"
+import {Endpoint, Fns} from "../../core/types.js"
 
-export function httpRemote<A extends Api>(url: string) {
-	return remote<A>(httpEndpoint(url))
+export function httpRemote<F extends Fns>(url: string) {
+	return remote<F>(httpEndpoint(url))
 }
 
 export function httpEndpoint(url: string): Endpoint {

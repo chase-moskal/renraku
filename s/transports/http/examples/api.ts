@@ -1,8 +1,7 @@
 
-import {api} from "../../../core/types.js"
 import {secure} from "../../../auth/secure.js"
 
-export const exampleApi = api(() => ({
+export const example = {
 
 	// unauthenticated service
 	unlocked: {
@@ -23,5 +22,5 @@ export const exampleApi = api(() => ({
 			},
 		}
 	}),
-}))
+}
 

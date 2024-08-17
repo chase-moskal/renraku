@@ -1,16 +1,16 @@
 
 import {remote} from "../../core/remote.js"
 import {Socketry} from "./utils/socketry.js"
-import {Api, Endpoint} from "../../core/types.js"
+import {Endpoint, Fns} from "../../core/types.js"
 
-type Options<A extends Api> = {
+type Options<F extends Fns> = {
 	url: string
 	timeout?: number
 	exposeErrors?: boolean
-	getLocalEndpoint?: (remote: ReturnType<A>) => Endpoint | null
+	getLocalEndpoint?: (remote: F) => Endpoint | null
 }
 
-export async function webSocketRemote<A extends Api>(options: Options<A>) {
+export async function webSocketRemote<F extends Fns>(options: Options<F>) {
 	const {
 		url,
 		timeout = 10_000,
@@ -32,7 +32,7 @@ export async function webSocketRemote<A extends Api>(options: Options<A>) {
 		exposeErrors,
 	})
 
-	const fns = remote<A>(socketry.remoteEndpoint)
+	const fns = remote<F>(socketry.remoteEndpoint)
 
 	socket.onmessage = socketry.prepareMessageHandler(
 		getLocalEndpoint(fns)

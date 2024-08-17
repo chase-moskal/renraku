@@ -1,9 +1,11 @@
 
 import {httpRemote} from "../client.js"
-import type {exampleApi} from "./api.js"
+import type {example} from "./api.js"
 import {authorize} from "../../../auth/authorize.js"
 
-const service = httpRemote<typeof exampleApi>("http://localhost:8000/")
+const service = httpRemote<typeof example>(
+	"http://localhost:8000/"
+)
 
 const unlocked = service.unlocked
 const locked = authorize(service.locked, async() => "hello")
