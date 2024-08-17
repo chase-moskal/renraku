@@ -9,7 +9,9 @@ export type Fns = {[key: string]: Fn | Fns}
 export type Meta = {headers: HttpHeaders}
 export type Api<F extends Fns = any> = (meta: Meta) => F
 
-export type GetFns<A extends Api> = ReturnType<A>
+export function fns<F extends Fns>(f: F) {
+	return f
+}
 
 export function api<A extends Api>(a: A) {
 	return a

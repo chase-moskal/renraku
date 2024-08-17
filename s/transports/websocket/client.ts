@@ -1,13 +1,13 @@
 
 import {remote} from "../../core/remote.js"
 import {Socketry} from "./utils/socketry.js"
-import {Api, Endpoint, GetFns} from "../../core/types.js"
+import {Api, Endpoint} from "../../core/types.js"
 
 type Options<A extends Api> = {
 	url: string
 	timeout?: number
 	exposeErrors?: boolean
-	getLocalEndpoint?: (remote: GetFns<A>) => Endpoint | null
+	getLocalEndpoint?: (remote: ReturnType<A>) => Endpoint | null
 }
 
 export async function webSocketRemote<A extends Api>(options: Options<A>) {

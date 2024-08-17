@@ -2,8 +2,6 @@
 import {api} from "../../../core/types.js"
 import {secure} from "../../../auth/secure.js"
 
-export type ExampleApi = typeof exampleApi
-
 export const exampleApi = api(() => ({
 
 	// unauthenticated service

@@ -1,7 +1,7 @@
 
+import {Api, Endpoint} from "./types.js"
 import {JsonRpc} from "../comms/json-rpc.js"
 import {remoteProxy} from "./remote-proxy.js"
-import {Api, Endpoint, GetFns} from "./types.js"
 
 export type RemoteOptions = {
 	notification?: boolean
@@ -14,7 +14,7 @@ export function remote<A extends Api>(
 		options: RemoteOptions = {notification: false},
 	) {
 
-	return remoteProxy<GetFns<A>>(async(
+	return remoteProxy<ReturnType<A>>(async(
 			path,
 			params,
 			settings,
