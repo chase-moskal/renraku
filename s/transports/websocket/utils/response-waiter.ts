@@ -28,10 +28,10 @@ export class ResponseWaiter {
 		const pend = this.pending.get(response.id)
 		if (pend) {
 			clearTimeout(pend.timeoutId)
-			if ("result" in response)
-				pend.deferred.resolve(response)
-			else
+			if ("error" in response)
 				pend.deferred.reject(new Error(response.error.message))
+			else
+				pend.deferred.resolve(response)
 		}
 	}
 }
