@@ -22,12 +22,9 @@ export function remote<F extends Fns>(
 
 		const notification = settings.notification ?? options.notification ?? false
 
-		// add leading dot
-		const method = "." + path.join(".")
-
 		const base: JsonRpc.Notification<any[]> = {
 			jsonrpc: "2.0" as const,
-			method,
+			method: path.join("."),
 			params,
 		}
 

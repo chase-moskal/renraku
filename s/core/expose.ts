@@ -8,20 +8,18 @@ export type ExposeOptions = {
 	onInvocation?: OnInvocationFn
 }
 
-export function expose<A extends Api>(api: A, options: ExposeOptions = {}): Endpoint {
+export function expose<A extends Api>(
+		api: A,
+		options: ExposeOptions = {},
+	): Endpoint {
+
 	const {
 		onError = () => {},
 		onInvocation = () => {},
 	} = options
 
 	return async(request, meta = {headers: {}}) => {
-
-		// remove leading dot
-		const method = request.method.startsWith(".")
-			? request.method.slice(1)
-			: request.method
-
-		const path = method.split(".")
+		const path = request.method.split(".")
 		const fns = api(meta)
 		const fn = obtain(fns, path) as Fn
 		const action = async() => await fn(...request.params)
