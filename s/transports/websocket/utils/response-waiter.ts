@@ -16,7 +16,7 @@ export class ResponseWaiter {
 	wait(id: JsonRpc.Id) {
 		const deferred = deferPromise<JsonRpc.Response>()
 		const timeoutFn = () => {
-			deferred.reject(new TimeoutError())
+			deferred.reject(new TimeoutError(`request ${id} timed out`))
 			this.pending.delete(id)
 		}
 		const timeoutId = setTimeout(timeoutFn, this.timeout)

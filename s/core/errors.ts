@@ -1,6 +1,12 @@
 
 export class ExposedError extends Error {}
 
+export class TimeoutError extends ExposedError {
+	name = "TimeoutError"
+}
+
+////////////////////////////////////////////////////
+
 export class HttpError extends Error {
 	readonly code: number
 
@@ -9,6 +15,4 @@ export class HttpError extends Error {
 		this.code = code
 	}
 }
-
-export class TimeoutError extends Error {}
 

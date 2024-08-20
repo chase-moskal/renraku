@@ -1,10 +1,20 @@
 
 import {obtain} from "../tools/obtain.js"
 import {respond} from "../comms/respond.js"
-import {Api, Endpoint, Fn} from "./types.js"
+import {Api, Endpoint, Fn, OnInvocationFn} from "./types.js"
 
-export function expose<A extends Api>(api: A): Endpoint {
-	return async(request, details = {exposeErrors: false, headers: {}}) => {
+export type ExposeOptions = {
+	onError?: (error: any) => void
+	onInvocation?: OnInvocationFn
+}
+
+export function expose<A extends Api>(api: A, options: ExposeOptions = {}): Endpoint {
+	const {
+		onError = () => {},
+		onInvocation = () => {},
+	} = options
+
+	return async(request, meta = {headers: {}}) => {
 
 		// remove leading dot
 		const method = request.method.startsWith(".")
@@ -12,10 +22,18 @@ export function expose<A extends Api>(api: A): Endpoint {
 			: request.method
 
 		const path = method.split(".")
-		const fns = api({headers: details.headers})
+		const fns = api(meta)
 		const fn = obtain(fns, path) as Fn
 		const action = async() => await fn(...request.params)
-		return await respond(request, action, details.exposeErrors)
+
+		const response = await respond({
+			request,
+			action,
+			onError,
+		})
+
+		onInvocation(request, response)
+		return response
 	}
 }
 

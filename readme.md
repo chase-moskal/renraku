@@ -117,7 +117,7 @@ this project is the result.
     },
   }))).listen(8000)
   ```
-- if you're smart you can use the `api` helper to extract the functions to another file while getting the types right
+- if you're smart you can use the `api` helper to extract the functions to another file while keeping the types right
   ```ts
   import {api} from "renraku"
 
@@ -214,7 +214,7 @@ this project is the result.
   // now we can define the api implementations.
 
   export function makeServersideApi(clientside: Clientside) {
-    return api((): Serverside => ({
+    return api<Serverside>(() => ({
       async sum(a, b) {
 
         // remember, each side can call the other
@@ -226,7 +226,7 @@ this project is the result.
   }
 
   export function makeClientsideApi(serverside: Serverside) {
-    return api((): Clientside => ({
+    return api<Clientside>(() => ({
       async now() {
         return Date.now()
       },

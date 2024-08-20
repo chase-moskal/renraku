@@ -7,7 +7,6 @@ import {Endpoint, HttpHeaders} from "../../../core/types.js"
 export type SocketryOptions = {
 	timeout: number
 	headers: HttpHeaders
-	exposeErrors: boolean
 	socket: WebSocket | ws.WebSocket
 }
 
@@ -26,12 +25,12 @@ export class Socketry {
 	}
 
 	prepareMessageHandler(localEndpoint: Endpoint | null) {
-		const {socket, headers, exposeErrors} = this.options
+		const {socket, headers} = this.options
 
 		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
 			if ("method" in message) {
 				if (localEndpoint)
-					return await localEndpoint(message, {headers, exposeErrors})
+					return await localEndpoint(message, {headers})
 			}
 			else
 				this.waiter.deliverResponse(message)

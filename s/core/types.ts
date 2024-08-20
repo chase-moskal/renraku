@@ -13,19 +13,19 @@ export function fns<F extends Fns>(f: F) {
 	return f
 }
 
-export function api<A extends Api>(a: A) {
+export function api<F extends Fns>(a: Api<F>) {
 	return a
 }
 
 export type HttpHeaders = IncomingHttpHeaders
 
-export type EndpointDetails = {
-	headers: HttpHeaders
-	exposeErrors: boolean
-}
+export type OnInvocationFn = (
+	request: JsonRpc.Request,
+	response: JsonRpc.Response | null,
+) => void
 
 export type Endpoint = (
-	(request: JsonRpc.Request, details?: EndpointDetails) =>
+	(request: JsonRpc.Request, meta?: Meta) =>
 		Promise<JsonRpc.Response | null>
 )
 

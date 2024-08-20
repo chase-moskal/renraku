@@ -3,18 +3,14 @@ import * as ws from "ws"
 import * as http from "http"
 
 import {Socketry} from "./utils/socketry.js"
-import {Logger} from "../../tools/logging/logger.js"
-import {errorString} from "../../tools/error-string.js"
 import {Endpoint, HttpHeaders} from "../../core/types.js"
-import {PrettyLogger} from "../../tools/logging/pretty-logger.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 type Options = {
-	logger: Logger
 	timeout: number
-	exposeErrors: boolean
 	maxPayloadSize: number
+	onError: (error: any) => void
 }
 
 type Requirements = {
@@ -45,10 +41,9 @@ export class WebSocketServer {
 
 	constructor(inputs: Partial<Options> & Requirements) {
 		const params = this.params = {
-			logger: new PrettyLogger(),
 			timeout: 10_000,
-			exposeErrors: false,
 			maxPayloadSize: 10_000_000,
+			onError: () => {},
 			...inputs,
 		}
 
@@ -61,14 +56,12 @@ export class WebSocketServer {
 		})
 
 		wsServer
-			.on("error", this.#log_error)
+			.on("error", params.onError)
 			.on("connection", this.#handle_websocket_connection)
 
 		httpServer
-			.on("error", this.#log_error)
-			.on("request", allowCors(
-				healthCheck("/health", params.logger, () => {})
-			))
+			.on("error", params.onError)
+			.on("request", allowCors(healthCheck("/health")))
 			.on("upgrade", (request, socket, head) => {
 				wsServer.handleUpgrade(request, socket, head, ws => {
 					wsServer.emit("connection", ws, request)
@@ -76,27 +69,16 @@ export class WebSocketServer {
 			})
 	}
 
-	#log_error = (err: Error) => {
-		this.params.logger.error(`${err.name}: ${err.message}`)
-	}
-
-	#count = 1
-
 	#handle_websocket_connection = async(
 			socket: ws.WebSocket,
 			req: http.IncomingMessage,
 		) => {
 
-		const {logger, timeout, exposeErrors, acceptConnection} = this.params
-		const clientCount = this.#count++
-
-		logger.log(`📖 connected ${clientCount}`)
-		const logDisconnect = () => logger.log(`📕 disconnected ${clientCount}`)
+		const {timeout, acceptConnection, onError} = this.params
 
 		const socketry = new Socketry({
 			timeout,
 			socket,
-			exposeErrors,
 			headers: req.headers,
 		})
 
@@ -108,27 +90,18 @@ export class WebSocketServer {
 			close: () => {
 				socket.close()
 				closed()
-				logDisconnect()
 			},
 			remoteEndpoint: socketry.remoteEndpoint,
 		})
 
+		socket.onerror = onError
+		socket.onclose = closed
 		socket.onmessage = socketry.prepareMessageHandler(localEndpoint)
-
-		socket.onerror = err => {
-			errorString("socket client", err.message)
-		}
-
-		socket.onclose = () => {
-			logDisconnect()
-			closed()
-		}
 	}
 
 	close() {
 		this.wsServer.close()
 		this.httpServer.close()
-		this.params.logger.log(`🛑 stopped web socket server`)
 	}
 }
 
