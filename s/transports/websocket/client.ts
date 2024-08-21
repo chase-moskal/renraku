@@ -10,6 +10,7 @@ type Requirements = {
 
 type Options<F extends Fns> = {
 	timeout: number
+	onError: (error: any) => void
 	getLocalEndpoint: (remote: F) => Endpoint | null
 }
 
@@ -17,6 +18,7 @@ export async function webSocketRemote<F extends Fns>(params: Requirements & Part
 	const {
 		url,
 		timeout = 10_000,
+		onError = () => {},
 		getLocalEndpoint = () => null,
 	} = params
 
@@ -32,6 +34,7 @@ export async function webSocketRemote<F extends Fns>(params: Requirements & Part
 			socket,
 			timeout,
 			headers: {},
+			onError,
 		})
 
 		const fns = remote<F>(socketry.remoteEndpoint)

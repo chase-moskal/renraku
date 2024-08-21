@@ -8,6 +8,11 @@ export type SocketryOptions = {
 	timeout: number
 	headers: HttpHeaders
 	socket: WebSocket | ws.WebSocket
+	onError: (error: any) => void
+}
+
+export type SocketryMessageEvent = {
+	data: any
 }
 
 export class Socketry {
@@ -36,7 +41,7 @@ export class Socketry {
 				this.waiter.deliverResponse(message)
 		}
 
-		const onmessage = async(event: any) => {
+		const onmessage = async(event: SocketryMessageEvent) => {
 			const bi: JsonRpc.Bidirectional = JSON.parse(event.data.toString())
 
 			if (Array.isArray(bi)) {
@@ -52,7 +57,14 @@ export class Socketry {
 			}
 		}
 
-		return onmessage
+		return async(event: SocketryMessageEvent) => {
+			try {
+				return await onmessage(event)
+			}
+			catch (error) {
+				this.options.onError(error)
+			}
+		}
 	}
 }
 

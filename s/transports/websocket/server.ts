@@ -77,9 +77,10 @@ export class WebSocketServer {
 		const {timeout, acceptConnection, onError} = this.params
 
 		const socketry = new Socketry({
-			timeout,
 			socket,
+			timeout,
 			headers: req.headers,
+			onError,
 		})
 
 		const {localEndpoint, closed} = acceptConnection({
