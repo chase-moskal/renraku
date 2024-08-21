@@ -4,14 +4,14 @@ import {JsonRpc} from "../comms/json-rpc.js"
 import {remoteProxy} from "./remote-proxy.js"
 
 export type RemoteOptions = {
-	notification?: boolean
+	notify?: boolean
 }
 
 let id = 0
 
 export function remote<F extends Fns>(
 		endpoint: Endpoint,
-		options: RemoteOptions = {notification: false},
+		options: RemoteOptions = {},
 	) {
 
 	return remoteProxy<F>(async(
@@ -20,7 +20,7 @@ export function remote<F extends Fns>(
 			settings,
 		) => {
 
-		const notification = settings.notification ?? options.notification ?? false
+		const notify = settings.notify ?? options.notify ?? false
 
 		const base: JsonRpc.Notification<any[]> = {
 			jsonrpc: "2.0" as const,
@@ -29,12 +29,12 @@ export function remote<F extends Fns>(
 		}
 
 		const response = await endpoint(
-			notification
+			notify
 				? base
 				: {...base, id: id++}
 		)
 
-		if (notification && !response)
+		if (notify && !response)
 			return null
 
 		if (!response)

@@ -1,33 +1,54 @@
 
 # RENRAKU experimental features
 
-<br/>
+## `notify` and `query`
 
-## notifications
+json-rpc has two kinds of requests: "queries" expect a response, and "notifications" do not.  
+renraku supports both of these.
 
-- **`notification`**
-  - a `query` is a request which elicits a response
-    - this is the default
-  - a `notification` is a request which does not want a response
-    - this might help you make your apis marginally more efficient
-    - you can designate certain remote functions as notifications
-  - because of the way the json-rpc spec is designed, the requester actually decides whether they send a query or a notification -- so this behavior is not something the server decides -- and thus, it's a setting for our remote
+### let's start with a `remote`
+
+```ts
+import {remote, query, notify, settings} from "renraku"
+
+const fns = remote(endpoint)
+```
+
+### use symbols to specify request type
+
+- use the `notify` symbol like this to send a notification request
   ```ts
-  import {remote, settings} from "renraku"
+  await fns.hello.world[notify]()
+    // you'll get null, because notifications have no responses
+  ```
+- use the `query` symbol to launch a query request which will await a response
+  ```ts
+  await fns.hello.world[query]()
 
-  const fns = remote(endpoint)
-
-  // so here's an ordinary query
-  await fns.hello.world()
-
-  // and now we change the setting for this function
-  fns.hello.world[settings].notification = true
-
-  // from now on, this function operates as a notification
+  // query is the default, so usually this is equivalent:
   await fns.hello.world()
   ```
-  - alternatively, you can set the whole remote to notifications-by-default like this:
-  ```ts
-  const fns = remote(endpoint, {notification: true})
-  ```
+
+### use the `settings` symbol to set-and-forget
+
+```ts
+// changing the default for this request
+fns.hello.world[settings].notify = true
+
+// now this is a notification
+await fns.hello.world()
+
+// unless we override and specify otherwise
+await fns.hello.world[query]()
+```
+
+### you can even make your whole remote default to `notify`
+
+```ts
+const fns = remote(endpoint, {notify: true})
+
+// now all requests are assumed to be notifications
+await fns.hello.world()
+await fns.anything.goes()
+```
 

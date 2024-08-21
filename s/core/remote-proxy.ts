@@ -1,7 +1,12 @@
 
-import {Fns} from "./types.js"
+import {Fn, Fns} from "./types.js"
 
+export const query = Symbol("query")
+export const notify = Symbol("notify")
 export const settings = Symbol("settings")
+
+export type QuerySymbol = typeof query
+export type NotifySymbol = typeof notify
 export type SettingsSymbol = typeof settings
 
 export type Executor = (
@@ -11,19 +16,43 @@ export type Executor = (
 ) => Promise<any>
 
 export type Settings = {
-	notification?: boolean
+	notify?: boolean
 }
+
+export type RemoteSpike<F extends Fn | Fns> = (
+	F extends Fn
+		? F & {
+			[query]: F
+			[notify]: F
+			[settings]: Settings
+		}
+		: F extends Fns
+			? {[K in keyof F]: RemoteSpike<F[K]>}
+			: never
+)
 
 export function remoteProxy<F extends Fns>(executor: Executor) {
 
 	function recurse(path: string[]) {
-		const currentSettings: Settings = {notification: undefined}
+		const currentSettings: Settings = {notify: undefined}
 
 		return new Proxy((() => {}) as any, {
 			apply: (_, _this, args) => {
 				return executor(path, args, currentSettings)
 			},
-			get: (target, key: string | SettingsSymbol) => {
+			get: (target, key: string | QuerySymbol | NotifySymbol | SettingsSymbol) => {
+
+				if (key === notify)
+					return (...args: any[]) => executor(path, args, {
+						...currentSettings,
+						notify: true,
+					})
+
+				if (key === query)
+					return (...args: any[]) => executor(path, args, {
+						...currentSettings,
+						notify: false,
+					})
 
 				if (key === settings)
 					return currentSettings
@@ -40,6 +69,6 @@ export function remoteProxy<F extends Fns>(executor: Executor) {
 		})
 	}
 
-	return recurse([]) as F
+	return recurse([]) as RemoteSpike<F>
 }
 
