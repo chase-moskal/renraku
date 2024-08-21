@@ -225,7 +225,7 @@ this project is the result.
     }))
   }
 
-  export function makeClientsideApi(serverside: Serverside) {
+  export function makeClientsideApi(getServerside: () => Serverside) {
     return api<Clientside>(() => ({
       async now() {
         return Date.now()
@@ -258,7 +258,7 @@ this project is the result.
   const {socket, fns: serverside} = await webSocketRemote<Api<Serverside>>({
     url: "http://localhost:8000",
     getLocalEndpoint: serverside => expose(
-      makeClientsideApi(serverside)
+      makeClientsideApi(() => serverside)
     ),
   })
 
