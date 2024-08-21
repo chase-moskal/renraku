@@ -19,7 +19,7 @@ export type Settings = {
 	notify?: boolean
 }
 
-export type RemoteSpike<F extends Fn | Fns> = (
+export type Remote<F extends Fn | Fns> = (
 	F extends Fn
 		? F & {
 			[query]: F
@@ -27,7 +27,7 @@ export type RemoteSpike<F extends Fn | Fns> = (
 			[settings]: Settings
 		}
 		: F extends Fns
-			? {[K in keyof F]: RemoteSpike<F[K]>}
+			? {[K in keyof F]: Remote<F[K]>}
 			: never
 )
 
@@ -69,6 +69,6 @@ export function remoteProxy<F extends Fns>(executor: Executor) {
 		})
 	}
 
-	return recurse([]) as RemoteSpike<F>
+	return recurse([]) as Remote<F>
 }
 
