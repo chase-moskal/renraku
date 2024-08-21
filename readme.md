@@ -255,7 +255,7 @@ this project is the result.
   import {webSocketRemote, Api} from "renraku"
   import {Serverside, makeClientsideApi} from "./apis.js"
 
-  const {socket, remote: serverside} = await webSocketRemote<Api<Serverside>>({
+  const {socket, fns: serverside} = await webSocketRemote<Api<Serverside>>({
     url: "http://localhost:8000",
     getLocalEndpoint: serverside => expose(
       makeClientsideApi(serverside)

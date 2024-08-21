@@ -6,9 +6,9 @@ import {exampleClientsideApi, ExampleServersideFns} from "./apis.js"
 let calls = 0
 let rememberCall = () => calls++
 
-const {socket, remote: serverside} = await webSocketRemote<ExampleServersideFns>({
+const {socket, fns: serverside} = await webSocketRemote<ExampleServersideFns>({
 	url: "http://localhost:8000",
-	getLocalEndpoint: serverside => expose(exampleClientsideApi(serverside, rememberCall)),
+	getLocalEndpoint: fns => expose(exampleClientsideApi(fns, rememberCall)),
 })
 
 const result = await serverside.now()
