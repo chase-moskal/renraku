@@ -320,6 +320,34 @@ await fns.hello.world()
 await fns.anything.goes()
 ```
 
+### you can use the `Remote` type when you need these symbols
+
+- the `remote` function applies the `Remote` type automatically
+  ```ts
+  const fns = remote(endpoint)
+
+  // ✅ happy types
+  await serverside.update[notify](data)
+  ```
+- but you might have a function that accepts some remote functionality
+  ```ts
+  async function whatever(serverside: Serverside) {
+
+    // ❌ bad types
+    await serverside.update[notify](data)
+  }
+  ```
+- you might need to specify `Remote` to use the remote symbols
+  ```ts
+  import {Remote} from "renraku"
+
+  async function whatever(serverside: Remote<Serverside>) {
+
+    // ✅ happy types
+    await serverside.update[notify](data)
+  }
+  ```
+
 <br/>
 
 ## ⛩ *RENRAKU* — more about the core primitives
