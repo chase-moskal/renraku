@@ -1,6 +1,7 @@
 
 import {remote} from "../../core/remote.js"
 import {Socketry} from "./utils/socketry.js"
+import {deadline} from "../../tools/deadline.js"
 import {Endpoint, Fns} from "../../core/types.js"
 
 type Requirements = {
@@ -19,26 +20,28 @@ export async function webSocketRemote<F extends Fns>(params: Requirements & Part
 		getLocalEndpoint = () => null,
 	} = params
 
-	const socket = new WebSocket(url)
+	return await deadline(timeout, async() => {
+		const socket = new WebSocket(url)
 
-	const ready = new Promise<WebSocket>((resolve, reject) => {
-		socket.onopen = () => resolve(socket)
-		socket.onerror = error => reject(error)
+		const ready = new Promise<WebSocket>((resolve, reject) => {
+			socket.onopen = () => resolve(socket)
+			socket.onerror = error => reject(error)
+		})
+
+		const socketry = new Socketry({
+			socket,
+			timeout,
+			headers: {},
+		})
+
+		const fns = remote<F>(socketry.remoteEndpoint)
+
+		socket.onmessage = socketry.prepareMessageHandler(
+			getLocalEndpoint(fns)
+		)
+
+		await ready
+		return {socket, remote: fns}
 	})
-
-	const socketry = new Socketry({
-		socket,
-		timeout,
-		headers: {},
-	})
-
-	const fns = remote<F>(socketry.remoteEndpoint)
-
-	socket.onmessage = socketry.prepareMessageHandler(
-		getLocalEndpoint(fns)
-	)
-
-	await ready
-	return {socket, remote: fns}
 }
 
