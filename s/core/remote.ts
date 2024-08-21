@@ -35,7 +35,7 @@ export function remote<F extends Fns>(
 		)
 
 		if (notification && !response)
-			return response
+			return null
 
 		if (!response)
 			throw new Error("response was null, but shouldn't be, because the request was not a notification")
