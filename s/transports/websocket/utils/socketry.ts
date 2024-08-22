@@ -25,7 +25,7 @@ export class Socketry {
 	remoteEndpoint: Endpoint = async request => {
 		this.options.socket.send(JSON.stringify(request))
 		return "id" in request
-			? await this.waiter.wait(request.id)
+			? await this.waiter.wait(request.id, request.method)
 			: null
 	}
 

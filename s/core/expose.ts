@@ -4,7 +4,6 @@ import {respond} from "../comms/respond.js"
 import {Api, Endpoint, Fn, OnInvocationFn} from "./types.js"
 
 export type ExposeOptions = {
-	label?: string
 	onError?: (error: any) => void
 	onInvocation?: OnInvocationFn
 }
@@ -15,7 +14,6 @@ export function expose<A extends Api>(
 	): Endpoint {
 
 	const {
-		label = "renraku service",
 		onError = () => {},
 		onInvocation = () => {},
 	} = options
@@ -27,7 +25,6 @@ export function expose<A extends Api>(
 		const action = async() => await fn(...request.params)
 
 		const response = await respond({
-			label,
 			request,
 			action,
 			onError,
