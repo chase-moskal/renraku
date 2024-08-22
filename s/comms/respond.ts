@@ -3,10 +3,12 @@ import {JsonRpc} from "./json-rpc.js"
 import {ExposedError} from "../core/errors.js"
 
 export async function respond<R>({
+		label,
 		request,
 		action,
 		onError,
 	}: {
+		label: string
 		request: JsonRpc.Request
 		action: () => Promise<R>
 		onError: (error: any) => void
@@ -37,11 +39,11 @@ export async function respond<R>({
 			error: (error instanceof ExposedError)
 				? {
 					code: -32000,
-					message: `${error.name}: ${error.message}`,
+					message: `${label} ${error.name}: ${error.message}`,
 				}
 				: {
 					code: -32000,
-					message: "error",
+					message: `${label} unexposed error`,
 				},
 		}
 	}
