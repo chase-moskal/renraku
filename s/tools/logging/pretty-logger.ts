@@ -6,12 +6,14 @@ export type PrettyLoggerOptions = {
 	color?: boolean
 	timestamp?: boolean
 	doubleSpace?: boolean
+	emoji?: boolean
 }
 
 const defaultOptions: PrettyLoggerOptions = {
 	color: true,
 	timestamp: true,
 	doubleSpace: false,
+	emoji: true,
 }
 
 export class PrettyLogger implements Logger {
@@ -57,6 +59,12 @@ export class PrettyLogger implements Logger {
 			console.log("")
 	}
 
+	#emojiPrefix(e: string, ...data: any[]) {
+		return this.options.emoji
+			? [e, ...data]
+			: data
+	}
+
 	log(...data: any[]): void {
 		console.log(...this.#stamp(...data))
 		this.#double()
@@ -68,7 +76,12 @@ export class PrettyLogger implements Logger {
 	}
 
 	error(...data: any[]): void {
-		console.log(...this.#stamp(...this.#colorize(color.red, ...data)))
+		console.log(
+			...this.#emojiPrefix(
+				"🚨",
+				...this.#stamp(...this.#colorize(color.red, ...data))
+			)
+		)
 		this.#double()
 	}
 }
