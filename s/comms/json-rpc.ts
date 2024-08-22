@@ -53,5 +53,13 @@ export namespace JsonRpc {
 		id: Id
 		error: Error
 	}
+
+	/////////////////////////////////////////////////////////////
+
+	export function getId(request: Request): Id {
+		return "id" in request
+			? request.id
+			: null
+	}
 }
 

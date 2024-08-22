@@ -1,10 +1,10 @@
 
 import {obtain} from "../tools/obtain.js"
-import {respond} from "../comms/respond.js"
 import {Api, Endpoint, Fn, OnInvocationFn} from "./types.js"
+import {OnRespondErrorFn, respond} from "../comms/respond.js"
 
 export type ExposeOptions = {
-	onError?: (error: any) => void
+	onError?: OnRespondErrorFn
 	onInvocation?: OnInvocationFn
 }
 

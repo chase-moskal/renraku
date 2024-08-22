@@ -2,6 +2,8 @@
 import {JsonRpc} from "./json-rpc.js"
 import {ExposedError} from "../core/errors.js"
 
+export type OnRespondErrorFn = (error: any, id: JsonRpc.Id, method: string) => void
+
 export async function respond<R>({
 		request,
 		action,
@@ -9,24 +11,26 @@ export async function respond<R>({
 	}: {
 		request: JsonRpc.Request
 		action: () => Promise<R>
-		onError: (error: any) => void
+		onError: OnRespondErrorFn
 	}): Promise<JsonRpc.Response<R> | null> {
+
+	const id = JsonRpc.getId(request)
 
 	try {
 		const result = await action()
 
-		if (!("id" in request))
+		if (id === null)
 			return null
 
 		return {
+			id,
 			result,
-			id: request.id,
 			jsonrpc: JsonRpc.version,
 		}
 	}
 
 	catch (error) {
-		onError(error)
+		onError(error, id, request.method)
 
 		if (!("id" in request))
 			return null
