@@ -398,6 +398,66 @@ await fns.anything.goes()
 
 <br/>
 
+## ⛩ *RENRAKU* — error handling
+
+- you can throw an `ExposedError` in your async functions when you want the remote to see the error message:
+  ```ts
+  import {ExposedError, fns} from "renraku"
+
+  const timingApi = fns({
+    async now() {
+      throw new ExposedError("not enough minerals")
+        //                           ↑
+        //                 publicly visible message
+    },
+  })
+  ```
+- any other kind of error will NOT send the message to the client
+  ```ts
+  import {fns} from "renraku"
+
+  const timingApi = fns({
+    async now() {
+      throw new Error("insufficient vespene gas")
+        //                           ↑
+        // secret message is hidden from remote clients
+    },
+  })
+  ```
+- the intention here is security-by-default, because error messages could potentialy include sensitive information
+
+<br/>
+
+## ⛩ *RENRAKU* — logging
+- renraku is silent by default
+- on the server, you can use various callbacks to do your own logging
+  ```ts
+  import {exampleFns} from "./example.js"
+  import {HttpServer, expose} from "renraku"
+
+  const endpoint = expose(() => exampleFns, {
+
+    // log when an error happens during an api invocation
+    onError: (error, id, method) =>
+      console.error(`!! ${id} ${method}()`, error),
+
+    // log when an api invocation completes
+    onInvocation: (request, response) =>
+      console.log(`invocation: `, request, response),
+  })
+
+  const server = new HttpServer(endpoint, {
+
+    // log when an error happens while processing a request
+    onError: error =>
+      console.error("bad request", error),
+  })
+
+  server.listen(8000)
+  ```
+
+<br/>
+
 ## ⛩ *RENRAKU* means *contact*
 
 💖 free and open source just for you  
