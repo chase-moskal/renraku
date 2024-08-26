@@ -14,6 +14,7 @@ type Options<F extends Fns> = {
 export async function webSocketRemote<F extends Fns>(
 		params: Options<F>
 	) {
+
 	const {
 		url,
 		timeout = 10_000,

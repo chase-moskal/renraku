@@ -10,7 +10,11 @@ export type EndpointListenerOptions = {
 	onError?: (error: any) => void
 }
 
-export function makeEndpointListener(endpoint: Endpoint, options: EndpointListenerOptions = {}): RequestListener {
+export function makeEndpointListener(
+		endpoint: Endpoint,
+		options: EndpointListenerOptions = {},
+	): RequestListener {
+
 	const {
 		maxPayloadSize = 10_000_000,
 		onError = () => {},
