@@ -9,6 +9,7 @@ export function deadline<R>(milliseconds: number, fn: () => Promise<R>) {
 
 		fn()
 			.then(resolve)
+			.catch(reject)
 			.finally(() => clearTimeout(id))
 	})
 }
