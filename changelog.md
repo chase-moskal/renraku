@@ -15,6 +15,7 @@
 
 - 🟥 totally massive rewrite
   - everything has changed, deal with it 😎
+  - you're gonna have to just read the new readme 💀
 
 <br/>
 
