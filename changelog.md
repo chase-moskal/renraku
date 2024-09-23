@@ -1,9 +1,20 @@
 
+# changelog for `renraku`
+
+### legend
+
+- 🟥 *harmful -- breaking change*
+- 🔶 *maybe harmful -- deprecation, or possible breaking change*
+- 🍏 *harmlesss -- addition, fix, or enhancement*
+
+<br/>
+
 ## v0.2
 
 ### v0.2.0
 
-- totally massive rewrite
+- 🟥 totally massive rewrite
+  - everything has changed, deal with it 😎
 
 <br/>
 
