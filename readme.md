@@ -235,7 +235,7 @@ this project is the result.
   ```
 - `ws/server.js` — on the serverside, we create a websocket server
   ```ts
-  import {WebSocketServer} from "renraku"
+  import {WebSocketServer} from "renraku/x/node.js"
   import {Clientside, makeServersideApi} from "./apis.js"
 
   const server = new WebSocketServer({
@@ -250,6 +250,7 @@ this project is the result.
 
   server.listen(8000)
   ```
+  - note that we have to import from `renraku/x/node.js`, because we keep all node imports separated to avoid making the browser upset
 - `ws/client.js` — on the clientside, we create a websocket remote
   ```ts
   import {webSocketRemote, Api} from "renraku"
