@@ -18,7 +18,7 @@ export function expose<A extends Api>(
 		onInvocation = () => {},
 	} = options
 
-	return async(request, meta = {headers: {}}) => {
+	return async(request, meta = {headers: {}, address: ""}) => {
 		const path = request.method.split(".")
 		const fns = api(meta)
 		const fn = obtain(fns, path) as Fn

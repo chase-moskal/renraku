@@ -2,11 +2,12 @@
 import * as ws from "ws"
 import {JsonRpc} from "../../../comms/json-rpc.js"
 import {ResponseWaiter} from "./response-waiter.js"
-import {Endpoint, HttpHeaders} from "../../../core/types.js"
+import {Endpoint, GeneralHeaders} from "../../../core/types.js"
 
 export type SocketryOptions = {
 	timeout: number
-	headers: HttpHeaders
+	address: string
+	headers: GeneralHeaders
 	socket: WebSocket | ws.WebSocket
 	onError: (error: any) => void
 }
@@ -30,12 +31,12 @@ export class Socketry {
 	}
 
 	prepareMessageHandler(localEndpoint: Endpoint | null) {
-		const {socket, headers} = this.options
+		const {socket, headers, address} = this.options
 
 		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
 			if ("method" in message) {
 				if (localEndpoint)
-					return await localEndpoint(message, {headers})
+					return await localEndpoint(message, {headers, address})
 			}
 			else
 				this.waiter.deliverResponse(message)

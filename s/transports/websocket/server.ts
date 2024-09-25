@@ -3,9 +3,11 @@ import * as ws from "ws"
 import * as http from "http"
 
 import {Socketry} from "./utils/socketry.js"
-import {Endpoint, HttpHeaders} from "../../core/types.js"
+import {Endpoint, GeneralHeaders} from "../../core/types.js"
+import {getIpAddress} from "../http/node-utils/get-ip-address.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
+import {crushHeaders} from "../../tools/crush-headers.js"
 
 type Options = {
 	timeout: number
@@ -23,7 +25,9 @@ type Handling = {
 }
 
 type Connection = {
-	headers: HttpHeaders
+	req: http.IncomingMessage
+	address: string
+	headers: GeneralHeaders
 	ping: () => void
 	close: () => void
 	remoteEndpoint: Endpoint
@@ -75,16 +79,21 @@ export class WebSocketServer {
 		) => {
 
 		const {timeout, acceptConnection, onError} = this.params
+		const address = getIpAddress(req)
+		const headers = crushHeaders(req.headers)
 
 		const socketry = new Socketry({
 			socket,
 			timeout,
-			headers: req.headers,
+			address,
+			headers,
 			onError,
 		})
 
 		const {localEndpoint, closed} = acceptConnection({
-			headers: req.headers,
+			req,
+			address,
+			headers,
 			ping: () => {
 				socket.ping()
 			},

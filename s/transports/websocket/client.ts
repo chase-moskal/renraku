@@ -34,6 +34,7 @@ export async function webSocketRemote<F extends Fns>(
 			socket,
 			timeout,
 			headers: {},
+			address: "",
 			onError,
 		})
 

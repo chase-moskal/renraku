@@ -108,11 +108,11 @@ this project is the result.
   ```
 - well, that `expose` function provides http headers
   ```ts
-    //               http headers
-    //                      ↓
-  new HttpServer(expose(({headers}) => ({
+    //              http headers      ip address
+    //                     ↓            ↓
+  new HttpServer(expose(({headers, address}) => ({
     async sum(a: number, b: number) {
-      console.log("content type", headers["content-type"])
+      console.log(headers["origin"], ip)
       return a + b
     },
   }))).listen(8000)
@@ -239,7 +239,7 @@ this project is the result.
   import {Clientside, makeServersideApi} from "./apis.js"
 
   const server = new WebSocketServer({
-    acceptConnection: ({remoteEndpoint}) => {
+    acceptConnection: ({remoteEndpoint, req, headers, address}) => {
       const clientside = remote<Clientside>(remoteEndpoint)
       return {
         closed: () => {},
