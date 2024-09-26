@@ -364,6 +364,43 @@ maybe this project is my life's work, actually...
 
 <br/>
 
+## ⛩ *RENRAKU* — custom transport medium
+- okay, so let's say you like renraku's elegant api, and it has HttpServer and WebSocketServer -- but you need it to work over another medium, like postMessage, or carrier pigeons
+- well, you're in luck, because it's actually not so hard to setup your own transport medium
+- consider that on the serverside, you have your functions, and you create an endpoint for your api:
+  ```ts
+  const myEndpoint = endpoint(myFunctions)
+  ```
+- this is the "real" endpoint, and it's just a function that accepts a json rpc request, calls the right function, and emits a json rpc response
+  ```ts
+  const jsonResponse = await myEndpoint(jsonRequest)
+  ```
+  - in fact, it has this type signature:
+    ```ts
+    (request: JsonRpc.Request) => Promise<JsonRpc.Response | null>
+    ```
+  - so your serverside basically just needs to be able to receive the request object, call this real endpoint function, and send back the response object
+- now, on your clientside, you just need to be able to generate and handle the json objects. that's what `remote` does:
+  ```ts
+  const myRemote = remote<typeof myFunctions>(myClientsideEndpoint)
+  ```
+  - here's the rub: the `remote` accepts an `Endpoint` type
+  - but of course, you're on the client, so you don't have the "real" endpoint that actually calls the real functions
+  - so instead, you provide a "remote" endpoint function, that is actually sneaking off to send the json request via carrier pigeon!
+    ```ts
+    const myRemote = remote<typeof myFunctions>(async jsonRequest => {
+      const jsonResponse = await carrierPigeon.send(jsonRequest)
+      return jsonResponse
+    })
+    ```
+  - and so that's it. the `remote` doesn't care about the transport mechanism, it just calls this async "Endpoint" function for each call
+  - in fact the "real" and "remote" endpoints have the same function signature, so you could imagine that `remote` doesn't even know whether it's directly talking to the "real" endpoint function, or the impostor that is secretly using carrier pigeons to talk to the real one
+- so, to recap,
+  - `endpoint` is used on the serverside to make "real" functions callable via json rpc objects.
+  - `remote` is used on the clientside, and you provide it a "remote" endpoint function that you implement, that ends the json objects to your server
+
+<br/>
+
 ## ⛩ *RENRAKU* — optimizations with `notify` and `query`
 
 json-rpc has two kinds of requests: "queries" expect a response, and "notifications" do not.  
