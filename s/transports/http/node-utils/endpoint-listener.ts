@@ -2,10 +2,10 @@
 import {RequestListener} from "http"
 
 import {readStream} from "./read-stream.js"
-import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
-import {getIpAddress} from "./get-ip-address.js"
-import {crushHeaders} from "../../../tools/crush-headers.js"
+import {ipAddress} from "../../../tools/ip-address.js"
+import {Endpoint, ServerMeta} from "../../../core/types.js"
+import {simplifyHeaders} from "../../../tools/simple-headers.js"
 
 export type EndpointListenerOptions = {
 	maxPayloadSize?: number
@@ -13,7 +13,7 @@ export type EndpointListenerOptions = {
 }
 
 export function makeEndpointListener(
-		endpoint: Endpoint,
+		makeEndpoint: (meta: ServerMeta) => Endpoint,
 		options: EndpointListenerOptions = {},
 	): RequestListener {
 
@@ -24,13 +24,16 @@ export function makeEndpointListener(
 
 	return async(req, res) => {
 		try {
-			const address = getIpAddress(req)
-			const headers = crushHeaders(req.headers)
 			const body = await readStream(req, maxPayloadSize)
 			const requestish = JSON.parse(body) as JsonRpc.Requestish
+			const endpoint = makeEndpoint({
+				req,
+				address: ipAddress(req),
+				headers: simplifyHeaders(req.headers),
+			})
 
 			const execute = async(request: JsonRpc.Request) => {
-				return await endpoint(request, {headers, address})
+				return await endpoint(request)
 			}
 
 			const send = (respondish: null | JsonRpc.Respondish) => {

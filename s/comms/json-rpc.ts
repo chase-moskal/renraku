@@ -18,10 +18,20 @@ export namespace JsonRpc {
 		| Failure
 	)
 
+	export type Serializable = (
+		| null
+		| undefined
+		| boolean
+		| number
+		| string
+		| Serializable[]
+		| {[key: string]: Serializable}
+	)
+
 	/////////////////////////////////////////////////////////////
 
 	export type Id = number | string | null
-	export type Params = any[] | {}
+	export type Params = Serializable[] | Record<string, Serializable>
 
 	export type Notification<P extends Params> = {
 		jsonrpc: string

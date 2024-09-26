@@ -33,8 +33,6 @@ export async function webSocketRemote<F extends Fns>(
 		const socketry = new Socketry({
 			socket,
 			timeout,
-			headers: {},
-			address: "",
 			onError,
 		})
 

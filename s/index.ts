@@ -21,4 +21,5 @@ export * from "./tools/logging/pretty-logger.js"
 export * from "./tools/logging/disabled-logger.js"
 export * from "./tools/deadline.js"
 export * from "./tools/errstring.js"
+export * from "./tools/simple-headers.js"
 

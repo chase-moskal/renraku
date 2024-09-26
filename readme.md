@@ -48,12 +48,12 @@ this project is the result.
     import {exampleFns} from "./example.js"
     import {HttpServer, expose} from "renraku"
 
-    new HttpServer(expose(() => exampleFns))
+    new HttpServer(() => expose(exampleFns))
       .listen(8000)
     ```
 1. `client.ts` — finally, let's call the functions from a web browser
     ```ts
-      // note, we import the *type* here
+      // note, only need the *type* here
       //    ↓
     import type {exampleFns} from "./example.js"
     import {httpRemote} from "renraku"
@@ -101,43 +101,18 @@ this project is the result.
 
 ## ⛩ *RENRAKU* — http headers
 
-- remember when we exposed the functions on an http server?
+- renraku will pass you the http stuff you need
   ```ts
-  new HttpServer(expose(() => exampleFns))
-    .listen(8000)
-  ```
-- well, that `expose` function provides http headers
-  ```ts
-    //              http headers      ip address
-    //                     ↓            ↓
-  new HttpServer(expose(({headers, address}) => ({
+    // ip addresss -----------------
+    // http headers -------        |
+    // node request -     |        |
+    //              ↓     ↓        ↓
+  new HttpServer(({req, headers, address}) => expose({
     async sum(a: number, b: number) {
-      console.log(headers["origin"], ip)
+      console.log(headers["origin"], address)
       return a + b
     },
-  }))).listen(8000)
-  ```
-- if you're smart you can use the `api` helper to extract the functions to another file while keeping the types right
-  ```ts
-  import {api} from "renraku"
-
-  export const exampleApi = api(({headers}) => ({
-    async sum(a: number, b: number) {
-      console.log("content type", headers["content-type"])
-      return a + b
-    },
-  }))
-  ```
-  then you can expose it like this
-  ```ts
-  new HttpServer(expose(exampleApi))
-    .listen(8000)
-  ```
-  and you can use that type in a remote like this
-  ```ts
-  const example = httpRemote<ReturnType<typeof exampleFns>>(
-    "http://localhost:8000/"
-  )
+  })).listen(8000)
   ```
 
 <br/>
@@ -197,11 +172,8 @@ this project is the result.
 - here our example websocket setup is more complex because we're setting up two apis that can communicate bidirectionally.
 - `ws/apis.js` — define your serverside and clientside apis
   ```ts
-  import {api, Api} from "renraku"
-
   // first, we must declare our api types.
-  // (otherwise, typescript gets thrown through a loop
-  // due to the mutual cross-referencing)
+  // (otherwise, typescript get a fit due to the mutual cross-referencing)
 
   export type Serverside = {
     sum(a: number, b: number): Promise<number>
@@ -213,37 +185,34 @@ this project is the result.
 
   // now we can define the api implementations.
 
-  export function makeServersideApi(clientside: Clientside) {
-    return api<Serverside>(() => ({
-      async sum(a, b) {
+  export const makeServerside =
+    (clientside: Clientside): Serverside => ({
 
-        // remember, each side can call the other
-        await clientside.now()
+    async sum(a, b) {
+      await clientside.now() // remember, each side can call the other
+      return a + b
+    },
+  })
 
-        return a + b
-      },
-    }))
-  }
+  export const makeClientside =
+    (getServerside: () => Serverside): Clientside => ({
 
-  export function makeClientsideApi(getServerside: () => Serverside) {
-    return api<Clientside>(() => ({
-      async now() {
-        return Date.now()
-      },
-    }))
-  }
+    async now() {
+      return Date.now()
+    },
+  })
   ```
 - `ws/server.js` — on the serverside, we create a websocket server
   ```ts
   import {WebSocketServer} from "renraku/x/node.js"
-  import {Clientside, makeServersideApi} from "./apis.js"
+  import {Clientside, makeServerside} from "./apis.js"
 
   const server = new WebSocketServer({
     acceptConnection: ({remoteEndpoint, req, headers, address}) => {
       const clientside = remote<Clientside>(remoteEndpoint)
       return {
         closed: () => {},
-        localEndpoint: expose(makeServersideApi(clientside)),
+        localEndpoint: expose(makeServerside(clientside)),
       }
     },
   })
@@ -254,12 +223,12 @@ this project is the result.
 - `ws/client.js` — on the clientside, we create a websocket remote
   ```ts
   import {webSocketRemote, Api} from "renraku"
-  import {Serverside, makeClientsideApi} from "./apis.js"
+  import {Serverside, makeClientside} from "./apis.js"
 
-  const {socket, fns: serverside} = await webSocketRemote<Serverside>({
+  const [serverside, socket] = await webSocketRemote<Serverside>({
     url: "http://localhost:8000",
     getLocalEndpoint: serverside => expose(
-      makeClientsideApi(() => serverside)
+      makeClientside(() => serverside)
     ),
   })
 
@@ -353,22 +322,21 @@ await fns.anything.goes()
 
 ## ⛩ *RENRAKU* — more about the core primitives
 
-- **`expose`** — generate a json-rpc endpoint for an api
+- **`expose`** — generate a json-rpc endpoint for a group of async functions
   ```ts
   import {expose} from "renraku"
 
-  const endpoint = expose(timingApi)
+  const endpoint = expose(timingFns)
   ```
-  - the endpoint is an async function that accepts a json-rpc request and calls the given api, and then returns the result in a json-rpc response
+  - the endpoint is an async function that accepts a json-rpc request, calls the appropriate function, and then returns the result in a json-rpc response
   - basically, the endpoint's inputs and outputs can be serialized and sent over the network — this is the transport-agnostic aspect
-  - you can make your own async function of type `Endpoint`, that sends requests across the wire to a server which feeds that request into its own exposed api endpoint
 - **`remote`** — generate a nested proxy tree of invokable functions
   - you need to provide the api type as a generic for typescript autocomplete to work on your remote
   - when you invoke an async function on a remote, under the hood, it's actually calling the async endpoint function, which may operate remote or local logic
   ```ts
   import {remote} from "renraku"
 
-  const timing = remote<typeof timingApi>(endpoint)
+  const timing = remote<typeof timingFns>(endpoint)
 
   // calls like this magically work
   await timing.now()
@@ -376,25 +344,15 @@ await fns.anything.goes()
 
 ### helper types
 
-- **`fns`** — keeps you honest by ensuring your functions are async
+- **`fns`** — keeps you honest by ensuring your functions are async, and return json-serializable data
   ```ts
   import {fns} from "renraku"
 
-  const timingApi = fns({
+  const timingFns = fns({
     async now() {
       return Date.now()
     },
   })
-  ```
-- **`api`** — requires you to conform to the type that `expose` expects
-  ```ts
-  import {api} from "renraku"
-
-  const timingApi = api(({headers}) => ({
-    async now() {
-      return Date.now()
-    },
-  }))
   ```
 
 <br/>
@@ -436,7 +394,7 @@ await fns.anything.goes()
   import {exampleFns} from "./example.js"
   import {HttpServer, expose} from "renraku"
 
-  const endpoint = expose(() => exampleFns, {
+  const endpoint = expose(exampleFns, {
 
     // log when an error happens during an api invocation
     onError: (error, id, method) =>
@@ -447,7 +405,7 @@ await fns.anything.goes()
       console.log(`invocation: `, request, response),
   })
 
-  const server = new HttpServer(endpoint, {
+  const server = new HttpServer(() => endpoint, {
 
     // log when an error happens while processing a request
     onError: error =>

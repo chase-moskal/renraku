@@ -1,22 +1,21 @@
 
+import type {IncomingMessage} from "http"
 import {JsonRpc} from "../comms/json-rpc.js"
+import {SimpleHeaders} from "../tools/simple-headers.js"
 
-export type Fn = (...p: any[]) => Promise<any>
-export type Service = Record<string, Fn>
-
+export type Fn = (...p: any[]) => Promise<JsonRpc.Serializable>
 export type Fns = {[key: string]: Fn | Fns}
-export type Meta = {headers: GeneralHeaders, address: string}
-export type Api<F extends Fns = any> = (meta: Meta) => F
+export type Service = Record<string, Fn>
 
 export function fns<F extends Fns>(f: F) {
 	return f
 }
 
-export function api<F extends Fns>(a: Api<F>) {
-	return a
+export type ServerMeta = {
+	req: IncomingMessage
+	headers: SimpleHeaders
+	address: string
 }
-
-export type GeneralHeaders = Record<string, string>
 
 export type OnInvocationFn = (
 	request: JsonRpc.Request,
@@ -24,7 +23,9 @@ export type OnInvocationFn = (
 ) => void
 
 export type Endpoint = (
-	(request: JsonRpc.Request, meta?: Meta) =>
+	(request: JsonRpc.Request) =>
 		Promise<JsonRpc.Response | null>
 )
+
+export {SimpleHeaders}
 

@@ -9,6 +9,23 @@
 
 <br/>
 
+## v0.3
+
+### v0.3.0
+
+- 🟥 ripped headers out of `expose` calls, and removed `api` and `Api` as concepts altogether
+  - now, HttpServer and WebSocketServer will provide you with `req`, `headers`, and `address`
+    ```ts
+    // old
+    new HttpServer(expose(({headers}) => fns))
+
+    // new
+    new HttpServer(({headers}) => expose(fns))
+    ```
+  - this is cleaner, so that postMessage apis and such don't need to pretend to pass fake headers like before
+
+<br/>
+
 ## v0.2
 
 ### v0.2.0
