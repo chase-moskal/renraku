@@ -247,89 +247,6 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## ⛩ *RENRAKU* — go ahead and prematurely optimize with `notify` and `query`
-
-json-rpc has two kinds of requests: "queries" expect a response, and "notifications" do not.  
-renraku supports both of these.
-
-don't worry about this stuff if you're just making an http api, this is more for realtime applications like websockets or postmessage for squeezing out a tiny bit more efficiency.
-
-### let's start with a `remote`
-
-```ts
-import {remote, query, notify, settings} from "renraku"
-
-const fns = remote(myEndpoint)
-```
-
-### use symbols to specify request type
-
-- use the `notify` symbol like this to send a notification request
-  ```ts
-  await fns.hello.world[notify]()
-    // you'll get null, because notifications have no responses
-  ```
-- use the `query` symbol to launch a query request which will await a response
-  ```ts
-  await fns.hello.world[query]()
-
-  // query is the default, so usually this is equivalent:
-  await fns.hello.world()
-  ```
-
-### use the `settings` symbol to set-and-forget
-
-```ts
-// changing the default for this request
-fns.hello.world[settings].notify = true
-
-// now this is a notification
-await fns.hello.world()
-
-// unless we override and specify otherwise
-await fns.hello.world[query]()
-```
-
-### you can even make your whole remote default to `notify`
-
-```ts
-const fns = remote(endpoint, {notify: true})
-
-// now all requests are assumed to be notifications
-await fns.hello.world()
-await fns.anything.goes()
-```
-
-### you can use the `Remote` type when you need these symbols
-
-- the `remote` function applies the `Remote` type automatically
-  ```ts
-  const fns = remote(endpoint)
-
-  // ✅ happy types
-  await serverside.update[notify](data)
-  ```
-- but you might have a function that accepts some remote functionality
-  ```ts
-  async function whatever(serverside: Serverside) {
-
-    // ❌ bad types
-    await serverside.update[notify](data)
-  }
-  ```
-- you might need to specify `Remote` to use the remote symbols
-  ```ts
-  import {Remote} from "renraku"
-
-  async function whatever(serverside: Remote<Serverside>) {
-
-    // ✅ happy types
-    await serverside.update[notify](data)
-  }
-  ```
-
-<br/>
-
 ## ⛩ *RENRAKU* — more about the core primitives
 
 - **`endpoint`** — function to generate a json-rpc endpoint for a group of async functions
@@ -444,6 +361,89 @@ await fns.anything.goes()
   })
 
   server.listen(8000)
+  ```
+
+<br/>
+
+## ⛩ *RENRAKU* — go ahead and prematurely optimize with `notify` and `query`
+
+json-rpc has two kinds of requests: "queries" expect a response, and "notifications" do not.  
+renraku supports both of these.
+
+don't worry about this stuff if you're just making an http api, this is more for realtime applications like websockets or postmessage for squeezing out a tiny bit more efficiency.
+
+### let's start with a `remote`
+
+```ts
+import {remote, query, notify, settings} from "renraku"
+
+const fns = remote(myEndpoint)
+```
+
+### use symbols to specify request type
+
+- use the `notify` symbol like this to send a notification request
+  ```ts
+  await fns.hello.world[notify]()
+    // you'll get null, because notifications have no responses
+  ```
+- use the `query` symbol to launch a query request which will await a response
+  ```ts
+  await fns.hello.world[query]()
+
+  // query is the default, so usually this is equivalent:
+  await fns.hello.world()
+  ```
+
+### use the `settings` symbol to set-and-forget
+
+```ts
+// changing the default for this request
+fns.hello.world[settings].notify = true
+
+// now this is a notification
+await fns.hello.world()
+
+// unless we override and specify otherwise
+await fns.hello.world[query]()
+```
+
+### you can even make your whole remote default to `notify`
+
+```ts
+const fns = remote(endpoint, {notify: true})
+
+// now all requests are assumed to be notifications
+await fns.hello.world()
+await fns.anything.goes()
+```
+
+### you can use the `Remote` type when you need these symbols
+
+- the `remote` function applies the `Remote` type automatically
+  ```ts
+  const fns = remote(endpoint)
+
+  // ✅ happy types
+  await serverside.update[notify](data)
+  ```
+- but you might have a function that accepts some remote functionality
+  ```ts
+  async function whatever(serverside: Serverside) {
+
+    // ❌ bad types
+    await serverside.update[notify](data)
+  }
+  ```
+- you might need to specify `Remote` to use the remote symbols
+  ```ts
+  import {Remote} from "renraku"
+
+  async function whatever(serverside: Remote<Serverside>) {
+
+    // ✅ happy types
+    await serverside.update[notify](data)
+  }
   ```
 
 <br/>
