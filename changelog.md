@@ -34,6 +34,8 @@
     const myApi = ({headers}: ServerMetas) => ({...myFunctions})
     new HttpServer(meta => endpoint(myApi(meta)))
     ```
+- 🟥 rename `maxPayloadBytes` to `maxRequestBytes`
+- 🍏 add `timeout` for HttpServer and also WebSocketServer, defaults to 10 seconds.
 
 <br/>
 
