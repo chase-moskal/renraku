@@ -4,23 +4,22 @@
 ### 🎨 make beautiful typescript apis.
 
 📦 **`npm i renraku`**  
-💡 elegantly expose async functions  
+💡 elegantly expose async functions as an api  
 🌐 node and browser  
 🏛️ json-rpc 2.0  
-🔌 http and websockets  
-🚚 transport agnostic core  
-🛡️ auth helpers  
-🧪 testable  
+🔌 http, websockets, and more  
+🚚 super transport agnostic  
+🛡️ beautiful little auth helpers  
 
 <br/>
 
 ## ⛩️ *RENRAKU* — a simple idea
 
-***"an api should just be a bunch of async functions."***
+***"an api should just be a bunch of async functions, damn it"***
 
-i had this idea in 2017, and since then i've been evolving the concept's implementation and typescript ergonomics.
+i had this idea in 2017, and have been evolving the implementation and typescript ergonomics ever since.
 
-this project is the result.
+maybe this project is my life's work, actually...
 
 <br/>
 
@@ -384,6 +383,31 @@ await fns.anything.goes()
   })
   ```
 - the intention here is security-by-default, because error messages could potentialy include sensitive information
+
+<br/>
+
+## ⛩ *RENRAKU* — request limits
+
+- you can customize `timeout` and `maxRequestBytes`
+  - `maxRequestBytes` prevents gigantic requests from dumping on you
+    - `10_000_000` (10 megabytes) is the default
+  - `timeout` kills a request if it goes stale
+    - `10_000` (10 seconds) is the default
+  - HttpServer
+    ```ts
+    new HttpServer(() => endpoint(fns), {
+      timeout: 10_000,
+      maxRequestBytes: 10_000_000,
+    })
+    ```
+  - WebSocketServer
+    ```ts
+    new WebSocketServer({
+      timeout: 10_000,
+      maxRequestBytes: 10_000_000,
+      acceptConnection,
+    })
+    ```
 
 <br/>
 
