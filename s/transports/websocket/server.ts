@@ -2,16 +2,17 @@
 import * as ws from "ws"
 import * as http from "http"
 
+import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
+import {ipAddress} from "../../tools/ip-address.js"
 import {Endpoint, ServerMeta} from "../../core/types.js"
+import {simplifyHeaders} from "../../tools/simple-headers.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
-import {ipAddress} from "../../tools/ip-address.js"
-import {simplifyHeaders} from "../../tools/simple-headers.js"
 
 type Options = {
 	timeout: number
-	maxPayloadSize: number
+	maxRequestBytes: number
 	onError: (error: any) => void
 }
 
@@ -42,8 +43,8 @@ export class WebSocketServer {
 
 	constructor(inputs: Partial<Options> & Requirements) {
 		const params = this.params = {
-			timeout: 10_000,
-			maxPayloadSize: 10_000_000,
+			timeout: defaults.timeout,
+			maxRequestBytes: defaults.maxRequestBytes,
 			onError: () => {},
 			...inputs,
 		}
@@ -53,7 +54,7 @@ export class WebSocketServer {
 
 		const wsServer = this.wsServer = new ws.WebSocketServer({
 			noServer: true,
-			maxPayload: params.maxPayloadSize,
+			maxPayload: params.maxRequestBytes,
 		})
 
 		wsServer

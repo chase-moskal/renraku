@@ -1,5 +1,6 @@
 
 import {Server} from "http"
+import {defaults} from "../defaults.js"
 import {Endpoint, ServerMeta} from "../../core/types.js"
 import {allowCors} from "./node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "./node-utils/listener-transforms/health-check.js"
@@ -15,6 +16,7 @@ export class HttpServer extends Server {
 				)
 			)
 		)
+		this.timeout = options.timeout ?? defaults.timeout
 	}
 }
 

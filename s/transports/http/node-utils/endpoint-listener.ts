@@ -6,9 +6,11 @@ import {JsonRpc} from "../../../comms/json-rpc.js"
 import {ipAddress} from "../../../tools/ip-address.js"
 import {Endpoint, ServerMeta} from "../../../core/types.js"
 import {simplifyHeaders} from "../../../tools/simple-headers.js"
+import {defaults} from "../../defaults.js"
 
 export type EndpointListenerOptions = {
-	maxPayloadSize?: number
+	timeout?: number
+	maxRequestBytes?: number
 	onError?: (error: any) => void
 }
 
@@ -18,13 +20,13 @@ export function makeEndpointListener(
 	): RequestListener {
 
 	const {
-		maxPayloadSize = 10_000_000,
+		maxRequestBytes = defaults.maxRequestBytes,
 		onError = () => {},
 	} = options
 
 	return async(req, res) => {
 		try {
-			const body = await readStream(req, maxPayloadSize)
+			const body = await readStream(req, maxRequestBytes)
 			const requestish = JSON.parse(body) as JsonRpc.Requestish
 			const endpoint = makeEndpoint({
 				req,
