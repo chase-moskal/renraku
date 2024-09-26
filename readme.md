@@ -73,8 +73,6 @@ maybe this project is my life's work, actually...
       // 3
     ```
 
-<br/>
-
 ### arbitrary nesting is cool
 
 - you can use arbitrary object nesting to organize your api
