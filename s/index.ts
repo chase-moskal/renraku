@@ -7,7 +7,7 @@ export * from "./comms/json-rpc.js"
 export * from "./comms/respond.js"
 
 export * from "./core/errors.js"
-export * from "./core/expose.js"
+export * from "./core/endpoint.js"
 export * from "./core/remote-proxy.js"
 export * from "./core/remote.js"
 export * from "./core/types.js"

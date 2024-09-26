@@ -3,14 +3,14 @@ import {obtain} from "../tools/obtain.js"
 import {Endpoint, Fn, Fns, OnInvocationFn} from "./types.js"
 import {OnRespondErrorFn, respond} from "../comms/respond.js"
 
-export type ExposeOptions = {
+export type EndpointOptions = {
 	onError?: OnRespondErrorFn
 	onInvocation?: OnInvocationFn
 }
 
-export function expose<F extends Fns>(
+export function endpoint<F extends Fns>(
 		fns: F,
-		options: ExposeOptions = {},
+		options: EndpointOptions = {},
 	): Endpoint {
 
 	const {

@@ -1,7 +1,7 @@
 
 import {WebSocketServer} from "../server.js"
 import {remote} from "../../../core/remote.js"
-import {expose} from "../../../core/expose.js"
+import {endpoint} from "../../../core/endpoint.js"
 import {ExampleClientsideFns, exampleServersideApi} from "./apis.js"
 
 const server = new WebSocketServer({
@@ -9,7 +9,7 @@ const server = new WebSocketServer({
 		const clientside = remote<ExampleClientsideFns>(remoteEndpoint)
 		return {
 			closed: () => {},
-			localEndpoint: expose(exampleServersideApi(clientside)),
+			localEndpoint: endpoint(exampleServersideApi(clientside)),
 		}
 	},
 })

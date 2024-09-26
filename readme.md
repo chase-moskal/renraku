@@ -46,9 +46,9 @@ this project is the result.
 1. `server.ts` — let's expose the functions on a node server
     ```ts
     import {exampleFns} from "./example.js"
-    import {HttpServer, expose} from "renraku"
+    import {HttpServer, endpoint} from "renraku"
 
-    new HttpServer(() => expose(exampleFns))
+    new HttpServer(() => endpoint(exampleFns))
       .listen(8000)
     ```
 1. `client.ts` — finally, let's call the functions from a web browser
@@ -107,7 +107,7 @@ this project is the result.
     // http headers -------        |
     // node request -     |        |
     //              ↓     ↓        ↓
-  new HttpServer(({req, headers, address}) => expose({
+  new HttpServer(({req, headers, address}) => endpoint({
     async sum(a: number, b: number) {
       console.log(headers["origin"], address)
       return a + b
@@ -212,7 +212,7 @@ this project is the result.
       const clientside = remote<Clientside>(remoteEndpoint)
       return {
         closed: () => {},
-        localEndpoint: expose(makeServerside(clientside)),
+        localEndpoint: endpoint(makeServerside(clientside)),
       }
     },
   })
@@ -227,7 +227,7 @@ this project is the result.
 
   const [serverside, socket] = await webSocketRemote<Serverside>({
     url: "http://localhost:8000",
-    getLocalEndpoint: serverside => expose(
+    getLocalEndpoint: serverside => endpoint(
       makeClientside(() => serverside)
     ),
   })
@@ -249,7 +249,7 @@ don't worry about this stuff if you're just making an http api, this is more for
 ```ts
 import {remote, query, notify, settings} from "renraku"
 
-const fns = remote(endpoint)
+const fns = remote(myEndpoint)
 ```
 
 ### use symbols to specify request type
@@ -322,11 +322,11 @@ await fns.anything.goes()
 
 ## ⛩ *RENRAKU* — more about the core primitives
 
-- **`expose`** — generate a json-rpc endpoint for a group of async functions
+- **`endpoint`** — generate a json-rpc endpoint for a group of async functions
   ```ts
-  import {expose} from "renraku"
+  import {endpoint} from "renraku"
 
-  const endpoint = expose(timingFns)
+  const timingEndpoint = endpoint(timingFns)
   ```
   - the endpoint is an async function that accepts a json-rpc request, calls the appropriate function, and then returns the result in a json-rpc response
   - basically, the endpoint's inputs and outputs can be serialized and sent over the network — this is the transport-agnostic aspect
@@ -336,7 +336,7 @@ await fns.anything.goes()
   ```ts
   import {remote} from "renraku"
 
-  const timing = remote<typeof timingFns>(endpoint)
+  const timing = remote<typeof timingFns>(timingEndpoint)
 
   // calls like this magically work
   await timing.now()
@@ -392,9 +392,9 @@ await fns.anything.goes()
 - on the server, you can use various callbacks to do your own logging
   ```ts
   import {exampleFns} from "./example.js"
-  import {HttpServer, expose} from "renraku"
+  import {HttpServer, endpoint} from "renraku"
 
-  const endpoint = expose(exampleFns, {
+  const exampleEndpoint = endpoint(exampleFns, {
 
     // log when an error happens during an api invocation
     onError: (error, id, method) =>
@@ -405,7 +405,7 @@ await fns.anything.goes()
       console.log(`invocation: `, request, response),
   })
 
-  const server = new HttpServer(() => endpoint, {
+  const server = new HttpServer(() => exampleEndpoint, {
 
     // log when an error happens while processing a request
     onError: error =>
