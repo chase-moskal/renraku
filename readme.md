@@ -13,7 +13,7 @@
 
 <br/>
 
-## ⛩️ *RENRAKU* — a simple idea
+### a simple idea
 
 ***"an api should just be a bunch of async functions, damn it"***
 
@@ -23,14 +23,16 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## ⛩️ *RENRAKU* — let's make a happy http api
+## *RENRAKU* — it's really this easy
 
 1. install renraku into your project
     ```sh
     npm i renraku
     ```
-1. `example.ts` — a bunch of async functions
+1. so, you have a bunch of async functions
     ```ts
+    // example.ts
+
     export const exampleFns = {
 
       async now() {
@@ -42,25 +44,27 @@ maybe this project is my life's work, actually...
       },
     }
     ```
-1. `server.ts` — let's expose the functions on a node server
+1. expose them on your server as a one-liner
     ```ts
+    // server.ts
+
     import {exampleFns} from "./example.js"
     import {HttpServer, endpoint} from "renraku"
 
-    new HttpServer(() => endpoint(exampleFns))
-      .listen(8000)
+    new HttpServer(() => endpoint(exampleFns)).listen(8000)
     ```
-1. `client.ts` — finally, let's call the functions from a web browser
+1. on the client, another one-liner, and you can magically call those functions
     ```ts
-      // note, only need the *type* here
-      //    ↓
-    import type {exampleFns} from "./example.js"
+    // client.ts
+
     import {httpRemote} from "renraku"
+    import type {exampleFns} from "./example.js"
+      //    ↑
+      //    🆒 we only need the *type* here
 
     const example = httpRemote<typeof exampleFns>("http://localhost:8000/")
 
-    // now you get a "natural" calling syntax,
-    // feels like ordinary async functions:
+    // 🪄 you can now call the functions
 
     await example.now()
       // 1723701145176
@@ -71,7 +75,7 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## ⛩ *RENRAKU* — arbitrary nesting is cool
+### arbitrary nesting is cool
 
 - you can use arbitrary object nesting to organize your api
   ```ts
@@ -98,13 +102,13 @@ maybe this project is my life's work, actually...
     await example.numbers.math.sum(1, 2)
     ```
 
-## ⛩ *RENRAKU* — http headers
+## http headers etc
 
-- renraku will pass you the http stuff you need
+- renraku will provide the http stuff you need
   ```ts
-    //              🆒     🆒    🆒
-    //              ↓      ↓     ↓
-  new HttpServer(({req, headers, ip}) => endpoint({
+    //              🆒  🆒    🆒
+    //              ↓   ↓     ↓
+  new HttpServer(({req, ip, headers}) => endpoint({
 
     async sum(a: number, b: number) {
       console.log(ip, headers["origin"])
@@ -117,7 +121,8 @@ maybe this project is my life's work, actually...
 
 ## ⛩ *RENRAKU* — `secure` and `authorize`
 
-- secure parts of your api by requiring auth
+- we have a lovely little auth system for you
+- use the `secure` function to section off parts of your api that require auth
   ```ts
   import {secure} from "renraku"
 
@@ -129,13 +134,10 @@ maybe this project is my life's work, actually...
       //    ↓                  ↓
     math: secure(async(auth: string) => {
 
-      // here you can do any auth work you need,
-      // (maybe get into bearer token crypto)
+      // here you can do any auth work you need
       if (auth !== "hello")
-        throw new Error("failed fake authentication lol")
+        throw new Error("auth error: did not receive warm greeting")
 
-      // finally, return the functionality for this
-      // authorized service
       return {
         async sum(a: number, b: number) {
           return a + b
@@ -144,32 +146,38 @@ maybe this project is my life's work, actually...
     }),
   }
   ```
-- on the clientside, the `auth` param is required
+  - you see, `secure` merely adds your initial auth parameter as a required argument to each function
+    ```ts
+      //                  auth param
+      //                      ↓
+    await example.math.sum("hello", 1, 2)
+    ```
+- use the `authorize` function on the clientside to provide the auth param upfront
   ```ts
-  import type {exampleFns} from "./example.js"
-  import {httpRemote, authorize} from "renraku"
+  import {authorize} from "renraku"
 
-  const example = httpRemote<typeof exampleFns>("http://localhost:8000/")
-
-  // you can provide the 'auth' as the first parameter
-  await example.math.sum("hello", 1, 2)
-
-  // or authorize a whole group of functions
+    //             (the secured area)  (async getter for auth param)
+    //                          ↓              ↓
   const math = authorize(example.math, async() => "hello")
     // it's an async function so you could refresh
     // tokens or whatever
 
-  // this call has been authorized
+  // now the auth is magically provided for each call
   await math.sum(1, 2)
   ```
+  - but why an async getter function?  
+    ah, well that's because it's a perfect opportunity for you to refresh your tokens or what-have-you.  
+    the getter is called for each api call.  
 
 <br/>
 
 ## ⛩ *RENRAKU* — whimsical websockets
 
 - here our example websocket setup is more complex because we're setting up two apis that can communicate bidirectionally.
-- `ws/apis.js` — define your serverside and clientside apis
+- define your serverside and clientside apis
   ```ts
+  // ws/apis.js
+
   // first, we must declare our api types.
   // (otherwise, typescript get a fit due to the mutual cross-referencing)
 
@@ -183,8 +191,8 @@ maybe this project is my life's work, actually...
 
   // now we can define the api implementations.
 
-  export const makeServerside =
-    (clientside: Clientside): Serverside => ({
+  export const makeServerside = (
+    clientside: Clientside): Serverside => ({
 
     async sum(a, b) {
       await clientside.now() // remember, each side can call the other
@@ -192,21 +200,23 @@ maybe this project is my life's work, actually...
     },
   })
 
-  export const makeClientside =
-    (getServerside: () => Serverside): Clientside => ({
+  export const makeClientside = (
+    getServerside: () => Serverside): Clientside => ({
 
     async now() {
       return Date.now()
     },
   })
   ```
-- `ws/server.js` — on the serverside, we create a websocket server
+- on the serverside, we create a websocket server
   ```ts
+  // ws/server.js
+
   import {WebSocketServer} from "renraku/x/node.js"
   import {Clientside, makeServerside} from "./apis.js"
 
   const server = new WebSocketServer({
-    acceptConnection: ({remoteEndpoint, req, headers, ip}) => {
+    acceptConnection: ({remoteEndpoint, req, ip, headers}) => {
       const clientside = remote<Clientside>(remoteEndpoint)
       return {
         closed: () => {},
@@ -218,8 +228,10 @@ maybe this project is my life's work, actually...
   server.listen(8000)
   ```
   - note that we have to import from `renraku/x/node.js`, because we keep all node imports separated to avoid making the browser upset
-- `ws/client.js` — on the clientside, we create a websocket remote
+- on the clientside, we create a websocket remote
   ```ts
+  // ws/client.js
+
   import {webSocketRemote, Api} from "renraku"
   import {Serverside, makeClientside} from "./apis.js"
 
@@ -235,7 +247,7 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## ⛩ *RENRAKU* — `notify` and `query`
+## ⛩ *RENRAKU* — go ahead and prematurely optimize with `notify` and `query`
 
 json-rpc has two kinds of requests: "queries" expect a response, and "notifications" do not.  
 renraku supports both of these.
@@ -320,29 +332,26 @@ await fns.anything.goes()
 
 ## ⛩ *RENRAKU* — more about the core primitives
 
-- **`endpoint`** — generate a json-rpc endpoint for a group of async functions
+- **`endpoint`** — function to generate a json-rpc endpoint for a group of async functions
   ```ts
   import {endpoint} from "renraku"
 
-  const timingEndpoint = endpoint(timingFns)
+  const myEndpoint = endpoint(myFunctions)
   ```
   - the endpoint is an async function that accepts a json-rpc request, calls the appropriate function, and then returns the result in a json-rpc response
   - basically, the endpoint's inputs and outputs can be serialized and sent over the network — this is the transport-agnostic aspect
-- **`remote`** — generate a nested proxy tree of invokable functions
+- **`remote`** — function to generate a nested proxy tree of invokable functions
   - you need to provide the api type as a generic for typescript autocomplete to work on your remote
   - when you invoke an async function on a remote, under the hood, it's actually calling the async endpoint function, which may operate remote or local logic
   ```ts
   import {remote} from "renraku"
 
-  const timing = remote<typeof timingFns>(timingEndpoint)
+  const myRemote = remote<typeof myFunctions>(myEndpoint)
 
   // calls like this magically work
-  await timing.now()
+  await myRemote.now()
   ```
-
-### helper types
-
-- **`fns`** — keeps you honest by ensuring your functions are async, and return json-serializable data
+- **`fns`** — helper function to keeps you honest by ensuring your functions are async and return json-serializable data
   ```ts
   import {fns} from "renraku"
 
@@ -355,9 +364,9 @@ await fns.anything.goes()
 
 <br/>
 
-## ⛩ *RENRAKU* — error handling
+## ⛩ *RENRAKU* — simple error handling
 
-- you can throw an `ExposedError` in your async functions when you want the remote to see the error message:
+- you can throw an `ExposedError` when you want the error message sent to the client
   ```ts
   import {ExposedError, fns} from "renraku"
 
@@ -381,32 +390,31 @@ await fns.anything.goes()
     },
   })
   ```
-- the intention here is security-by-default, because error messages could potentialy include sensitive information
+- the intention here is security-by-default, because error messages could potentially include sensitive information
 
 <br/>
 
 ## ⛩ *RENRAKU* — request limits
 
-- you can customize `timeout` and `maxRequestBytes`
-  - `maxRequestBytes` prevents gigantic requests from dumping on you
-    - `10_000_000` (10 megabytes) is the default
-  - `timeout` kills a request if it goes stale
-    - `10_000` (10 seconds) is the default
-  - HttpServer
-    ```ts
-    new HttpServer(() => endpoint(fns), {
-      timeout: 10_000,
-      maxRequestBytes: 10_000_000,
-    })
-    ```
-  - WebSocketServer
-    ```ts
-    new WebSocketServer({
-      timeout: 10_000,
-      maxRequestBytes: 10_000_000,
-      acceptConnection,
-    })
-    ```
+- `maxRequestBytes` prevents gigantic requests from dumping on you
+  - `10_000_000` (10 megabytes) is the default
+- `timeout` kills a request if it goes stale
+  - `10_000` (10 seconds) is the default
+- set these on your HttpServer
+  ```ts
+  new HttpServer(() => endpoint(fns), {
+    timeout: 10_000,
+    maxRequestBytes: 10_000_000,
+  })
+  ```
+- or set these on your WebSocketServer
+  ```ts
+  new WebSocketServer({
+    timeout: 10_000,
+    maxRequestBytes: 10_000_000,
+    acceptConnection,
+  })
+  ```
 
 <br/>
 
