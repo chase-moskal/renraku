@@ -77,7 +77,7 @@ export class WebSocketServer {
 		) => {
 
 		const {timeout, acceptConnection, onError} = this.params
-		const address = ipAddress(req)
+		const ip = ipAddress(req)
 		const headers = simplifyHeaders(req.headers)
 
 		const socketry = new Socketry({
@@ -88,7 +88,7 @@ export class WebSocketServer {
 
 		const {localEndpoint, closed} = acceptConnection({
 			req,
-			address,
+			ip,
 			headers,
 			ping: () => {
 				socket.ping()

@@ -14,7 +14,7 @@ export function fns<F extends Fns>(f: F) {
 export type ServerMeta = {
 	req: IncomingMessage
 	headers: SimpleHeaders
-	address: string
+	ip: string
 }
 
 export type OnInvocationFn = (

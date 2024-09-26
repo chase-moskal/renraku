@@ -102,13 +102,12 @@ maybe this project is my life's work, actually...
 
 - renraku will pass you the http stuff you need
   ```ts
-    // ip addresss -----------------
-    // http headers -------        |
-    // node request -     |        |
-    //              ↓     ↓        ↓
-  new HttpServer(({req, headers, address}) => endpoint({
+    //              🆒     🆒    🆒
+    //              ↓      ↓     ↓
+  new HttpServer(({req, headers, ip}) => endpoint({
+
     async sum(a: number, b: number) {
-      console.log(headers["origin"], address)
+      console.log(ip, headers["origin"])
       return a + b
     },
   })).listen(8000)
@@ -207,7 +206,7 @@ maybe this project is my life's work, actually...
   import {Clientside, makeServerside} from "./apis.js"
 
   const server = new WebSocketServer({
-    acceptConnection: ({remoteEndpoint, req, headers, address}) => {
+    acceptConnection: ({remoteEndpoint, req, headers, ip}) => {
       const clientside = remote<Clientside>(remoteEndpoint)
       return {
         closed: () => {},

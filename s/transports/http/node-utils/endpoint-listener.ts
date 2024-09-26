@@ -30,7 +30,7 @@ export function makeEndpointListener(
 			const requestish = JSON.parse(body) as JsonRpc.Requestish
 			const endpoint = makeEndpoint({
 				req,
-				address: ipAddress(req),
+				ip: ipAddress(req),
 				headers: simplifyHeaders(req.headers),
 			})
 
