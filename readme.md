@@ -375,7 +375,7 @@ maybe this project is my life's work, actually...
   ```
   - in fact, it has this type signature:
     ```ts
-    (request: JsonRpc.Request) => Promise<JsonRpc.Response | null>
+    export type Endpoint = (request: JsonRpc.Request) => Promise<JsonRpc.Response | null>
     ```
   - so your serverside basically just needs to be able to receive the request object, call this real endpoint function, and send back the response object
 - now, on your clientside, you just need to be able to generate and handle the json objects. that's what `remote` does:
