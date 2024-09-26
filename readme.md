@@ -119,9 +119,8 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## ⛩ *RENRAKU* — `secure` and `authorize`
+## ⛩ *RENRAKU* — auth with `secure` and `authorize`
 
-- we have a lovely little auth system for you
 - use the `secure` function to section off parts of your api that require auth
   ```ts
   import {secure} from "renraku"
@@ -365,7 +364,7 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## ⛩ *RENRAKU* — go ahead and prematurely optimize with `notify` and `query`
+## ⛩ *RENRAKU* — optimizations with `notify` and `query`
 
 json-rpc has two kinds of requests: "queries" expect a response, and "notifications" do not.  
 renraku supports both of these.
