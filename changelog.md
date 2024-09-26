@@ -13,16 +13,27 @@
 
 ### v0.3.0
 
-- 🟥 ripped headers out of `expose` calls, and removed `api` and `Api` as concepts altogether
-  - now, HttpServer and WebSocketServer will provide you with `req`, `headers`, and `address`
-    ```ts
-    // old
-    new HttpServer(expose(({headers}) => fns))
+- 🟥 replaced `expose` function with similar new `endpoint` function
+  ```ts
+  // OLD -- this is outdated
+  new HttpServer(expose(({headers}) => fns))
 
-    // new
-    new HttpServer(({headers}) => expose(fns))
+  // NEW -- do it like this now
+  new HttpServer(({headers}) => endpoint(fns))
+  ```
+  - this new design is cleaner, and non-http apis like postMessage don't need to pretend and pass fake headers like before
+  - we also removed the concept of an `Api` type and the `api` helper function
+  - if you were using `api`, you are now expected to roll-your-own, like this:
+    ```ts
+    // OLD
+    const myApi = api(({headers}) => ({...myFunctions}))
+    new HttpServer(expose(myApi))
+
+    // NEW
+    import {ServerMetas} from "renraku"
+    const myApi = ({headers}: ServerMetas) => ({...myFunctions})
+    new HttpServer(meta => endpoint(myApi(meta)))
     ```
-  - this is cleaner, so that postMessage apis and such don't need to pretend to pass fake headers like before
 
 <br/>
 
