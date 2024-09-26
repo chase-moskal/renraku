@@ -23,7 +23,7 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## *RENRAKU* — it's really this easy
+## ⛩️ *RENRAKU* — it's really this easy
 
 1. install renraku into your project
     ```sh
@@ -102,7 +102,7 @@ maybe this project is my life's work, actually...
     await example.numbers.math.sum(1, 2)
     ```
 
-## http headers etc
+### http headers etc
 
 - renraku will provide the http stuff you need
   ```ts
@@ -179,7 +179,7 @@ maybe this project is my life's work, actually...
   // ws/apis.js
 
   // first, we must declare our api types.
-  // (otherwise, typescript get a fit due to the mutual cross-referencing)
+  // (otherwise, typescript has a fit due to the mutual cross-referencing)
 
   export type Serverside = {
     sum(a: number, b: number): Promise<number>
