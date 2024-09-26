@@ -394,8 +394,8 @@ maybe this project is my life's work, actually...
   - and so that's it. the `remote` doesn't care about the transport mechanism, it just calls this async "Endpoint" function for each call
   - in fact the "real" and "remote" endpoints have the same function signature, so you could imagine that `remote` doesn't even know whether it's directly talking to the "real" endpoint function, or the impostor that is secretly using carrier pigeons to talk to the real one
 - so, to recap,
-  - `endpoint` is used on the serverside to make "real" functions callable via json rpc objects.
-  - `remote` is used on the clientside, and you provide it a "remote" endpoint function that you implement, that ends the json objects to your server
+  - `endpoint` is used on the serverside to make "real" functions callable via json rpc objects
+  - `remote` is used on the clientside, and you provide it a "remote" endpoint function that you implement, that transports the json rpc objects to and from your own serverside (ultimately to talk to the "real" endpoint function)
 
 <br/>
 
