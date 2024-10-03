@@ -17,7 +17,7 @@ type Options = {
 }
 
 type Requirements = {
-	acceptConnection({}: Connection): Handling
+	acceptConnection({}: Connection): Promise<Handling>
 }
 
 type Handling = {
@@ -86,7 +86,7 @@ export class WebSocketServer {
 			onError,
 		})
 
-		const {localEndpoint, closed} = acceptConnection({
+		const {localEndpoint, closed} = await acceptConnection({
 			req,
 			ip,
 			headers,

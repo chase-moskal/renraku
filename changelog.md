@@ -13,6 +13,7 @@
 
 ### v0.3.0
 
+- 🟥 WebSocketServer `acceptConnection` is now an async function
 - 🟥 replaced `expose` function with similar new `endpoint` function
   ```ts
   // OLD -- this is outdated

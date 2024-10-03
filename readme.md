@@ -213,7 +213,7 @@ maybe this project is my life's work, actually...
   import {Clientside, makeServerside} from "./apis.js"
 
   const server = new WebSocketServer({
-    acceptConnection: ({remoteEndpoint, req, ip, headers}) => {
+    acceptConnection: async({remoteEndpoint, req, ip, headers}) => {
       const clientside = remote<Clientside>(remoteEndpoint)
       return {
         closed: () => {},
