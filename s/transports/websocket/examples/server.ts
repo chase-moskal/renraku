@@ -5,7 +5,7 @@ import {endpoint} from "../../../core/endpoint.js"
 import {ExampleClientsideFns, exampleServersideApi} from "./apis.js"
 
 const server = new WebSocketServer({
-	acceptConnection: ({remoteEndpoint}) => {
+	acceptConnection: async({remoteEndpoint}) => {
 		const clientside = remote<ExampleClientsideFns>(remoteEndpoint)
 		return {
 			closed: () => {},
