@@ -19,6 +19,7 @@ export namespace JsonRpc {
 	)
 
 	export type Serializable = (
+		| void
 		| null
 		| undefined
 		| boolean
