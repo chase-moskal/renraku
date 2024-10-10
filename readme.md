@@ -362,40 +362,53 @@ maybe this project is my life's work, actually...
 
 <br/>
 
-## ⛩ *RENRAKU* — custom transport medium
-- okay, so let's say you like renraku's elegant api, and it has HttpServer and WebSocketServer -- but you need it to work over another medium, like postMessage, or carrier pigeons
-- well, you're in luck, because it's actually not so hard to setup your own transport medium
-- consider that on the serverside, you have your functions, and you create an endpoint for your api:
+## ⛩ *RENRAKU* — carrier pigeons, as custom transport medium
+
+- renraku has HttpServer and WebSocketServer out of the box, but sometimes you need it to work over another medium, like postMessage, or carrier pigeons.
+- you're in luck because it's really easy to setup your own transport medium
+- so let's assume you have a group of async functions called `myFunctions`
+- first, let's do your "serverside":
   ```ts
+  import {endpoint} from "renraku"
+  import {myFunctions} from "./my-functions.js"
+
+  // create a renraku endpoint for your functions
   const myEndpoint = endpoint(myFunctions)
+
+  // create your wacky carrier pigeon server
+  const pigeons = new CarrierPigeonServer({
+    handleIncomingPigeon: async incoming => {
+
+      // you parse your incoming string as json
+      const request = JSON.parse(incoming)
+
+      // execute the api call on your renraku endpoint
+      const response = await myEndpoint(request)
+
+      // you send back the json response as a string
+      pigeons.send(JSON.stringify(response))
+    },
+  })
   ```
-- this is the "real" endpoint, and it's just a function that accepts a json rpc request, calls the right function, and emits a json rpc response
+- second, let's do your "clientside":
   ```ts
-  const jsonResponse = await myEndpoint(jsonRequest)
+  import {remote} from "renraku"
+  import type {myFunctions} from "./my-functions.js"
+
+  // create your wacky carrier pigeon client
+  const pigeons = new CarrierPigeonClient()
+
+  // create a remote with the type of your async functions
+  const myRemote = remote<typeof myFunctions>(
+
+    // your carrier pigeon implementation needs only to
+    // transmit the json request object, and return then json response object
+    async request => await carrierPigeon.send(request)
+  )
+
+  // usage
+  await myRemote.math.sum(1, 2) // 3
   ```
-  - in fact, it has this type signature:
-    ```ts
-    export type Endpoint = (request: JsonRpc.Request) => Promise<JsonRpc.Response | null>
-    ```
-  - so your serverside basically just needs to be able to receive the request object, call this real endpoint function, and send back the response object
-- now, on your clientside, you just need to be able to generate and handle the json objects. that's what `remote` does:
-  ```ts
-  const myRemote = remote<typeof myFunctions>(myClientsideEndpoint)
-  ```
-  - here's the rub: the `remote` accepts an `Endpoint` type
-  - but of course, you're on the client, so you don't have the "real" endpoint that actually calls the real functions
-  - so instead, you provide a "remote" endpoint function, that is actually sneaking off to send the json request via carrier pigeon!
-    ```ts
-    const myRemote = remote<typeof myFunctions>(async jsonRequest => {
-      const jsonResponse = await carrierPigeon.send(jsonRequest)
-      return jsonResponse
-    })
-    ```
-  - and so that's it. the `remote` doesn't care about the transport mechanism, it just calls this async "Endpoint" function for each call
-  - in fact the "real" and "remote" endpoints have the same function signature, so you could imagine that `remote` doesn't even know whether it's directly talking to the "real" endpoint function, or the impostor that is secretly using carrier pigeons to talk to the real one
-- so, to recap,
-  - `endpoint` is used on the serverside to make "real" functions callable via json rpc objects
-  - `remote` is used on the clientside, and you provide it a "remote" endpoint function that you implement, that transports the json rpc objects to and from your own serverside (ultimately to talk to the "real" endpoint function)
 
 <br/>
 
