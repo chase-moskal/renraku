@@ -34,10 +34,6 @@ export function makeEndpointListener(
 				headers: simplifyHeaders(req.headers),
 			})
 
-			const execute = async(request: JsonRpc.Request) => {
-				return await endpoint(request)
-			}
-
 			const send = (respondish: null | JsonRpc.Respondish) => {
 				res.statusCode = 200
 				res.setHeader("Content-Type", "application/json")
@@ -45,7 +41,7 @@ export function makeEndpointListener(
 			}
 
 			if (Array.isArray(requestish)) {
-				const responses = (await Promise.all(requestish.map(execute)))
+				const responses = (await Promise.all(requestish.map(endpoint)))
 					.filter(r => !!r)
 				send(
 					(responses.length > 0)
@@ -54,7 +50,7 @@ export function makeEndpointListener(
 				)
 			}
 			else
-				send(await execute(requestish))
+				send(await endpoint(requestish))
 		}
 		catch (error) {
 			res.statusCode = 500
