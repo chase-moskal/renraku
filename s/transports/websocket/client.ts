@@ -38,8 +38,9 @@ export async function webSocketRemote<F extends Fns>(
 
 		const fns = remote<F>(socketry.remoteEndpoint, params)
 
-		socket.onmessage = socketry.prepareMessageHandler(
-			getLocalEndpoint(fns as F)
+		socket.onmessage = event => socketry.receive(
+			getLocalEndpoint(fns as F),
+			event,
 		)
 
 		await ready

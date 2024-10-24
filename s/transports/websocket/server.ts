@@ -102,7 +102,7 @@ export class WebSocketServer {
 
 		socket.onerror = onError
 		socket.onclose = closed
-		socket.onmessage = socketry.prepareMessageHandler(localEndpoint)
+		socket.onmessage = event => socketry.receive(localEndpoint, event)
 	}
 
 	close() {
