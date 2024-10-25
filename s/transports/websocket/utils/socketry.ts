@@ -30,7 +30,7 @@ export class Socketry {
 
 	async receive(localEndpoint: Endpoint | null, event: SocketryMessageEvent) {
 		const incoming = JSON.parse(event.data.toString())
-		return this.bidirectional.receive(localEndpoint, incoming)
+		return await this.bidirectional.receive(localEndpoint, incoming)
 	}
 }
 

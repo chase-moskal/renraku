@@ -13,6 +13,7 @@ export * from "./core/remote.js"
 export * from "./core/types.js"
 
 export * from "./transports/http/client.js"
+export * from "./transports/post-message/peer.js"
 export * from "./transports/websocket/client.js"
 export * from "./transports/utils/bidirectional.js"
 export * from "./transports/utils/response-waiter.js"

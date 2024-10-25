@@ -33,8 +33,9 @@ export class Bidirectional {
 				else
 					throw new Error(`no endpoint to call method "${message.method}"`)
 			}
-			else
+			else {
 				this.waiter.deliverResponse(message)
+			}
 		}
 
 		try {
