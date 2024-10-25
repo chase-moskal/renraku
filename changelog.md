@@ -36,6 +36,7 @@
     new HttpServer(meta => endpoint(myApi(meta)))
     ```
 - 🟥 rename `maxPayloadBytes` to `maxRequestBytes`
+- 🍏 new `PostMessenger` for bidirectional postmessage apis
 - 🍏 add `timeout` for HttpServer and also WebSocketServer, defaults to 10 seconds.
 
 <br/>
