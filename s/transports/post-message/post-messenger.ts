@@ -6,7 +6,7 @@ import {endpoint} from "../../core/endpoint.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Bidirectional} from "../utils/bidirectional.js"
 
-export type PostMessageLocal<R extends Fns> = {
+export type PostMessengerLocal<R extends Fns> = {
 	getFns: (event: MessageEvent, remote: Remote<R>) => (Fns | null)
 	window: {
 		addEventListener: (e: "message", listener: (event: MessageEvent) => void) => void
@@ -14,26 +14,26 @@ export type PostMessageLocal<R extends Fns> = {
 	}
 }
 
-export type PostMessageRemote = {
+export type PostMessengerRemote = {
 	getOrigin: () => string
 	window: {
 		postMessage: (message: any, origin: string) => void
 	}
 }
 
-export type PostMessagePeerOptions<R extends Fns> = {
+export type PostMessengerOptions<R extends Fns> = {
+	local: PostMessengerLocal<R>
+	remote: PostMessengerRemote
 	timeout?: number
 	onError?: (error: any) => void
-	local: PostMessageLocal<R>
-	remote: PostMessageRemote
 }
 
-export class PostMessagePeer<R extends Fns> {
+export class PostMessenger<R extends Fns> {
 	bidirectional: Bidirectional
 	remote: Remote<R>
 	dispose = () => {}
 
-	constructor(options: PostMessagePeerOptions<R>) {
+	constructor(options: PostMessengerOptions<R>) {
 		const onError = options.onError ?? (err => console.error(err))
 
 		this.bidirectional = new Bidirectional({
