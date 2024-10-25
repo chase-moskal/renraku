@@ -9,6 +9,38 @@
 
 <br/>
 
+## v0.3
+
+### v0.3.0
+
+- 🟥 WebSocketServer `acceptConnection` is now an async function
+- 🟥 replaced `expose` function with similar new `endpoint` function
+  ```ts
+  // OLD -- this is outdated
+  new HttpServer(expose(({headers}) => fns))
+
+  // NEW -- do it like this now
+  new HttpServer(({headers}) => endpoint(fns))
+  ```
+  - this new design is cleaner, and non-http apis like postMessage don't need to pretend and pass fake headers like before
+  - we also removed the concept of an `Api` type and the `api` helper function
+  - if you were using `api`, you are now expected to roll-your-own, like this:
+    ```ts
+    // OLD
+    const myApi = api(({headers}) => ({...myFunctions}))
+    new HttpServer(expose(myApi))
+
+    // NEW
+    import {ServerMetas} from "renraku"
+    const myApi = ({headers}: ServerMetas) => ({...myFunctions})
+    new HttpServer(meta => endpoint(myApi(meta)))
+    ```
+- 🟥 rename `maxPayloadBytes` to `maxRequestBytes`
+- 🍏 new `PostMessenger` for bidirectional postmessage apis
+- 🍏 add `timeout` for HttpServer and also WebSocketServer, defaults to 10 seconds.
+
+<br/>
+
 ## v0.2
 
 ### v0.2.0

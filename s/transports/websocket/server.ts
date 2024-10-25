@@ -2,19 +2,22 @@
 import * as ws from "ws"
 import * as http from "http"
 
+import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
-import {Endpoint, HttpHeaders} from "../../core/types.js"
+import {ipAddress} from "../../tools/ip-address.js"
+import {Endpoint, ServerMeta} from "../../core/types.js"
+import {simplifyHeaders} from "../../tools/simple-headers.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 type Options = {
 	timeout: number
-	maxPayloadSize: number
+	maxRequestBytes: number
 	onError: (error: any) => void
 }
 
 type Requirements = {
-	acceptConnection({}: Connection): Handling
+	acceptConnection({}: Connection): Promise<Handling>
 }
 
 type Handling = {
@@ -23,11 +26,10 @@ type Handling = {
 }
 
 type Connection = {
-	headers: HttpHeaders
 	ping: () => void
 	close: () => void
 	remoteEndpoint: Endpoint
-}
+} & ServerMeta
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
@@ -41,8 +43,8 @@ export class WebSocketServer {
 
 	constructor(inputs: Partial<Options> & Requirements) {
 		const params = this.params = {
-			timeout: 10_000,
-			maxPayloadSize: 10_000_000,
+			timeout: defaults.timeout,
+			maxRequestBytes: defaults.maxRequestBytes,
 			onError: () => {},
 			...inputs,
 		}
@@ -52,7 +54,7 @@ export class WebSocketServer {
 
 		const wsServer = this.wsServer = new ws.WebSocketServer({
 			noServer: true,
-			maxPayload: params.maxPayloadSize,
+			maxPayload: params.maxRequestBytes,
 		})
 
 		wsServer
@@ -75,16 +77,19 @@ export class WebSocketServer {
 		) => {
 
 		const {timeout, acceptConnection, onError} = this.params
+		const ip = ipAddress(req)
+		const headers = simplifyHeaders(req.headers)
 
 		const socketry = new Socketry({
 			socket,
 			timeout,
-			headers: req.headers,
 			onError,
 		})
 
-		const {localEndpoint, closed} = acceptConnection({
-			headers: req.headers,
+		const {localEndpoint, closed} = await acceptConnection({
+			req,
+			ip,
+			headers,
 			ping: () => {
 				socket.ping()
 			},
@@ -97,7 +102,7 @@ export class WebSocketServer {
 
 		socket.onerror = onError
 		socket.onclose = closed
-		socket.onmessage = socketry.prepareMessageHandler(localEndpoint)
+		socket.onmessage = event => socketry.receive(localEndpoint, event)
 	}
 
 	close() {

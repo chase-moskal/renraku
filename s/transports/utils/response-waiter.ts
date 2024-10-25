@@ -1,12 +1,12 @@
 
-import {JsonRpc} from "../../../comms/json-rpc.js"
-import {RemoteError, RemoteTimeoutError} from "../../../core/errors.js"
-import {deferPromise, DeferredPromise} from "../../../tools/defer-promise.js"
+import {JsonRpc} from "../../comms/json-rpc.js"
+import {RemoteError, RemoteTimeoutError} from "../../core/errors.js"
+import {deferPromise, DeferredPromise} from "../../tools/defer-promise.js"
 
 type Pend = {
 	method: string
 	deferred: DeferredPromise<JsonRpc.Response>
-	timeoutId: any
+	clear: () => void
 }
 
 export class ResponseWaiter {
@@ -18,17 +18,18 @@ export class ResponseWaiter {
 		const deferred = deferPromise<JsonRpc.Response>()
 		const timeoutFn = () => {
 			deferred.reject(new RemoteTimeoutError(id, method, `timed out in ${(this.timeout / 1000).toFixed(1)} seconds`))
-			this.pending.delete(id)
+			clear()
 		}
 		const timeoutId = setTimeout(timeoutFn, this.timeout)
-		this.pending.set(id, {deferred, timeoutId, method})
+		const clear = () => clearTimeout(timeoutId)
+		this.pending.set(id, {method, deferred, clear})
 		return deferred.promise
 	}
 
 	deliverResponse(response: JsonRpc.Response) {
 		const pend = this.pending.get(response.id)
 		if (pend) {
-			clearTimeout(pend.timeoutId)
+			pend.clear()
 			if ("error" in response)
 				pend.deferred.reject(new RemoteError(response.id, pend.method, response.error.message))
 			else

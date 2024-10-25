@@ -1,7 +1,8 @@
 
+import {fns} from "../../../core/types.js"
 import {secure} from "../../../auth/secure.js"
 
-export const example = {
+export const example = fns({
 
 	// unauthenticated service
 	unlocked: {
@@ -22,5 +23,5 @@ export const example = {
 			},
 		}
 	}),
-}
+})
 
