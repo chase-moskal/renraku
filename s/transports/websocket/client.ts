@@ -27,7 +27,7 @@ export async function webSocketRemote<F extends Fns>(
 
 		const ready = new Promise<WebSocket>((resolve, reject) => {
 			socket.onopen = () => resolve(socket)
-			socket.onerror = error => reject(error)
+			socket.onerror = () => reject(new Error(`websocket connection failed "${url}"`))
 		})
 
 		const socketry = new Socketry({
