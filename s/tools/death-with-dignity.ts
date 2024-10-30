@@ -1,42 +1,41 @@
 
-import {Logger} from "./logging/logger.js"
+import {loggers as stdLoggers} from "./logging/loggers.js"
 
-export type Signal =
+export type Signal = (
 	| "SIGINT"
 	| "SIGTERM"
 	| "uncaughtException"
 	| "unhandledRejection"
+)
 
-export function deathWithDignity({logger = console}: {
-		logger?: Logger
-	} = {}) {
-
+export function deathWithDignity(loggers = stdLoggers) {
 	const deathListeners = new Set<(signal: Signal) => void>()
+
 	function triggerDeathListeners(signal: Signal) {
 		for (const listener of deathListeners)
 			listener(signal)
 	}
 
 	process.on("SIGINT", () => {
-		logger.log("💣 SIGINT")
+		loggers.log("💣 SIGINT")
 		triggerDeathListeners("SIGINT")
 		process.exit(0)
 	})
-	
+
 	process.on("SIGTERM", () => {
-		logger.log("🗡️ SIGTERM")
+		loggers.log("🗡️ SIGTERM")
 		triggerDeathListeners("SIGTERM")
 		process.exit(0)
 	})
 
 	process.on("uncaughtException", error => {
-		logger.error("🚨 unhandled exception:", error)
+		loggers.error("🚨 unhandled exception:", error)
 		triggerDeathListeners("uncaughtException")
 		process.exit(1)
 	})
 
 	process.on("unhandledRejection", (reason, error) => {
-		logger.error("🚨 unhandled rejection:", reason, error)
+		loggers.error("🚨 unhandled rejection:", reason, error)
 		triggerDeathListeners("unhandledRejection")
 		process.exit(1)
 	})
@@ -48,3 +47,4 @@ export function deathWithDignity({logger = console}: {
 		},
 	}
 }
+

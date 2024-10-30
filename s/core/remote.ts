@@ -2,12 +2,12 @@
 import {RemoteError} from "./errors.js"
 import {JsonRpc} from "../comms/json-rpc.js"
 import {remoteProxy} from "./remote-proxy.js"
-import {Endpoint, Fns, OnInvocationFn} from "./types.js"
+import {Endpoint, Fns, OnCall} from "./types.js"
 
 export type RemoteOptions = {
 	label?: string
 	notify?: boolean
-	onInvocation?: OnInvocationFn
+	onCall?: OnCall
 }
 
 let id = 0
@@ -39,21 +39,21 @@ export function remote<F extends Fns>(
 
 		const response = await endpoint(request)
 
-		if (options.onInvocation)
-			options.onInvocation(request, response)
+		if (options.onCall)
+			options.onCall(request, response)
 
 		if (notify && !response)
 			return null
 
 		if (!response)
-			throw new RemoteError(null, base.method, "response was null, but shouldn't be, because the request was not a notification")
+			throw new RemoteError("response was null, but shouldn't be, because the request was not a notification")
 
 		if ("error" in response)
-			throw new RemoteError(response.id, base.method, (
+			throw new RemoteError(
 				options.label
 					? `${options.label}: ${response.error.message}`
 					: response.error.message
-			))
+			)
 
 		return response.result
 	})

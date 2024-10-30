@@ -1,11 +1,12 @@
 
 import {obtain} from "../tools/obtain.js"
-import {Endpoint, Fn, Fns, OnInvocationFn} from "./types.js"
-import {OnRespondErrorFn, respond} from "../comms/respond.js"
+import {respond} from "../comms/respond.js"
+import {loggers} from "../tools/logging/loggers.js"
+import {Endpoint, Fn, Fns, OnCallError, OnCall} from "./types.js"
 
 export type EndpointOptions = {
-	onError?: OnRespondErrorFn
-	onInvocation?: OnInvocationFn
+	onCall?: OnCall
+	onCallError?: OnCallError
 }
 
 export function endpoint<F extends Fns>(
@@ -14,8 +15,8 @@ export function endpoint<F extends Fns>(
 	): Endpoint {
 
 	const {
-		onError = () => {},
-		onInvocation = () => {},
+		onCall = loggers.onCall,
+		onCallError = loggers.onCallError,
 	} = options
 
 	return async request => {
@@ -26,10 +27,10 @@ export function endpoint<F extends Fns>(
 		const response = await respond({
 			request,
 			action,
-			onError,
+			onCallError,
 		})
 
-		onInvocation(request, response)
+		onCall(request, response)
 		return response
 	}
 }

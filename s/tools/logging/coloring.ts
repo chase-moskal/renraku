@@ -1,5 +1,7 @@
 
-const codes = Object.freeze({
+import {isColorSupported} from "../supports.js"
+
+export const codes = Object.freeze({
 
 	// regular colors
 	black: "\u001b[30m",
@@ -84,6 +86,8 @@ export function colorBgRgb(r: number, g: number, b: number) {
 	return (s: string) => `${code}${s}${codes.reset}`
 }
 
+const plain = (s: string) => s
+
 export const color = {
 	none: (s: string) => s,
 	...<{[key in keyof typeof codes]: (s: string) => string}>(
@@ -91,7 +95,9 @@ export const color = {
 			Object.entries(codes)
 				.map(([key, code]) => [
 					key,
-					(s: string) => `${code}${s}${codes.reset}`,
+					isColorSupported()
+						? (s: string) => `${code}${s}${codes.reset}`
+						: plain,
 				])
 		)
 	),

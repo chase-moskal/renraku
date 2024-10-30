@@ -16,10 +16,9 @@ export type SocketryMessageEvent = {
 export class Socketry {
 	bidirectional: Bidirectional
 
-	constructor(options: SocketryOptions) {
+	constructor(private options: SocketryOptions) {
 		this.bidirectional = new Bidirectional({
 			timeout: options.timeout,
-			onError: options.onError,
 			onSend: outgoing => options.socket.send(JSON.stringify(outgoing)),
 		})
 	}
@@ -29,8 +28,13 @@ export class Socketry {
 	}
 
 	async receive(localEndpoint: Endpoint | null, event: SocketryMessageEvent) {
-		const incoming = JSON.parse(event.data.toString())
-		return await this.bidirectional.receive(localEndpoint, incoming)
+		try {
+			const incoming = JSON.parse(event.data.toString())
+			return await this.bidirectional.receive(localEndpoint, incoming)
+		}
+		catch (error) {
+			this.options.onError(error)
+		}
 	}
 }
 
