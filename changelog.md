@@ -1,13 +1,29 @@
 
 # changelog for `renraku`
 
-### legend
-
 - 🟥 *harmful -- breaking change*
 - 🔶 *maybe harmful -- deprecation, or possible breaking change*
 - 🍏 *harmlesss -- addition, fix, or enhancement*
 
 <br/>
+
+## v0.4
+
+logging and error handling has been revised and greatly improved.
+- 🍏 basically the new error handling and logging is good now
+- 🔶 simplified RemoteError constructor to just take a message like ordinary Error
+- 🟥 replaced `onInvocation(request, response)` with `onCall(request, remote)`
+- 🟥 replaced endpoint `onError` with `onCallError`
+- 🟥 replace `PrettyLogger` with `loggers`
+  - now you just import `loggers` which is an instance of `Loggers`
+  - it attempts to detect if the tty supports ansi colors
+  - the loggers instance has ready-made functions `onCall`, `onCallError`, and `onError` for renraku logging
+    - these are now the defaults
+  - renraku now defaults to logging everything
+    - i realized the first thing a developer wants to do, is see that their api is working, and probably start troubleshooting
+    - it was just unacceptable to setup renraku and immediately see nothing and be confused and then have a chore to setup logging
+    - so now, you can disable logging by passing empty functions for onCall/onCallError/onError
+    - i suppose you could actually set those empty functions on the `logger` instance 🤔
 
 ## v0.3
 

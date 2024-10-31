@@ -333,31 +333,13 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — logging
-- renraku is silent by default
-- on the server, you can use various callbacks to do your own logging
+- renraku logs stuff by default
+- you can do this to make renraku silent
   ```ts
-  import {exampleFns} from "./example.js"
-  import {HttpServer, endpoint} from "renraku"
-
-  const exampleEndpoint = endpoint(exampleFns, {
-
-    // log when an error happens during an api invocation
-    onError: (error, id, method) =>
-      console.error(`!! ${id} ${method}()`, error),
-
-    // log when an api invocation completes
-    onInvocation: (request, response) =>
-      console.log(`invocation: `, request, response),
-  })
-
-  const server = new HttpServer(() => exampleEndpoint, {
-
-    // log when an error happens while processing a request
-    onError: error =>
-      console.error("bad request", error),
-  })
-
-  server.listen(8000)
+  import {loggers} from "renraku"
+  loggers.onCall = () => {}
+  loggers.onCallError = () => {}
+  loggers.onError = () => {}
   ```
 
 <br/>
