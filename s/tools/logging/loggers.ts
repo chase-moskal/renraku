@@ -28,12 +28,9 @@ export class Loggers {
 	}
 
 	labelOnCall(label: string | undefined): OnCall {
-		return ({request, remote}) => console.log(
+		return ({request}) => console.log(
 			color.blue(this.#timestamp()),
 			...(label ? [label] : []),
-			remote
-				? "<-"
-				: "->",
 			...(("id" in request && request.id)
 				? [color.cyan(request.id.toString())]
 				: []),
@@ -42,12 +39,9 @@ export class Loggers {
 	}
 
 	labelOnCallError(label: string | undefined): OnCallError {
-		return ({error, request, remote}) => console.error(
+		return ({error, request}) => console.error(
 			color.red(this.#timestamp()),
 			...(label ? [label] : []),
-			remote
-				? "<-"
-				: "->",
 			...(("id" in request && request.id)
 				? [color.yellow(request.id.toString())]
 				: []),

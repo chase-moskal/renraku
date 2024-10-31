@@ -29,7 +29,7 @@ export async function respond<R>({
 	}
 
 	catch (error) {
-		onCallError({error, request, remote: false})
+		onCallError({error, request})
 
 		if (!("id" in request))
 			return null

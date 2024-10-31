@@ -21,13 +21,11 @@ export type OnError = (error: any) => void
 
 export type OnCall = (options: {
 	request: JsonRpc.Request
-	remote: boolean
 }) => void
 
 export type OnCallError = (options: {
 	error: any
 	request: JsonRpc.Request
-	remote: boolean
 }) => void
 
 export type Endpoint = (

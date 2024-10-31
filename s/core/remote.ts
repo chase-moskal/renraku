@@ -39,8 +39,7 @@ export function remote<F extends Fns>(
 				: {...base, id: id++}
 		)
 
-		onCall({request, remote: true})
-
+		onCall({request})
 		const response = await endpoint(request)
 
 		if (notify && !response)

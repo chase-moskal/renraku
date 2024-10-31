@@ -24,7 +24,7 @@ export function endpoint<F extends Fns>(
 		const fn = obtain(fns, path) as Fn
 		const action = async() => await fn(...request.params)
 
-		onCall({request, remote: false})
+		onCall({request})
 
 		const response = await respond({
 			request,
