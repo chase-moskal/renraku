@@ -11,13 +11,12 @@ export type RemoteOptions = {
 	onCall?: OnCall
 }
 
-let id = 0
-
 export function remote<F extends Fns>(
 		endpoint: Endpoint,
 		options: RemoteOptions = {},
 	) {
 
+	let id = 1
 	const {onCall = loggers.onCall} = options
 
 	return remoteProxy<F>(async(
