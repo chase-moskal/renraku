@@ -11,7 +11,8 @@
 		".": {
 			"default": "./x/index.js",
 			"browser": "./x/index.js",
-			"node": "./x/node.js"
+			"node": "./x/server.js",
+			"deno": "./x/server.js"
 		}
 	},
 	"files": [

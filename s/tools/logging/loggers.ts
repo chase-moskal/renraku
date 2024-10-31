@@ -20,10 +20,10 @@ export class Loggers {
 
 	//////////////////////////////////////////////////////////////////////////////
 
-	onCall: OnCall = request => {
+	onCall: OnCall = (request, remote) => {
 		console.log(
 			color.blue(this.#timestamp()),
-			"🔔",
+			remote ? "🚀" : "🔔",
 			color.green(`${request.method}()`),
 		)
 	}

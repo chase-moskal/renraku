@@ -1,12 +1,13 @@
 
 import {RequestListener} from "http"
 
+import {defaults} from "../../defaults.js"
 import {readStream} from "./read-stream.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
 import {ipAddress} from "../../../tools/ip-address.js"
+import {loggers} from "../../../tools/logging/loggers.js"
 import {Endpoint, ServerMeta} from "../../../core/types.js"
 import {simplifyHeaders} from "../../../tools/simple-headers.js"
-import {defaults} from "../../defaults.js"
 
 export type EndpointListenerOptions = {
 	timeout?: number
@@ -20,8 +21,8 @@ export function makeEndpointListener(
 	): RequestListener {
 
 	const {
+		onError = loggers.onError,
 		maxRequestBytes = defaults.maxRequestBytes,
-		onError = () => {},
 	} = options
 
 	return async(req, res) => {

@@ -24,13 +24,14 @@ export function endpoint<F extends Fns>(
 		const fn = obtain(fns, path) as Fn
 		const action = async() => await fn(...request.params)
 
+		onCall(request, false)
+
 		const response = await respond({
 			request,
 			action,
 			onCallError,
 		})
 
-		onCall(request, response)
 		return response
 	}
 }

@@ -2,6 +2,7 @@
 import {Socketry} from "./utils/socketry.js"
 import {deadline} from "../../tools/deadline.js"
 import {Endpoint, Fns} from "../../core/types.js"
+import {loggers} from "../../tools/logging/loggers.js"
 import {remote, RemoteOptions} from "../../core/remote.js"
 
 type Options<F extends Fns> = {
@@ -18,7 +19,7 @@ export async function webSocketRemote<F extends Fns>(
 	const {
 		url,
 		timeout = 10_000,
-		onError = () => {},
+		onError = loggers.onError,
 		getLocalEndpoint = () => null,
 	} = params
 
