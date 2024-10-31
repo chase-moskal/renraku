@@ -31,9 +31,11 @@ export class Loggers {
 		return ({request, remote}) => console.log(
 			color.blue(this.#timestamp()),
 			...(label ? [label] : []),
-			remote ? "📡" : "🔔",
+			remote
+				? "<-"
+				: "->",
 			...(("id" in request && request.id)
-				? [color.cyan("#" + request.id.toString())]
+				? [color.cyan(request.id.toString())]
 				: []),
 			color.green(`${request.method}()`),
 		)
@@ -43,11 +45,14 @@ export class Loggers {
 		return ({error, request, remote}) => console.error(
 			color.red(this.#timestamp()),
 			...(label ? [label] : []),
-			remote ? "📡🚨" : "🔔🚨",
+			remote
+				? "<-"
+				: "->",
 			...(("id" in request && request.id)
-				? [color.cyan("#" + request.id.toString())]
+				? [color.yellow(request.id.toString())]
 				: []),
-			color.yellow(`${request.method}()`),
+			color.red(`${request.method}()`),
+			"🚨",
 			...this.#err(error),
 		)
 	}
@@ -83,7 +88,7 @@ export class Loggers {
 		const milliseconds = date.getUTCMilliseconds().toString().padStart(3, "0")
 		const clock = `${hour}:${minute}:${second}.${milliseconds}`
 
-		return `[${calendar}::${clock}]`
+		return `${calendar}::${clock}`
 	}
 
 	#err = (error: any) => {
