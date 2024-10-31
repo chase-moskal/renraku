@@ -43,7 +43,7 @@ export class PostMessenger<R extends Fns> {
 	constructor(options: PostMessengerOptions<R>) {
 		const loggers = new Loggers()
 		const {
-			onCall,
+			onCall = loggers.onCall,
 			onError = loggers.onError,
 			onCallError = loggers.onCallError,
 		} = options
@@ -58,7 +58,7 @@ export class PostMessenger<R extends Fns> {
 			},
 		})
 
-		this.remote = remote<R>(this.bidirectional.remoteEndpoint)
+		this.remote = remote<R>(this.bidirectional.remoteEndpoint, {onCall})
 
 		const listener = (event: MessageEvent) => {
 			const fns = options.local.getFns(event, this.remote)
