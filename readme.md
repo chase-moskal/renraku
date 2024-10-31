@@ -333,13 +333,24 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — logging
-- renraku logs stuff by default
-- you can do this to make renraku silent
+- renraku will log everything by default
+- make renraku silent like this:
   ```ts
   import {loggers} from "renraku"
   loggers.onCall = () => {}
   loggers.onCallError = () => {}
   loggers.onError = () => {}
+  ```
+- you can prefix a label onto onCall and onCallError, useful for distinguishing clients in the logs
+  ```ts
+  import {loggers, RandomUserEmojis, endpoint, remote} from "renraku"
+
+  const emojis = new RandomUserEmojis() // provides random emojis like "🧔"
+  const {onCall, onCallError} = loggers.label(emojis.pull())
+
+  // wherever you're setting up your remote/endpoints..
+  const myRemote = remote<MyFns>(remoteEndpoint, {onCall})
+  const myEndpoint = endpoint(signalingApi, {onCall, onCallError})
   ```
 
 <br/>

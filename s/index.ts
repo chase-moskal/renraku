@@ -22,5 +22,6 @@ export * from "./tools/logging/coloring.js"
 export * from "./tools/logging/loggers.js"
 export * from "./tools/deadline.js"
 export * from "./tools/errstring.js"
+export * from "./tools/random-user-emojis.js"
 export * from "./tools/simple-headers.js"
 

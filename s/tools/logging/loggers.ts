@@ -20,22 +20,40 @@ export class Loggers {
 
 	//////////////////////////////////////////////////////////////////////////////
 
-	onCall: OnCall = (request, remote) => {
-		console.log(
+	label(s: string) {
+		return {
+			onCall: this.labelOnCall(s),
+			onCallError: this.labelOnCallError(s),
+		}
+	}
+
+	labelOnCall(label: string | undefined): OnCall {
+		return ({request, remote}) => console.log(
 			color.blue(this.#timestamp()),
-			remote ? "🚀" : "🔔",
+			...(label ? [label] : []),
+			remote ? "📡" : "🔔",
+			...(("id" in request && request.id)
+				? [color.cyan("#" + request.id.toString())]
+				: []),
 			color.green(`${request.method}()`),
 		)
 	}
 
-	onCallError: OnCallError = (error, request) => {
-		console.error(
+	labelOnCallError(label: string | undefined): OnCallError {
+		return ({error, request, remote}) => console.error(
 			color.red(this.#timestamp()),
-			"🚨",
-			color.brightRed(`${request.method}()`),
+			...(label ? [label] : []),
+			remote ? "📡🚨" : "🔔🚨",
+			...(("id" in request && request.id)
+				? [color.cyan("#" + request.id.toString())]
+				: []),
+			color.yellow(`${request.method}()`),
 			...this.#err(error),
 		)
 	}
+
+	onCall = this.labelOnCall(undefined)
+	onCallError = this.labelOnCallError(undefined)
 
 	onError: OnError = error => {
 		console.error(
