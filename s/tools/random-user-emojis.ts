@@ -1,7 +1,7 @@
 
-import {HatPuller} from "./hat-puller.js"
+import {Hat} from "./hat.js"
 
-export class RandomUserEmojis extends HatPuller<string> {
+export class RandomUserEmojis extends Hat<string> {
 	constructor() {
 		super([
 			"🐶",
