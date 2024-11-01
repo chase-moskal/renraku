@@ -67,7 +67,6 @@ export class RandomUserEmojis extends Hat<string> {
 			"🦉",
 			"🦩",
 			"🦤",
-			"🪶",
 			"🐸",
 			"🦎",
 			"🐢",
