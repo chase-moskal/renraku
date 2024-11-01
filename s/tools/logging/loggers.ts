@@ -2,6 +2,16 @@
 import {color} from "./coloring.js"
 import {OnCall, OnCallError, OnError} from "../../core/types.js"
 
+export type LogLabelling = {
+	label?: string
+	remote?: boolean
+	prefix?: string
+}
+
+function ok(x: any) {
+	return !!x
+}
+
 export class Loggers {
 	log(...data: any[]) {
 		console.log(
@@ -20,39 +30,38 @@ export class Loggers {
 
 	//////////////////////////////////////////////////////////////////////////////
 
-	label(s: string) {
+	label(labelling: LogLabelling) {
 		return {
-			onCall: this.labelOnCall(s),
-			onCallError: this.labelOnCallError(s),
+			onCall: this.labelOnCall(labelling),
+			onCallError: this.labelOnCallError(labelling),
 		}
 	}
 
-	labelOnCall(label: string | undefined): OnCall {
+	labelOnCall({label, remote, prefix}: LogLabelling = {}): OnCall {
+		const palette = remote
+			? {id: color.green, method: color.green}
+			: {id: color.cyan, method: color.cyan}
 		return ({request}) => console.log(
 			color.blue(this.#timestamp()),
-			...(label ? [label] : []),
-			...(("id" in request && request.id)
-				? [color.cyan(request.id.toString())]
-				: []),
-			color.green(`${request.method}()`),
+			...[label].filter(ok),
+			...[("id" in request && request.id) && palette.id(request.id.toString())],
+			palette.method([prefix, request.method].filter(ok).join(".") + "()"),
 		)
 	}
 
-	labelOnCallError(label: string | undefined): OnCallError {
+	labelOnCallError({label, prefix}: LogLabelling = {}): OnCallError {
 		return ({error, request}) => console.error(
 			color.red(this.#timestamp()),
 			...(label ? [label] : []),
-			...(("id" in request && request.id)
-				? [color.yellow(request.id.toString())]
-				: []),
-			color.red(`${request.method}()`),
+			...[("id" in request && request.id) && color.red(request.id.toString())],
+			color.red([prefix, request.method].join(".") + "()"),
 			"🚨",
 			...this.#err(error),
 		)
 	}
 
-	onCall = this.labelOnCall(undefined)
-	onCallError = this.labelOnCallError(undefined)
+	onCall = this.labelOnCall()
+	onCallError = this.labelOnCallError()
 
 	onError: OnError = error => {
 		console.error(
