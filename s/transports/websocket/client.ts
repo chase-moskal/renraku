@@ -7,6 +7,7 @@ import {remote, RemoteOptions} from "../../core/remote.js"
 
 type Options<F extends Fns> = {
 	url: string
+	onClose: () => void
 	timeout?: number
 	onError?: (error: any) => void
 	getLocalEndpoint?: (remote: F) => Endpoint | null
@@ -18,6 +19,7 @@ export async function webSocketRemote<F extends Fns>(
 
 	const {
 		url,
+		onClose,
 		timeout = 10_000,
 		onError = loggers.onError,
 		getLocalEndpoint = () => null,
@@ -39,6 +41,7 @@ export async function webSocketRemote<F extends Fns>(
 
 		const fns = remote<F>(socketry.remoteEndpoint, params)
 
+		socket.onclose = () => onClose()
 		socket.onmessage = event => socketry.receive(
 			getLocalEndpoint(fns as F),
 			event,

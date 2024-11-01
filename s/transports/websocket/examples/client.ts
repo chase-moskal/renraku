@@ -9,6 +9,7 @@ let rememberCall = () => calls++
 const {socket, fns: serverside} = await webSocketRemote<ExampleServersideFns>({
 	url: "http://localhost:8000",
 	getLocalEndpoint: fns => endpoint(exampleClientsideApi(fns, rememberCall)),
+	onClose: () => console.error("web socket remote disconnected"),
 })
 
 const result = await serverside.now()

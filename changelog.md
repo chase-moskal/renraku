@@ -9,8 +9,11 @@
 
 ## v0.4
 
-logging and error handling has been revised and greatly improved.
+changes and improvements
 - 🍏 added new export `RandomUserEmojis`
+- 🟥 require `onClose` in `webSocketRemote`
+
+logging and error handling has been revised and greatly improved.
 - 🔶 simplified RemoteError constructor to just take a message like ordinary Error
 - 🟥 replaced `onInvocation(request, response)` with `onCall(request, remote)`
 - 🟥 replaced endpoint `onError` with `onCallError`
