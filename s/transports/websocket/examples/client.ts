@@ -6,7 +6,7 @@ import {exampleClientsideApi, ExampleServersideFns} from "./apis.js"
 let calls = 0
 let rememberCall = () => calls++
 
-const {socket, fns: serverside} = await webSocketRemote<ExampleServersideFns>({
+const {socket, remote: serverside} = await webSocketRemote<ExampleServersideFns>({
 	url: "http://localhost:8000",
 	getLocalEndpoint: fns => endpoint(exampleClientsideApi(fns, rememberCall)),
 	onClose: () => console.error("web socket remote disconnected"),

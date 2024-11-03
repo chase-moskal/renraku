@@ -12,6 +12,14 @@
 changes and improvements
 - 🍏 added new export `RandomUserEmojis`
 - 🟥 require `onClose` in `webSocketRemote`
+- 🟥 in webSocketRemote, rename `fns` to `remote`
+  ```ts
+  // BAD old way
+  const {fns: serverside} = await webSocketRemote<Serverside>(options)
+
+  // GOOD new way
+  const {remote: serverside} = await webSocketRemote<Serverside>(options)
+  ```
 
 logging and error handling has been revised and greatly improved.
 - 🔶 simplified RemoteError constructor to just take a message like ordinary Error

@@ -232,11 +232,14 @@ maybe this project is my life's work, actually...
   import {webSocketRemote, Api} from "renraku"
   import {Serverside, makeClientside} from "./apis.js"
 
-  const [serverside, socket] = await webSocketRemote<Serverside>({
+  const {remote: serverside} = await webSocketRemote<Serverside>({
     url: "http://localhost:8000",
     getLocalEndpoint: serverside => endpoint(
       makeClientside(() => serverside)
     ),
+    onClosed: () => {
+      console.log("web socket closed")
+    },
   })
 
   const result = await serverside.now()
