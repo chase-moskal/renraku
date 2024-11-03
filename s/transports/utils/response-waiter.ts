@@ -17,7 +17,7 @@ export class ResponseWaiter {
 	async wait(id: JsonRpc.Id, method: string) {
 		const deferred = deferPromise<JsonRpc.Response>()
 		this.pending.set(id, {method, deferred})
-		return await deadline(this.timeout, () => deferred.promise)
+		return await deadline(`request #${id} ${method}()`, this.timeout, () => deferred.promise)
 	}
 
 	deliverResponse(response: JsonRpc.Response) {

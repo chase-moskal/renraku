@@ -25,7 +25,7 @@ export async function webSocketRemote<F extends Fns>(
 		getLocalEndpoint = () => null,
 	} = params
 
-	return await deadline(timeout, async() => {
+	return await deadline("web socket remote", timeout, async() => {
 		const socket = new WebSocket(url)
 
 		const ready = new Promise<WebSocket>((resolve, reject) => {
