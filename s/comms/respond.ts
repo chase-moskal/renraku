@@ -1,17 +1,16 @@
 
 import {JsonRpc} from "./json-rpc.js"
+import {OnCallError} from "../core/types.js"
 import {ExposedError} from "../core/errors.js"
-
-export type OnRespondErrorFn = (error: any, id: JsonRpc.Id, method: string) => void
 
 export async function respond<R>({
 		request,
 		action,
-		onError,
+		onCallError,
 	}: {
 		request: JsonRpc.Request
 		action: () => Promise<R>
-		onError: OnRespondErrorFn
+		onCallError: OnCallError
 	}): Promise<JsonRpc.Response<R> | null> {
 
 	const id = JsonRpc.getId(request)
@@ -30,7 +29,7 @@ export async function respond<R>({
 	}
 
 	catch (error) {
-		onError(error, id, request.method)
+		onCallError({error, request})
 
 		if (!("id" in request))
 			return null
@@ -40,11 +39,11 @@ export async function respond<R>({
 			jsonrpc: JsonRpc.version,
 			error: (error instanceof ExposedError)
 				? {
-					code: -32000,
+					code: JsonRpc.errorCodes.serverError,
 					message: `${error.name}: ${error.message}`,
 				}
 				: {
-					code: -32000,
+					code: JsonRpc.errorCodes.unexposedError,
 					message: `unexposed error`,
 				},
 		}

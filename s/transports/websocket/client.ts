@@ -2,10 +2,12 @@
 import {Socketry} from "./utils/socketry.js"
 import {deadline} from "../../tools/deadline.js"
 import {Endpoint, Fns} from "../../core/types.js"
+import {loggers} from "../../tools/logging/loggers.js"
 import {remote, RemoteOptions} from "../../core/remote.js"
 
 type Options<F extends Fns> = {
 	url: string
+	onClose: () => void
 	timeout?: number
 	onError?: (error: any) => void
 	getLocalEndpoint?: (remote: F) => Endpoint | null
@@ -17,12 +19,13 @@ export async function webSocketRemote<F extends Fns>(
 
 	const {
 		url,
+		onClose,
 		timeout = 10_000,
-		onError = () => {},
+		onError = loggers.onError,
 		getLocalEndpoint = () => null,
 	} = params
 
-	return await deadline(timeout, async() => {
+	return await deadline("web socket remote", timeout, async() => {
 		const socket = new WebSocket(url)
 
 		const ready = new Promise<WebSocket>((resolve, reject) => {
@@ -38,6 +41,7 @@ export async function webSocketRemote<F extends Fns>(
 
 		const fns = remote<F>(socketry.remoteEndpoint, params)
 
+		socket.onclose = () => onClose()
 		socket.onmessage = event => socketry.receive(
 			getLocalEndpoint(fns as F),
 			event,

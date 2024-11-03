@@ -5,7 +5,6 @@ import {ResponseWaiter} from "./response-waiter.js"
 
 export type BidirectionalOptions = {
 	timeout: number
-	onError: (error: any) => void
 	onSend: (outgoing: JsonRpc.Bidirectional) => void
 }
 
@@ -24,7 +23,7 @@ export class Bidirectional {
 	}
 
 	async receive(localEndpoint: Endpoint | null, incoming: JsonRpc.Bidirectional) {
-		const {onSend, onError} = this.options
+		const {onSend} = this.options
 
 		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
 			if ("method" in message) {
@@ -38,21 +37,16 @@ export class Bidirectional {
 			}
 		}
 
-		try {
-			if (Array.isArray(incoming)) {
-				const responses = (await Promise.all(incoming.map(processMessage)))
-					.filter(r => !!r)
-				if (responses.length > 0)
-					onSend(responses)
-			}
-			else {
-				const response = await processMessage(incoming)
-				if (response)
-					onSend(response)
-			}
+		if (Array.isArray(incoming)) {
+			const responses = (await Promise.all(incoming.map(processMessage)))
+				.filter(r => !!r)
+			if (responses.length > 0)
+				onSend(responses)
 		}
-		catch (error) {
-			onError(error)
+		else {
+			const response = await processMessage(incoming)
+			if (response)
+				onSend(response)
 		}
 	}
 }

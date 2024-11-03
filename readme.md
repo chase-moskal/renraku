@@ -333,31 +333,24 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — logging
-- renraku is silent by default
-- on the server, you can use various callbacks to do your own logging
+- renraku will log everything by default
+- make renraku silent like this:
   ```ts
-  import {exampleFns} from "./example.js"
-  import {HttpServer, endpoint} from "renraku"
+  import {loggers} from "renraku"
+  loggers.onCall = () => {}
+  loggers.onCallError = () => {}
+  loggers.onError = () => {}
+  ```
+- you can prefix a label onto onCall and onCallError, useful for distinguishing clients in the logs
+  ```ts
+  import {loggers, RandomUserEmojis, endpoint, remote} from "renraku"
 
-  const exampleEndpoint = endpoint(exampleFns, {
+  const emojis = new RandomUserEmojis() // provides random emojis like "🧔"
+  const {onCall, onCallError} = loggers.label(emojis.pull())
 
-    // log when an error happens during an api invocation
-    onError: (error, id, method) =>
-      console.error(`!! ${id} ${method}()`, error),
-
-    // log when an api invocation completes
-    onInvocation: (request, response) =>
-      console.log(`invocation: `, request, response),
-  })
-
-  const server = new HttpServer(() => exampleEndpoint, {
-
-    // log when an error happens while processing a request
-    onError: error =>
-      console.error("bad request", error),
-  })
-
-  server.listen(8000)
+  // wherever you're setting up your remote/endpoints..
+  const myRemote = remote<MyFns>(remoteEndpoint, {onCall})
+  const myEndpoint = endpoint(signalingApi, {onCall, onCallError})
   ```
 
 <br/>

@@ -11,7 +11,8 @@
 		".": {
 			"default": "./x/index.js",
 			"browser": "./x/index.js",
-			"node": "./x/node.js"
+			"node": "./x/server.js",
+			"deno": "./x/server.js"
 		}
 	},
 	"files": [
@@ -23,10 +24,9 @@
 		"clean": "rimraf x *.pem && mkdirp x",
 		"importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"compile": "tsc",
-		"watch": "npm run compile -s -- --watch",
-		"start": "run-p watch start-static-http",
-		"start-static-http": "http-server -p 8080",
-		"api": "run-p api-http",
+		"watch": "tsc -w",
+		"start": "run-p watch start-http",
+		"start-http": "http-server -p 8080",
 		"api-http": "node x/transports/http/examples/server.js",
 		"api-http-debug": "node inspect x/transports/http/examples/server.js",
 		"api-ws": "node x/transports/websocket/examples/server.js",
@@ -52,10 +52,10 @@
 	},
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
-		"@types/node": "^22.8.4",
-		"@types/ws": "^8.5.12",
+		"@types/node": "^22.8.7",
+		"@types/ws": "^8.5.13",
 		"cynic": "^0.2.1",
-		"es-module-shims": "^1.10.0",
+		"es-module-shims": "^1.10.1",
 		"http-server": "^14.1.1",
 		"importly": "^0.2.3",
 		"mkdirp": "^3.0.1",

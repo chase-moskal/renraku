@@ -17,10 +17,16 @@ export type ServerMeta = {
 	ip: string
 }
 
-export type OnInvocationFn = (
-	request: JsonRpc.Request,
-	response: JsonRpc.Response | null,
-) => void
+export type OnError = (error: any) => void
+
+export type OnCall = (options: {
+	request: JsonRpc.Request
+}) => void
+
+export type OnCallError = (options: {
+	error: any
+	request: JsonRpc.Request
+}) => void
 
 export type Endpoint = (
 	(request: JsonRpc.Request) =>

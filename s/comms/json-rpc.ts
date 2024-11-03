@@ -72,5 +72,10 @@ export namespace JsonRpc {
 			? request.id
 			: null
 	}
+
+	export const errorCodes = {
+		serverError: -32000,
+		unexposedError: -32001,
+	}
 }
 
