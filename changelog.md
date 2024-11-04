@@ -11,6 +11,7 @@
 
 changes and improvements
 - 🍏 added new export `RandomUserEmojis`
+- 🟥 revise arguments for `deadline(timeout, message, fn)`
 - 🟥 require `onClose` in `webSocketRemote`
 - 🟥 in webSocketRemote, rename `fns` to `remote`
   ```ts

@@ -1,15 +1,15 @@
 
 export class DeadlineError extends Error {
-	constructor(message: string, public milliseconds: number) {
+	constructor(public milliseconds: number, message: string) {
 		super(`${message}, timed out in ${(milliseconds / 1000).toFixed(1)} seconds`)
 	}
 }
 
-export function deadline<R>(message: string, milliseconds: number, fn: () => Promise<R>) {
+export function deadline<R>(milliseconds: number, message: string, fn: () => Promise<R>) {
 	return new Promise<R>((resolve, reject) => {
 
 		const id = setTimeout(
-			() => reject(new DeadlineError(message, milliseconds)),
+			() => reject(new DeadlineError(milliseconds, message)),
 			milliseconds,
 		)
 
