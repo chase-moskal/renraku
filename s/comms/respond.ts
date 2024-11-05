@@ -40,7 +40,7 @@ export async function respond<R>({
 			error: (error instanceof ExposedError)
 				? {
 					code: JsonRpc.errorCodes.serverError,
-					message: `${error.name}: ${error.message}`,
+					message: error.message,
 				}
 				: {
 					code: JsonRpc.errorCodes.unexposedError,
