@@ -1,4 +1,5 @@
 
+import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
 import {deadline} from "../../tools/deadline.js"
 import {Endpoint, Fns} from "../../core/types.js"
@@ -20,7 +21,7 @@ export async function webSocketRemote<F extends Fns>(
 	const {
 		url,
 		onClose,
-		timeout = 10_000,
+		timeout = defaults.timeout,
 		onError = loggers.onError,
 		getLocalEndpoint = () => null,
 	} = params
