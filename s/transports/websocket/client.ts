@@ -40,10 +40,11 @@ export async function webSocketRemote<F extends Fns>(
 		})
 
 		const r = remote<F>(socketry.remoteEndpoint, params)
+		const localEndpoint = getLocalEndpoint(r as F)
 
 		socket.onclose = () => onClose()
 		socket.onmessage = event => socketry.receive(
-			getLocalEndpoint(r as F),
+			localEndpoint,
 			event,
 		)
 
