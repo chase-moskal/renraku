@@ -8,7 +8,11 @@ export type Signal = (
 	| "unhandledRejection"
 )
 
-export function deathWithDignity(loggers = stdLoggers) {
+export function deathWithDignity(
+		loggers = stdLoggers,
+		options: {dieOnUncaught?: boolean} = {},
+	) {
+
 	const deathListeners = new Set<(signal: Signal) => void>()
 
 	function triggerDeathListeners(signal: Signal) {
@@ -30,14 +34,18 @@ export function deathWithDignity(loggers = stdLoggers) {
 
 	process.on("uncaughtException", error => {
 		loggers.error("🚨 unhandled exception:", error)
-		triggerDeathListeners("uncaughtException")
-		process.exit(1)
+		if (options.dieOnUncaught) {
+			triggerDeathListeners("uncaughtException")
+			process.exit(1)
+		}
 	})
 
 	process.on("unhandledRejection", (reason, error) => {
 		loggers.error("🚨 unhandled rejection:", reason, error)
-		triggerDeathListeners("unhandledRejection")
-		process.exit(1)
+		if (options.dieOnUncaught) {
+			triggerDeathListeners("unhandledRejection")
+			process.exit(1)
+		}
 	})
 
 	return {
