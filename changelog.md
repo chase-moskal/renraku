@@ -9,6 +9,15 @@
 
 ## v0.4
 
+### v0.4.2
+- 🍏 isColorSupported accepts env var `FORCE_COLOR`
+- 🍏 deathWithDignity now doesn't die on uncaught errors
+  -  added option `dieOnUncaught` which you can set `true` if you are a severe person
+
+### v0.4.1
+- 🍏 fix efficiency issue in webSocketRemote
+
+### v0.4.0
 changes and improvements
 - 🍏 added new export `RandomUserEmojis`
 - 🟥 revise arguments for `deadline(timeout, message, fn)`
