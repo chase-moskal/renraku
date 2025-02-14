@@ -42,6 +42,9 @@ export function remoteProxy<F extends Fns>(executor: Executor) {
 			},
 			get: (target, key: string | QuerySymbol | NotifySymbol | SettingsSymbol) => {
 
+				if (key === "then")
+					return undefined
+
 				if (key === notify)
 					return (...args: any[]) => executor(path, args, {
 						...currentSettings,

@@ -9,6 +9,9 @@ export function authorize<A, S extends AuthFns<A>>(
 	return new Proxy({}, {
 
 		get: (target: any, key: string) => {
+			if (key === "then")
+				return undefined
+
 			return target[key] ?? (
 				async(...p: any[]) => await service[key](await getAuth(), ...p)
 			)

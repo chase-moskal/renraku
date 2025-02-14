@@ -7,6 +7,9 @@ export function secure<A, S extends Service>(s: (auth: A) => Promise<S>) {
 	return new Proxy(target, {
 
 		get: (_, key: string) => {
+			if (key === "then")
+				return undefined
+
 			return target[key] ?? (
 				async(auth: A, ...params: any[]) => (await s(auth))[key](...params)
 			)
