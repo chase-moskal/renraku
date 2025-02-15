@@ -24,15 +24,12 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩️ *RENRAKU* — it's really this easy
-
 1. install renraku into your project
     ```sh
     npm i renraku
     ```
-1. so, you have a bunch of async functions
+1. `example.ts` — your bunch of async functions
     ```ts
-    // example.ts
-
     export const exampleFns = {
 
       async now() {
@@ -42,25 +39,33 @@ maybe this project is my life's work, actually...
       async sum(a: number, b: number) {
         return a + b
       },
+
+      // arbitrary nesting is cool
+      nested: {
+        async multiply(a: number, b: number) {
+          return a * b
+        },
+      },
     }
     ```
-1. expose them on your server as a one-liner
+1. `server.ts` — expose them on a server
     ```ts
-    // server.ts
-
     import {exampleFns} from "./example.js"
-    import {HttpServer, endpoint} from "renraku"
+    import {endpoint} from "renraku"
+    import {HttpServer} from "renraku/x/server.js"
+      //                                 ↑
+      // serverside/clientside stuff are cleanly separated
 
     new HttpServer(() => endpoint(exampleFns)).listen(8000)
     ```
-1. on the client, another one-liner, and you can magically call those functions
+1. `client.ts` — make a clientside remote to call them
     ```ts
     // client.ts
 
     import {httpRemote} from "renraku"
     import type {exampleFns} from "./example.js"
       //    ↑
-      //    🆒 we only need the *type* here
+      // we only need the *type* here
 
     const example = httpRemote<typeof exampleFns>("http://localhost:8000/")
 
@@ -71,37 +76,12 @@ maybe this project is my life's work, actually...
 
     await example.sum(1, 2)
       // 3
-    ```
 
-### arbitrary nesting is cool
-
-- you can use arbitrary object nesting to organize your api
-  ```ts
-  export const exampleFns = {
-
-    date: {
-      async now() {
-        return Date.now()
-      },
-    },
-
-    numbers: {
-      math: {
-        async sum(a: number, b: number) {
-          return a + b
-        },
-      },
-    },
-  }
-  ```
-  - on the remote side, you'll get a natural calling syntax
-    ```ts
-    await example.date.now()
-    await example.numbers.math.sum(1, 2)
+    await example.nested.multiply(2, 2)
+      // 4
     ```
 
 ### http headers etc
-
 - renraku will provide the http stuff you need
   ```ts
     //              🆒  🆒    🆒
@@ -169,7 +149,6 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — whimsical websockets
-
 - here our example websocket setup is more complex because we're setting up two apis that can communicate bidirectionally.
 - define your serverside and clientside apis
   ```ts
@@ -248,7 +227,6 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — more about the core primitives
-
 - **`endpoint`** — function to generate a json-rpc endpoint for a group of async functions
   ```ts
   import {endpoint} from "renraku"
@@ -282,7 +260,6 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — simple error handling
-
 - you can throw an `ExposedError` when you want the error message sent to the client
   ```ts
   import {ExposedError, fns} from "renraku"
@@ -312,7 +289,6 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — request limits
-
 - `maxRequestBytes` prevents gigantic requests from dumping on you
   - `10_000_000` (10 megabytes) is the default
 - `timeout` kills a request if it goes stale
@@ -359,7 +335,6 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — carrier pigeons, as custom transport medium
-
 - renraku has HttpServer and WebSocketServer out of the box, but sometimes you need it to work over another medium, like postMessage, or carrier pigeons.
 - you're in luck because it's really easy to setup your own transport medium
 - so let's assume you have a group of async functions called `myFunctions`
@@ -409,14 +384,12 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — optimizations with `notify` and `query`
-
 json-rpc has two kinds of requests: "queries" expect a response, and "notifications" do not.  
 renraku supports both of these.
 
 don't worry about this stuff if you're just making an http api, this is more for realtime applications like websockets or postmessage for squeezing out a tiny bit more efficiency.
 
 ### let's start with a `remote`
-
 ```ts
 import {remote, query, notify, settings} from "renraku"
 
@@ -424,7 +397,6 @@ const fns = remote(myEndpoint)
 ```
 
 ### use symbols to specify request type
-
 - use the `notify` symbol like this to send a notification request
   ```ts
   await fns.hello.world[notify]()
@@ -439,7 +411,6 @@ const fns = remote(myEndpoint)
   ```
 
 ### use the `settings` symbol to set-and-forget
-
 ```ts
 // changing the default for this request
 fns.hello.world[settings].notify = true
@@ -452,7 +423,6 @@ await fns.hello.world[query]()
 ```
 
 ### you can even make your whole remote default to `notify`
-
 ```ts
 const fns = remote(endpoint, {notify: true})
 
@@ -462,7 +432,6 @@ await fns.anything.goes()
 ```
 
 ### you can use the `Remote` type when you need these symbols
-
 - the `remote` function applies the `Remote` type automatically
   ```ts
   const fns = remote(endpoint)
@@ -492,7 +461,6 @@ await fns.anything.goes()
 <br/>
 
 ## ⛩ *RENRAKU* means *contact*
-
 💖 free and open source just for you  
 🌟 gimme a star on github  
 
