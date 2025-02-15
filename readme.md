@@ -118,7 +118,7 @@ maybe this project is my life's work, actually...
 <br/>
 
 ## ⛩ *RENRAKU* — auth with `secure` and `authorize`
-
+- ⛔ right now `secure` and `authorize` do not support arbitrary nesting, so you have to pass in a flat object of async functions.
 - use the `secure` function to section off parts of your api that require auth
   ```ts
   import {secure} from "renraku"
