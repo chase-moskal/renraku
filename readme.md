@@ -9,17 +9,20 @@
 🏛️ json-rpc 2.0  
 🔌 http, websockets, and more  
 🚚 super transport agnostic  
-🛡️ beautiful little auth helpers  
+🛡️ handy little auth helpers  
 
 <br/>
 
 ### a simple idea
 
-***"an api should just be a bunch of async functions, damn it"***
+> ***"an api should just be a bunch of async functions, damn it"***  
+> &nbsp; — *Chase Moskal, many years ago*
 
-i had this idea in 2017, and have been evolving the implementation and typescript ergonomics ever since.
+*renraku* is my project to realize this dream, and i've been evolving this typescript implementation for many years.
 
-maybe this project is my life's work, actually...
+i keep finding ways to make it more elegant, more terse, and more flexible.. renraku might be near its penultimate form.. the server and client are basically one-liners now.
+
+renraku doesn't do input validation, you might want to use [zod](https://github.com/colinhacks/zod) for that.
 
 <br/>
 
@@ -60,12 +63,10 @@ maybe this project is my life's work, actually...
     ```
 1. `client.ts` — make a clientside remote to call them
     ```ts
-    // client.ts
-
     import {httpRemote} from "renraku"
     import type {exampleFns} from "./example.js"
       //    ↑
-      // we only need the *type* here
+      // we actually only need the *type* here
 
     const example = httpRemote<typeof exampleFns>("http://localhost:8000/")
 
