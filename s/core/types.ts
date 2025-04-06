@@ -3,7 +3,7 @@ import type {IncomingMessage} from "http"
 import {JsonRpc} from "../comms/json-rpc.js"
 import {SimpleHeaders} from "../tools/simple-headers.js"
 
-export type Fn = (...p: any[]) => Promise<JsonRpc.Serializable>
+export type Fn = (...p: any[]) => Promise<any>
 export type Fns = {[key: string]: Fn | Fns}
 export type Service = Record<string, Fn>
 
