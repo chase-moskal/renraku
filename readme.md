@@ -392,9 +392,16 @@ don't worry about this stuff if you're just making an http api, this is more for
 
 ### let's start with a `remote`
 ```ts
-import {remote, query, notify, settings} from "renraku"
+import {remote, query, notify, tune, settings} from "renraku"
 
 const fns = remote(myEndpoint)
+```
+
+### *new* use the `tune` symbol for setting multiple options per-call
+```ts
+await fns.hello.world[tune]({notify: true, transfer: [buffer]})
+  // you can set notify true/false,
+  // and you get set a transfer to send transferables, like for postMessage api
 ```
 
 ### use symbols to specify request type
@@ -410,13 +417,6 @@ const fns = remote(myEndpoint)
   // query is the default, so usually this is equivalent:
   await fns.hello.world()
   ```
-
-### *new* advanced symbol for setting multiple options per-call
-```ts
-await fns.hello.world[advanced]({notify: true, transfer: [buffer]})
-  // you can set notify true/false,
-  // and you get set a transfer to send transferables, like for postMessage api
-```
 
 ### use the `settings` symbol to set-and-forget
 ```ts

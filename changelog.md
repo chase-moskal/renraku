@@ -9,7 +9,10 @@
 
 ## v0.5
 
-### v0.5.0
+### v0.5.0-2
+- 🟥 rename `advanced` symbol to `tune`
+
+### v0.5.0-1
 - 🟥 added optional `transfer` argument to Endpoint type
 - 🟥 added required `logistics` argument to `Bidirectional->receive`
 - 🔶 deprecate `PostMessenger` in favor of new `Messenger`
