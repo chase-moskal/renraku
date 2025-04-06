@@ -19,37 +19,26 @@ export class Messenger<xRemoteFns extends Fns> {
 	dispose = () => {}
 
 	constructor(options: MessengerOptions<xRemoteFns>) {
-		const localSide = options.local
 		const loggers = new Loggers()
-		const {
-			onCall = loggers.onCall,
-			onError = loggers.onError,
-			onCallError = loggers.onCallError,
-		} = options
+		const {getLocalEndpoint, remotePortal} = options
 
 		this.bidirectional = new Bidirectional({
 			timeout: options.timeout ?? defaults.timeout,
-			onSend: (outgoing, transfer) => {
-				options.remote.port.postMessage(
-					outgoing,
-					options.remote.getOrigin(),
-					transfer,
-				)
-			},
+			onSend: (outgoing, transfer) => remotePortal.send(outgoing, transfer),
 		})
 
-		this.remote = remote<xRemoteFns>(this.bidirectional.remoteEndpoint, {onCall})
+		this.remote = remote<xRemoteFns>(this.bidirectional.remoteEndpoint, {onCall: options.onCall ?? loggers.onCall})
 
-		if (localSide) {
-			const listener = (event: MessageEvent) => {
-				const logistics = new Logistics()
-				const localEndpoint = localSide.getEndpoint(event, this.remote, logistics, {onCall, onCallError})
-				this.bidirectional.receive(localEndpoint, event.data, logistics)
-					.catch(onError)
-			}
-			localSide.port.addEventListener("message", listener)
-			this.dispose = () => localSide.port.removeEventListener("message", listener)
+		const listener = (event: MessageEvent) => {
+			const logistics = new Logistics()
+			const localEndpoint = getLocalEndpoint
+				? getLocalEndpoint(this.remote, logistics, event)
+				: null
+			this.bidirectional.receive(localEndpoint, event.data, logistics)
+				.catch(options.onError ?? loggers.onError)
 		}
+		remotePortal.addEventListener("message", listener)
+		this.dispose = () => remotePortal.removeEventListener("message", listener)
 	}
 }
 
