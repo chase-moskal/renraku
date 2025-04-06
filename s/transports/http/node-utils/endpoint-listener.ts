@@ -42,7 +42,7 @@ export function makeEndpointListener(
 			}
 
 			if (Array.isArray(requestish)) {
-				const responses = (await Promise.all(requestish.map(endpoint)))
+				const responses = (await Promise.all(requestish.map(x => endpoint(x))))
 					.filter(r => !!r)
 				send(
 					(responses.length > 0)

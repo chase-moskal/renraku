@@ -1,15 +1,12 @@
 
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
+import {Logistics} from "../utils/logistics.js"
 import {endpoint} from "../../core/endpoint.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Loggers} from "../../tools/logging/loggers.js"
 import {Bidirectional} from "../utils/bidirectional.js"
 import {Fns, OnCall, OnCallError, OnError} from "../../core/types.js"
-
-// TODO
-// change getFns to getEndpoint, thus outsourcing the responsibility
-// to define the endpoint options
 
 export type PostMessengerLocal<R extends Fns> = {
 	getFns: (event: MessageEvent, remote: Remote<R>) => (Fns | null)
@@ -64,7 +61,7 @@ export class PostMessenger<R extends Fns> {
 		const listener = (event: MessageEvent) => {
 			const fns = options.local.getFns(event, this.remote)
 			const localEndpoint = fns ? endpoint(fns, {onCall, onCallError}) : null
-			this.bidirectional.receive(localEndpoint, event.data)
+			this.bidirectional.receive(localEndpoint, event.data, new Logistics())
 				.catch(onError)
 		}
 

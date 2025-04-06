@@ -7,12 +7,16 @@
 
 <br/>
 
-## v0.4
+## v0.5
 
-### v0.4.6
+### v0.5.0
+- 🟥 added optional `transfer` argument to Endpoint type
+- 🟥 added required `logistics` argument to `Bidirectional->receive`
 - 🔶 deprecate `PostMessenger` in favor of new `Messenger`
 - 🍏 add new remote fn symbol `advanced` which allows us to specify `transfer` on remote requests
 - 🍏 messenger has `logistics` system allowing us to specify `transfer` in local responses
+
+## v0.4
 
 ### v0.4.3 — v0.4.5
 - 🍏 updated dependencies

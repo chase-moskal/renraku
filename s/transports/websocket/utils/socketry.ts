@@ -1,6 +1,7 @@
 
 import * as ws from "ws"
 import {Endpoint} from "../../../core/types.js"
+import {Logistics} from "../../utils/logistics.js"
 import {Bidirectional} from "../../utils/bidirectional.js"
 
 export type SocketryOptions = {
@@ -30,7 +31,7 @@ export class Socketry {
 	async receive(localEndpoint: Endpoint | null, event: SocketryMessageEvent) {
 		try {
 			const incoming = JSON.parse(event.data.toString())
-			return await this.bidirectional.receive(localEndpoint, incoming)
+			return await this.bidirectional.receive(localEndpoint, incoming, new Logistics())
 		}
 		catch (error) {
 			this.options.onError(error)
