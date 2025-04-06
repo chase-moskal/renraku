@@ -29,7 +29,7 @@ export type OnCallError = (options: {
 }) => void
 
 export type Endpoint = (
-	(request: JsonRpc.Request) =>
+	(request: JsonRpc.Request, transfer?: Transferable[]) =>
 		Promise<JsonRpc.Response | null>
 )
 

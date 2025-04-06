@@ -35,6 +35,7 @@ export type PostMessengerOptions<R extends Fns> = {
 	onCallError?: OnCallError
 }
 
+/** @deprecated use `Messenger` instead */
 export class PostMessenger<R extends Fns> {
 	bidirectional: Bidirectional
 	remote: Remote<R>

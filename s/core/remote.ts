@@ -26,6 +26,7 @@ export function remote<F extends Fns>(
 		) => {
 
 		const notify = settings.notify ?? options.notify ?? false
+		const transfer = settings.transfer
 
 		const base: JsonRpc.Notification<any[]> = {
 			jsonrpc: "2.0" as const,
@@ -40,7 +41,7 @@ export function remote<F extends Fns>(
 		)
 
 		onCall({request})
-		const response = await endpoint(request)
+		const response = await endpoint(request, transfer)
 
 		if (notify && !response)
 			return null

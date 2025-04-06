@@ -5,7 +5,7 @@ import {ResponseWaiter} from "./response-waiter.js"
 
 export type BidirectionalOptions = {
 	timeout: number
-	onSend: (outgoing: JsonRpc.Bidirectional) => void
+	onSend: (outgoing: JsonRpc.Bidirectional, transfer?: Transferable[]) => void
 }
 
 export class Bidirectional {
@@ -15,8 +15,8 @@ export class Bidirectional {
 		this.waiter = new ResponseWaiter(this.options.timeout)
 	}
 
-	remoteEndpoint: Endpoint = async request => {
-		this.options.onSend(request)
+	remoteEndpoint: Endpoint = async(request, transfer) => {
+		this.options.onSend(request, transfer)
 		return "id" in request
 			? await this.waiter.wait(request.id, request.method)
 			: null
