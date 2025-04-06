@@ -19,7 +19,7 @@ export * from "./transports/post-message/post-messenger.js"
 export * from "./transports/post-message/types.js"
 export * from "./transports/websocket/client.js"
 export * from "./transports/utils/bidirectional.js"
-export * from "./transports/utils/logistics.js"
+export * from "./transports/utils/rig.js"
 export * from "./transports/utils/response-waiter.js"
 
 export * from "./tools/logging/coloring.js"

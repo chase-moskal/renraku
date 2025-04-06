@@ -1,5 +1,5 @@
 
-import {Logistics} from "./logistics.js"
+import {Rig} from "./rig.js"
 import {Endpoint} from "../../core/types.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {ResponseWaiter} from "./response-waiter.js"
@@ -23,7 +23,7 @@ export class Bidirectional {
 			: null
 	}
 
-	async receive(localEndpoint: Endpoint | null, incoming: JsonRpc.Bidirectional, logistics: Logistics) {
+	async receive(localEndpoint: Endpoint | null, incoming: JsonRpc.Bidirectional, rig: Rig) {
 		const {onSend} = this.options
 
 		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
@@ -42,12 +42,12 @@ export class Bidirectional {
 			const responses = (await Promise.all(incoming.map(processMessage)))
 				.filter(r => !!r)
 			if (responses.length > 0)
-				onSend(responses, logistics.transfer)
+				onSend(responses, rig.transfer)
 		}
 		else {
 			const response = await processMessage(incoming)
 			if (response)
-				onSend(response, logistics.transfer)
+				onSend(response, rig.transfer)
 		}
 	}
 }

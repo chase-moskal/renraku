@@ -1,6 +1,6 @@
 
 import {BasePortal} from "./portals.js"
-import {Logistics} from "../utils/logistics.js"
+import {Rig} from "../utils/rig.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Endpoint, Fns, OnCall, OnError} from "../../core/types.js"
 
@@ -13,7 +13,7 @@ export type MessengerOptions<xRemoteFns extends Fns> = {
 	remotePortal: BasePortal
 	getLocalEndpoint?: (
 		remote: Remote<xRemoteFns>,
-		logistics: Logistics,
+		rig: Rig,
 		event: MessageEvent,
 	) => Endpoint
 	timeout?: number

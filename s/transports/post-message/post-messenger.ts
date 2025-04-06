@@ -1,7 +1,7 @@
 
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
-import {Logistics} from "../utils/logistics.js"
+import {Rig} from "../utils/rig.js"
 import {endpoint} from "../../core/endpoint.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Loggers} from "../../tools/logging/loggers.js"
@@ -61,7 +61,7 @@ export class PostMessenger<R extends Fns> {
 		const listener = (event: MessageEvent) => {
 			const fns = options.local.getFns(event, this.remote)
 			const localEndpoint = fns ? endpoint(fns, {onCall, onCallError}) : null
-			this.bidirectional.receive(localEndpoint, event.data, new Logistics())
+			this.bidirectional.receive(localEndpoint, event.data, new Rig())
 				.catch(onError)
 		}
 

@@ -1,5 +1,5 @@
 
-export class Logistics {
+export class Rig {
 	transfer: undefined | Transferable[]
 }
 

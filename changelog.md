@@ -11,6 +11,7 @@
 
 ### v0.5.0-2
 - 🟥 rename `advanced` symbol to `tune`
+- 🟥 rename `logistics` symbol to `rig`
 
 ### v0.5.0-1
 - 🟥 added optional `transfer` argument to Endpoint type
