@@ -1,5 +1,6 @@
 
 import {BasePortal} from "./portals.js"
+import {Logistics} from "../utils/logistics.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {EndpointOptions} from "../../core/endpoint.js"
 import {Endpoint, Fns, OnCall, OnCallError, OnError} from "../../core/types.js"
@@ -11,7 +12,12 @@ export type MessageBindables = {
 
 export type MessengerLocal<xRemoteFns extends Fns> = {
 	port: BasePortal
-	getEndpoint: (event: MessageEvent, remote: Remote<xRemoteFns>, endpointOptions: EndpointOptions) => Endpoint
+	getEndpoint: (
+		event: MessageEvent,
+		remote: Remote<xRemoteFns>,
+		logistics: Logistics,
+		options: EndpointOptions,
+	) => Endpoint
 }
 
 export type MessengerRemote = {

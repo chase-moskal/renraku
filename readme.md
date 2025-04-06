@@ -411,6 +411,13 @@ const fns = remote(myEndpoint)
   await fns.hello.world()
   ```
 
+### *new* advanced symbol for setting multiple options per-call
+```ts
+await fns.hello.world[advanced]({notify: true, transfer: [buffer]})
+  // you can set notify true/false,
+  // and you get set a transfer to send transferables, like for postMessage api
+```
+
 ### use the `settings` symbol to set-and-forget
 ```ts
 // changing the default for this request

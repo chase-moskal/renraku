@@ -9,6 +9,16 @@
 
 ## v0.4
 
+### v0.4.6
+- 🔶 deprecate `PostMessenger` in favor of new `Messenger`
+- 🍏 add new remote fn symbol `advanced` which allows us to specify `transfer` on remote requests
+- 🍏 messenger has `logistics` system allowing us to specify `transfer` in local responses
+
+### v0.4.3 — v0.4.5
+- 🍏 updated dependencies
+- 🍏 fixed proxies for async returns
+- 🍏 improved readme
+
 ### v0.4.2
 - 🍏 isColorSupported accepts env var `FORCE_COLOR`
 - 🍏 deathWithDignity now doesn't die on uncaught errors

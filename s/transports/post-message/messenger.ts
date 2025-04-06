@@ -3,6 +3,7 @@ import {Fns} from "../../core/types.js"
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
 import {MessengerOptions} from "./types.js"
+import {Logistics} from "../utils/logistics.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Loggers} from "../../tools/logging/loggers.js"
 import {Bidirectional} from "../utils/bidirectional.js"
@@ -41,8 +42,9 @@ export class Messenger<xRemoteFns extends Fns> {
 
 		if (localSide) {
 			const listener = (event: MessageEvent) => {
-				const localEndpoint = localSide.getEndpoint(event, this.remote, {onCall, onCallError})
-				this.bidirectional.receive(localEndpoint, event.data)
+				const logistics = new Logistics()
+				const localEndpoint = localSide.getEndpoint(event, this.remote, logistics, {onCall, onCallError})
+				this.bidirectional.receive(localEndpoint, event.data, logistics)
 					.catch(onError)
 			}
 			localSide.port.addEventListener("message", listener)
