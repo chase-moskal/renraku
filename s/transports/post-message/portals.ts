@@ -1,17 +1,9 @@
 
-import {MessageBindables} from "./types.js"
+import {PortalChannel} from "./types.js"
 
 export abstract class BasePortal {
-	abstract channel: MessageBindables
+	abstract channel: PortalChannel
 	abstract send(message: any, transfer?: Transferable[]): void
-
-	addEventListener(e: "message", listener: (event: MessageEvent) => void) {
-		this.channel.addEventListener(e, listener)
-	}
-
-	removeEventListener(e: "message", listener: (event: MessageEvent) => void) {
-		this.channel.removeEventListener(e, listener)
-	}
 }
 
 export class WindowPortal extends BasePortal {
@@ -30,9 +22,9 @@ export class BroadcastPortal extends BasePortal {
 
 export class MessagePortal extends BasePortal {
 	constructor(
-		public channel: MessageBindables & {
+		public channel: {
 			postMessage(message: any, transfer?: Transferable[]): void
-		}
+		} & PortalChannel
 	) { super() }
 
 	send(message: any, transfer?: Transferable[]) {

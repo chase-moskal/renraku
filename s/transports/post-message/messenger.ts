@@ -37,8 +37,8 @@ export class Messenger<xRemoteFns extends Fns> {
 			this.bidirectional.receive(localEndpoint, event.data, rig)
 				.catch(options.onError ?? loggers.onError)
 		}
-		remotePortal.addEventListener("message", listener)
-		this.dispose = () => remotePortal.removeEventListener("message", listener)
+		remotePortal.channel.addEventListener("message", listener)
+		this.dispose = () => remotePortal.channel.removeEventListener("message", listener)
 	}
 }
 
