@@ -9,6 +9,21 @@
 
 ## v0.5
 
+### v0.5.0-3
+- 🟥 rework package `exports` for nodejs
+  ```ts
+    //    ❌ old bad entrypoint --------.
+    //                                   \
+  import {WebSocketServer} from "renraku/x/server.js"
+
+    //    ✅ new good entrypoint -------.
+    //                                   \
+  import {WebSocketServer} from "renraku/node"
+  ```
+  - previously i actually tried to do the fancy auto environment detection thing, but ts lsp didn't seem to jive with it
+  - so now i'm going with a simpler explicit pattern
+- 🍏 add `AsFns` helper type, to keep your fn types honest
+
 ### v0.5.0-2
 - 🟥 rename `advanced` symbol to `tune`
 - 🟥 rename `logistics` symbol to `rig`

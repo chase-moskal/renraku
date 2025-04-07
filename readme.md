@@ -55,8 +55,8 @@ renraku doesn't do input validation, you might want to use [zod](https://github.
     ```ts
     import {exampleFns} from "./example.js"
     import {endpoint} from "renraku"
-    import {HttpServer} from "renraku/x/server.js"
-      //                                 ↑
+    import {HttpServer} from "renraku/node"
+      //                               ↑
       // serverside/clientside stuff are cleanly separated
 
     new HttpServer(() => endpoint(exampleFns)).listen(8000)
@@ -189,7 +189,7 @@ renraku doesn't do input validation, you might want to use [zod](https://github.
   ```ts
   // ws/server.js
 
-  import {WebSocketServer} from "renraku/x/server.js"
+  import {WebSocketServer} from "renraku/node"
   import {Clientside, makeServerside} from "./apis.js"
 
   const server = new WebSocketServer({
@@ -204,7 +204,7 @@ renraku doesn't do input validation, you might want to use [zod](https://github.
 
   server.listen(8000)
   ```
-  - note that we have to import from `renraku/x/server.js`, because we keep all node imports separated to avoid making the browser upset
+  - note that we have to import from `renraku/node`, because we keep all node imports separated to avoid making the browser upset
 - on the clientside, we create a websocket remote
   ```ts
   // ws/client.js
