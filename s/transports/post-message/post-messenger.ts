@@ -48,9 +48,15 @@ export class PostMessenger<R extends Fns> {
 
 		this.bidirectional = new Bidirectional({
 			timeout: options.timeout ?? defaults.timeout,
-			onSend: outgoing => {
+			sendRequest: message => {
 				options.remote.window.postMessage(
-					outgoing,
+					message,
+					options.remote.getOrigin(),
+				)
+			},
+			sendResponse: message => {
+				options.remote.window.postMessage(
+					message,
 					options.remote.getOrigin(),
 				)
 			},

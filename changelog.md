@@ -9,6 +9,10 @@
 
 ## v0.5
 
+### v0.5.0-4
+- 🟥 change `Bidirectional` to semantically separate `sendRequest` from `sendResponse`.
+  - also added a `done` promise to sendRequest params, which enabled advanced integrations.
+
 ### v0.5.0-3
 - 🟥 rework package `exports` for nodejs
   ```ts

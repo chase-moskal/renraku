@@ -3,10 +3,12 @@ import {Rig} from "./rig.js"
 import {Endpoint} from "../../core/types.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {ResponseWaiter} from "./response-waiter.js"
+import {deferPromise} from "../../tools/defer-promise.js"
 
 export type BidirectionalOptions = {
 	timeout: number
-	onSend: (outgoing: JsonRpc.Bidirectional, transfer?: Transferable[]) => void
+	sendRequest: (request: JsonRpc.Requestish, transfer: Transferable[] | undefined, done: Promise<JsonRpc.Respondish | null>) => void
+	sendResponse: (request: JsonRpc.Respondish, transfer: Transferable[] | undefined) => void
 }
 
 export class Bidirectional {
@@ -17,14 +19,24 @@ export class Bidirectional {
 	}
 
 	remoteEndpoint: Endpoint = async(request, transfer) => {
-		this.options.onSend(request, transfer)
-		return "id" in request
-			? await this.waiter.wait(request.id, request.method)
-			: null
+		if ("id" in request) {
+			const done = deferPromise<JsonRpc.Respondish | null>()
+			this.options.sendRequest(request, transfer, done.promise)
+			return this.waiter.wait(request.id, request.method)
+				.then(response => {
+					done.resolve(response)
+					return response
+				})
+		}
+		else {
+			const done = Promise.resolve(null)
+			this.options.sendRequest(request, transfer, done)
+			return done
+		}
 	}
 
 	async receive(localEndpoint: Endpoint | null, incoming: JsonRpc.Bidirectional, rig: Rig) {
-		const {onSend} = this.options
+		const {sendResponse} = this.options
 
 		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
 			if ("method" in message) {
@@ -42,12 +54,12 @@ export class Bidirectional {
 			const responses = (await Promise.all(incoming.map(processMessage)))
 				.filter(r => !!r)
 			if (responses.length > 0)
-				onSend(responses, rig.transfer)
+				sendResponse(responses, rig.transfer)
 		}
 		else {
 			const response = await processMessage(incoming)
 			if (response)
-				onSend(response, rig.transfer)
+				sendResponse(response, rig.transfer)
 		}
 	}
 }

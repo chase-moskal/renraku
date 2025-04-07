@@ -20,7 +20,8 @@ export class Socketry {
 	constructor(private options: SocketryOptions) {
 		this.bidirectional = new Bidirectional({
 			timeout: options.timeout,
-			onSend: outgoing => options.socket.send(JSON.stringify(outgoing)),
+			sendRequest: message => options.socket.send(JSON.stringify(message)),
+			sendResponse: message => options.socket.send(JSON.stringify(message)),
 		})
 	}
 
