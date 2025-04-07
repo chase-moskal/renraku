@@ -6,6 +6,7 @@ import {SimpleHeaders} from "../tools/simple-headers.js"
 export type Fn = (...p: any[]) => Promise<any>
 export type Fns = {[key: string]: Fn | Fns}
 export type Service = Record<string, Fn>
+export type AsFns<F extends Fns> = F
 
 export function fns<F extends Fns>(f: F) {
 	return f
