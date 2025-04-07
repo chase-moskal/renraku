@@ -1,7 +1,7 @@
 
+import {Rig} from "../utils/rig.js"
 import {Fns} from "../../core/types.js"
 import {defaults} from "../defaults.js"
-import {Rig} from "../utils/rig.js"
 import {remote} from "../../core/remote.js"
 import {MessengerOptions} from "./types.js"
 import {Remote} from "../../core/remote-proxy.js"
@@ -18,7 +18,7 @@ export class Messenger<xRemoteFns extends Fns> {
 	remote: Remote<xRemoteFns>
 	dispose = () => {}
 
-	constructor(options: MessengerOptions<xRemoteFns>) {
+	constructor(public options: MessengerOptions<xRemoteFns>) {
 		const loggers = new Loggers()
 		const {getLocalEndpoint, remotePortal} = options
 
@@ -39,6 +39,10 @@ export class Messenger<xRemoteFns extends Fns> {
 		}
 		remotePortal.channel.addEventListener("message", listener)
 		this.dispose = () => remotePortal.channel.removeEventListener("message", listener)
+	}
+
+	get portal() {
+		return this.options.remotePortal
 	}
 }
 
