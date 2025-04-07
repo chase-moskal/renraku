@@ -22,11 +22,12 @@
   ```
   - previously i actually tried to do the fancy auto environment detection thing, but ts lsp didn't seem to jive with it
   - so now i'm going with a simpler explicit pattern
+- 🔶 change messenger portal types, rename `MessageBindables` to `PortalChannel`
 - 🍏 add `AsFns` helper type, to keep your fn types honest
 
 ### v0.5.0-2
-- 🟥 rename `advanced` symbol to `tune`
-- 🟥 rename `logistics` symbol to `rig`
+- 🔶 rename `advanced` symbol to `tune`
+- 🔶 rename `logistics` symbol to `rig`
 
 ### v0.5.0-1
 - 🟥 added optional `transfer` argument to Endpoint type
