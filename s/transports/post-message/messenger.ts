@@ -25,7 +25,7 @@ export class Messenger<xRemoteFns extends Fns> {
 		this.bidirectional = new Bidirectional({
 			timeout: options.timeout ?? defaults.timeout,
 			sendRequest: (message, transfer, done) => remotePortal.sendRequest(message, transfer, done),
-			sendResponse: (message, transfer) => remotePortal.sendResponse(message, transfer),
+			sendResponse: (message, transfer) => remotePortal.sendResponse(message, transfer, remotePortal),
 		})
 
 		this.remote = remote<xRemoteFns>(this.bidirectional.remoteEndpoint, {onCall: options.onCall ?? loggers.onCall})

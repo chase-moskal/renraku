@@ -5,7 +5,7 @@ import {JsonRpc} from "../../comms/json-rpc.js"
 export abstract class BasePortal {
 	abstract channel: PortalChannel
 	abstract sendRequest(message: JsonRpc.Requestish, transfer: Transferable[] | undefined, done: Promise<JsonRpc.Respondish | null>): void
-	abstract sendResponse(message: JsonRpc.Respondish, transfer: Transferable[] | undefined): void
+	abstract sendResponse(message: JsonRpc.Respondish, transfer: Transferable[] | undefined, portal: BasePortal): void
 }
 
 export class WindowPortal extends BasePortal {
