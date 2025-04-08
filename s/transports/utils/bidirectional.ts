@@ -1,27 +1,28 @@
 
-import {Rig} from "./rig.js"
 import {Endpoint} from "../../core/types.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {ResponseWaiter} from "./response-waiter.js"
 import {deferPromise} from "../../tools/defer-promise.js"
 
-export type BidirectionalOptions = {
+export type BidirectionalOptions<R> = {
 	timeout: number
 	sendRequest: (request: JsonRpc.Requestish, transfer: Transferable[] | undefined, done: Promise<JsonRpc.Respondish | null>) => void
-	sendResponse: (request: JsonRpc.Respondish, transfer: Transferable[] | undefined) => void
+	sendResponse: (request: JsonRpc.Respondish, rig: R) => void
 }
 
-export class Bidirectional {
+export class Bidirectional<R> {
 	waiter: ResponseWaiter
 
-	constructor(private options: BidirectionalOptions) {
+	constructor(private options: BidirectionalOptions<R>) {
 		this.waiter = new ResponseWaiter(this.options.timeout)
 	}
 
 	remoteEndpoint: Endpoint = async(request, transfer) => {
+		const {sendRequest} = this.options
+
 		if ("id" in request) {
 			const done = deferPromise<JsonRpc.Respondish | null>()
-			this.options.sendRequest(request, transfer, done.promise)
+			sendRequest(request, transfer, done.promise)
 			return this.waiter.wait(request.id, request.method)
 				.then(response => {
 					done.resolve(response)
@@ -30,12 +31,12 @@ export class Bidirectional {
 		}
 		else {
 			const done = Promise.resolve(null)
-			this.options.sendRequest(request, transfer, done)
+			sendRequest(request, transfer, done)
 			return done
 		}
 	}
 
-	async receive(localEndpoint: Endpoint | null, incoming: JsonRpc.Bidirectional, rig: Rig) {
+	async receive(localEndpoint: Endpoint | null, incoming: JsonRpc.Bidirectional, rig: R) {
 		const {sendResponse} = this.options
 
 		const processMessage = async(message: JsonRpc.Request | JsonRpc.Response) => {
@@ -54,12 +55,12 @@ export class Bidirectional {
 			const responses = (await Promise.all(incoming.map(processMessage)))
 				.filter(r => !!r)
 			if (responses.length > 0)
-				sendResponse(responses, rig.transfer)
+				sendResponse(responses, rig)
 		}
 		else {
 			const response = await processMessage(incoming)
 			if (response)
-				sendResponse(response, rig.transfer)
+				sendResponse(response, rig)
 		}
 	}
 }

@@ -1,6 +1,5 @@
 
 import * as ws from "ws"
-import {Rig} from "../../utils/rig.js"
 import {Endpoint} from "../../../core/types.js"
 import {Bidirectional} from "../../utils/bidirectional.js"
 
@@ -15,7 +14,7 @@ export type SocketryMessageEvent = {
 }
 
 export class Socketry {
-	bidirectional: Bidirectional
+	bidirectional: Bidirectional<undefined>
 
 	constructor(private options: SocketryOptions) {
 		this.bidirectional = new Bidirectional({
@@ -32,7 +31,7 @@ export class Socketry {
 	async receive(localEndpoint: Endpoint | null, event: SocketryMessageEvent) {
 		try {
 			const incoming = JSON.parse(event.data.toString())
-			return await this.bidirectional.receive(localEndpoint, incoming, new Rig())
+			return await this.bidirectional.receive(localEndpoint, incoming, undefined)
 		}
 		catch (error) {
 			this.options.onError(error)
