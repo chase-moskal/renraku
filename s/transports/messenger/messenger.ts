@@ -1,4 +1,6 @@
 
+import type * as ws from "ws"
+
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
 import {pubsub} from "../../tools/pubsub.js"
@@ -9,6 +11,7 @@ import {Loggers} from "../../tools/logging/loggers.js"
 import {ResponseWaiter} from "../utils/response-waiter.js"
 import {MessengerOptions, PostableChannel} from "./types.js"
 import {onMessage, handleIncomingRequests, interpretIncoming, makeRemoteEndpoint, Rig} from "./parts/helpers.js"
+import {disposers} from "../../tools/disposers.js"
 
 export class Messenger<xRemoteFns extends Fns> {
 	waiter: ResponseWaiter
@@ -43,21 +46,36 @@ export class Messenger<xRemoteFns extends Fns> {
 	}
 
 	attach(channel: PostableChannel) {
-		this.onSendRequest((m, transfer) => channel.postMessage(m, transfer))
-		this.onSendResponse((m, transfer) => channel.postMessage(m, transfer))
-		return onMessage(channel, e => this.recv(e.data))
+		return disposers(
+			this.onSendRequest((m, transfer) => channel.postMessage(m, transfer)),
+			this.onSendResponse((m, transfer) => channel.postMessage(m, transfer)),
+			onMessage(channel, e => this.recv(e.data)),
+		)
 	}
 
 	attachWindow(channel: Window, targetOrigin: string) {
-		this.onSendRequest((m, transfer) => channel.postMessage(m, targetOrigin, transfer))
-		this.onSendResponse((m, transfer) => channel.postMessage(m, targetOrigin, transfer))
-		return onMessage(channel, e => this.recv(e.data))
+		return disposers(
+			this.onSendRequest((m, transfer) => channel.postMessage(m, targetOrigin, transfer)),
+			this.onSendResponse((m, transfer) => channel.postMessage(m, targetOrigin, transfer)),
+			onMessage(channel, e => this.recv(e.data)),
+		)
 	}
 
 	attachBroadcastChannel(channel: BroadcastChannel) {
-		this.onSendRequest(m => channel.postMessage(m))
-		this.onSendResponse(m => channel.postMessage(m))
-		return onMessage(channel, e => this.recv(e.data))
+		return disposers(
+			this.onSendRequest(m => channel.postMessage(m)),
+			this.onSendResponse(m => channel.postMessage(m)),
+			onMessage(channel, e => this.recv(e.data)),
+		)
+	}
+
+	attachSocket(channel: WebSocket | ws.WebSocket) {
+		channel.onmessage = (e: MessageEvent) => this.recv(JSON.parse(e.data.toString()))
+		return disposers(
+			this.onSendRequest(m => channel.send(JSON.stringify(m))),
+			this.onSendResponse(m => channel.send(JSON.stringify(m))),
+			() => { channel.onmessage = () => {} },
+		)
 	}
 }
 

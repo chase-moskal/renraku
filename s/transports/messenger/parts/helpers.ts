@@ -2,8 +2,8 @@
 import {Channel} from "../types.js"
 import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
-import {ResponseWaiter} from "../../utils/response-waiter.js"
 import {deferPromise} from "../../../tools/defer-promise.js"
+import {ResponseWaiter} from "../../utils/response-waiter.js"
 
 export class Rig {
 	transfer: Transferable[] | undefined = undefined
