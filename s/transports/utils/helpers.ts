@@ -4,7 +4,11 @@ import {JsonRpc} from "../../comms/json-rpc.js"
 import {ResponseWaiter} from "./response-waiter.js"
 import {deferPromise} from "../../tools/defer-promise.js"
 
-export type SendRequestFn = (request: JsonRpc.Request, transfer: Transferable[] | undefined, done: Promise<JsonRpc.Response | null>) => void
+export type SendRequestFn = (
+	request: JsonRpc.Request,
+	transfer: Transferable[] | undefined,
+	done: Promise<JsonRpc.Response | null>,
+) => void
 
 export function makeRemoteEndpoint(waiter: ResponseWaiter, sendRequest: SendRequestFn): Endpoint {
 	return async(request, transfer) => {

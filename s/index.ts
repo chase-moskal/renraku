@@ -14,9 +14,9 @@ export * from "./core/types.js"
 
 export * from "./transports/http/client.js"
 export * from "./transports/post-message/messenger.js"
-export * from "./transports/post-message/portals.js"
 export * from "./transports/websocket/client.js"
 export * from "./transports/utils/bidirectional.js"
+export * from "./transports/utils/helpers.js"
 export * from "./transports/utils/response-waiter.js"
 
 export * from "./tools/logging/coloring.js"
