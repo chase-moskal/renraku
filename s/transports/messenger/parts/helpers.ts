@@ -1,8 +1,20 @@
 
-import {Endpoint} from "../../core/types.js"
-import {JsonRpc} from "../../comms/json-rpc.js"
-import {ResponseWaiter} from "./response-waiter.js"
-import {deferPromise} from "../../tools/defer-promise.js"
+import {Channel} from "../types.js"
+import {Endpoint} from "../../../core/types.js"
+import {JsonRpc} from "../../../comms/json-rpc.js"
+import {ResponseWaiter} from "../../utils/response-waiter.js"
+import {deferPromise} from "../../../tools/defer-promise.js"
+
+export class Rig {
+	transfer: Transferable[] | undefined = undefined
+}
+
+export function onMessage(channel: Channel, fn: (e: MessageEvent) => void) {
+	channel.addEventListener("message", fn)
+	return () => channel.removeEventListener("message", fn)
+}
+
+////////////////
 
 export type SendRequestFn = (
 	request: JsonRpc.Request,
