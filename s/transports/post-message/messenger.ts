@@ -1,62 +1,52 @@
 
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
+import {JsonRpc} from "../../comms/json-rpc.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Loggers} from "../../tools/logging/loggers.js"
-import {Bidirectional} from "../utils/bidirectional.js"
+import {ResponseWaiter} from "../utils/response-waiter.js"
 import {Endpoint, Fns, OnCall, OnError} from "../../core/types.js"
-import {BroadcastPortal, MessagePortal, Portal, WindowPortal} from "./portals.js"
+import {handleIncomingRequests, interpretIncoming, makeRemoteEndpoint} from "../utils/sketch.js"
 
-export class Rig<xPortal extends Portal = Portal> {
+export class Rig {
 	transfer: Transferable[] | undefined = undefined
-	constructor(public event: MessageEvent, public portal: xPortal) {}
 }
 
-export type MessengerOptions<xRemoteFns extends Fns, xPortal extends Portal = Portal> = {
-	portal: xPortal
-	getLocalEndpoint?: (
-		remote: Remote<xRemoteFns>,
-		rig: Rig<xPortal>,
-		event: MessageEvent,
-	) => Endpoint
-	timeout?: number
-	onError?: OnError
-	onCall?: OnCall
-}
-
-export class Messenger<xRemoteFns extends Fns, xPortal extends Portal = Portal> {
-	static WindowPortal = WindowPortal
-	static BroadcastPortal = BroadcastPortal
-	static MessagePortal = MessagePortal
-
-	bidirectional: Bidirectional<Rig>
+export class Messenger<xRemoteFns extends Fns> {
+	waiter: ResponseWaiter
+	remoteEndpoint: Endpoint
 	remote: Remote<xRemoteFns>
-	dispose = () => {}
 
-	constructor(public options: MessengerOptions<xRemoteFns, xPortal>) {
+	constructor(public options: {
+			sendRequest: (request: JsonRpc.Requestish, transfer: Transferable[] | undefined) => void
+			sendResponse: (response: JsonRpc.Respondish, transfer: Transferable[] | undefined) => void
+			getLocalEndpoint?: (
+				remote: Remote<xRemoteFns>,
+				rig: Rig,
+			) => Endpoint
+			timeout?: number
+			onError?: OnError
+			onCall?: OnCall
+		}) {
+
 		const loggers = new Loggers()
-		const {getLocalEndpoint, portal} = options
-
-		this.bidirectional = new Bidirectional({
-			timeout: options.timeout ?? defaults.timeout,
-			sendRequest: (message, transfer, done) => portal.sendRequest(message, transfer, done),
-			sendResponse: (message, rig) => portal.sendResponse(message, rig),
-		})
-
-		this.remote = remote<xRemoteFns>(this.bidirectional.remoteEndpoint, {onCall: options.onCall ?? loggers.onCall})
-
-		this.dispose = portal.onMessage((event: MessageEvent) => {
-			const rig = new Rig<xPortal>(event, options.portal)
-			const localEndpoint = getLocalEndpoint
-				? getLocalEndpoint(this.remote, rig, event)
-				: null
-			this.bidirectional.receive(localEndpoint, event.data, rig)
-				.catch(options.onError ?? loggers.onError)
-		})
+		this.waiter = new ResponseWaiter(options.timeout ?? defaults.timeout)
+		this.remoteEndpoint = makeRemoteEndpoint(this.waiter, options.sendRequest)
+		this.remote = remote<xRemoteFns>(this.remoteEndpoint, {onCall: options.onCall ?? loggers.onCall})
 	}
 
-	get portal() {
-		return this.options.portal
+	recv(incoming: JsonRpc.Bidirectional) {
+		const rig = new Rig()
+		const {getLocalEndpoint} = this.options
+
+		const {requests, responses} = interpretIncoming(incoming)
+
+		for (const response of responses)
+			this.waiter.deliverResponse(response)
+
+		return (getLocalEndpoint)
+			? handleIncomingRequests(getLocalEndpoint(this.remote, rig), requests)
+			: null
 	}
 }
 
