@@ -10,6 +10,8 @@
 ## v0.5
 
 ### v0.5.0-4
+- 🟥 **deleted `PostMessenger`!** it was annoying to upkeep so i chucked it!
+  - you gotta switch to using the new `Messenger` now, sorry
 - 🟥 change `Bidirectional` to semantically separate `sendRequest` from `sendResponse`.
   - also added a `done` promise to sendRequest params, which enabled advanced integrations.
 
