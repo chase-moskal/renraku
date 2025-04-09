@@ -6,6 +6,9 @@ export class DeadlineError extends Error {
 }
 
 export function deadline<R>(milliseconds: number, message: string, fn: () => Promise<R>) {
+	if (milliseconds <= 0 || milliseconds === Infinity)
+		return fn()
+
 	return new Promise<R>((resolve, reject) => {
 
 		const id = setTimeout(
