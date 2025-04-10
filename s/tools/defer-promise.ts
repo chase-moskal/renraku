@@ -1,23 +1,25 @@
 
-export type DeferredPromise<T> = {
-	resolve: (value: T) => void
+export type DeferPromise<R> = {
+	promise: Promise<R>
+	resolve: (result: R) => void
 	reject: (reason: any) => void
-	promise: Promise<T>
+	entangle: (outsidePromise: Promise<R>) => Promise<R>
 }
 
-export function deferPromise<T>(): DeferredPromise<T> {
-	let resolve: (value: T) => void
-	let reject: (reason: any) => void
+export function deferPromise<R>(): DeferPromise<R> {
+	let resolve!: (result: R) => void
+	let reject!: (reason: any) => void
 
-	const promise = new Promise<T>((res, rej) => {
+	const promise = new Promise<R>((res, rej) => {
 		resolve = res
 		reject = rej
 	})
 
-	return {
-		promise,
-		resolve: resolve!,
-		reject: reject!,
+	function entangle(outside: Promise<R>) {
+		outside.then(resolve).catch(reject)
+		return promise
 	}
+
+	return {promise, resolve, reject, entangle}
 }
 

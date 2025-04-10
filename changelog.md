@@ -9,6 +9,10 @@
 
 ## v0.5
 
+### v0.5.0-5
+- 🟥 renamed `DeferredPromise` to `DeferPromise` to match slate (it does sound sus tho).
+  - also upgraded deferPromise impl to match slate, gained entangle method
+
 ### v0.5.0-4
 - 🟥 **deleted `PostMessenger`!** it was annoying to upkeep so i chucked it!
   - you gotta switch to using the new `Messenger` now, sorry
