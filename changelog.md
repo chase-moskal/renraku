@@ -9,6 +9,9 @@
 
 ## v0.5
 
+### v0.5.0-6
+- 🍏 add new `mock` function, which just wraps functions in a remote
+
 ### v0.5.0-5
 - 🟥 renamed `DeferredPromise` to `DeferPromise` to match slate (it does sound sus tho).
   - also upgraded deferPromise impl to match slate, gained entangle method

@@ -257,6 +257,19 @@ renraku doesn't do input validation, you might want to use [zod](https://github.
     },
   })
   ```
+- **`mock`** — wrap local function in a renraku remote, just so the fancy *tune* syntax works happily
+  ```ts
+  import {mock, tune} from "renraku"
+
+  const timingFns = mock({
+    async now() {
+      return Date.now()
+    },
+  })
+
+  // mock enables the tune api for local functions
+  await timingFns.now[tune]({notify: false, transfer: []})()
+  ```
 
 <br/>
 
