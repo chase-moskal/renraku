@@ -13,9 +13,11 @@ export type MessengerOptions<xRemoteFns extends Fns> = {
 	onCall?: OnCall
 }
 
+export type ChannelMessage<D = any> = {data: D}
+
 export type Channel = {
-	addEventListener(e: "message", listener: (event: MessageEvent) => void): void
-	removeEventListener(e: "message", listener: (event: MessageEvent) => void): void
+	addEventListener(e: "message", listener: (event: ChannelMessage) => void): void
+	removeEventListener(e: "message", listener: (event: ChannelMessage) => void): void
 }
 
 export type PostableChannel = {

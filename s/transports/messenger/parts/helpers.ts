@@ -1,7 +1,7 @@
 
-import {Channel} from "../types.js"
 import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
+import {Channel, ChannelMessage} from "../types.js"
 import {deferPromise} from "../../../tools/defer-promise.js"
 import {ResponseWaiter} from "../../utils/response-waiter.js"
 
@@ -9,7 +9,7 @@ export class Rig {
 	transfer: Transferable[] | undefined = undefined
 }
 
-export function onMessage(channel: Channel, fn: (e: MessageEvent) => void) {
+export function onMessage(channel: Channel, fn: (e: ChannelMessage) => void) {
 	channel.addEventListener("message", fn)
 	return () => channel.removeEventListener("message", fn)
 }
