@@ -7,11 +7,11 @@ import {pubsub} from "../../tools/pubsub.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Endpoint, Fns} from "../../core/types.js"
+import {disposers} from "../../tools/disposers.js"
 import {Loggers} from "../../tools/logging/loggers.js"
 import {ResponseWaiter} from "../utils/response-waiter.js"
 import {MessengerOptions, PostableChannel} from "./types.js"
 import {onMessage, handleIncomingRequests, interpretIncoming, makeRemoteEndpoint, Rig} from "./parts/helpers.js"
-import {disposers} from "../../tools/disposers.js"
 
 export class Messenger<xRemoteFns extends Fns> {
 	waiter: ResponseWaiter
