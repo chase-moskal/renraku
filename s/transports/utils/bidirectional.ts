@@ -4,13 +4,13 @@ import {JsonRpc} from "../../comms/json-rpc.js"
 import {ResponseWaiter} from "./response-waiter.js"
 import {deferPromise} from "../../tools/defer-promise.js"
 
-export type BidirectionalOptions<R> = {
+export type BidirectionalOptions<R = undefined> = {
 	timeout: number
 	sendRequest: (request: JsonRpc.Requestish, transfer: Transferable[] | undefined, done: Promise<JsonRpc.Respondish | null>) => void
 	sendResponse: (request: JsonRpc.Respondish, rig: R) => void
 }
 
-export class Bidirectional<R> {
+export class Bidirectional<R = undefined> {
 	waiter: ResponseWaiter
 
 	constructor(private options: BidirectionalOptions<R>) {
