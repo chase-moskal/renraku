@@ -24,3 +24,7 @@ export type PostableChannel = {
 	postMessage(m: any, transfer?: Transferable[]): void
 } & Channel
 
+export type Conduit = {
+	send(): void
+}
+
