@@ -48,7 +48,7 @@
 	},
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
-		"@types/node": "^22.14.0",
+		"@types/node": "^22.14.1",
 		"@types/ws": "^8.18.1",
 		"cynic": "^0.2.1",
 		"es-module-shims": "^2.0.10",
@@ -60,6 +60,7 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
+		"@e280/stz": "^0.0.0-3",
 		"ws": "^8.18.1"
 	}
 }

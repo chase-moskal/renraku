@@ -1,9 +1,9 @@
 
 import type * as ws from "ws"
+import {sub} from "@e280/stz"
 
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
-import {pubsub} from "../../tools/pubsub.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Endpoint, Fns} from "../../core/types.js"
@@ -18,13 +18,13 @@ export class Messenger<xRemoteFns extends Fns> {
 	remoteEndpoint: Endpoint
 	remote: Remote<xRemoteFns>
 
-	onSendRequest = pubsub<[request: JsonRpc.Requestish, transfer: Transferable[] | undefined]>()
-	onSendResponse = pubsub<[response: JsonRpc.Respondish, transfer: Transferable[] | undefined]>()
+	onSendRequest = sub<[request: JsonRpc.Requestish, transfer: Transferable[] | undefined]>()
+	onSendResponse = sub<[response: JsonRpc.Respondish, transfer: Transferable[] | undefined]>()
 
 	constructor(public options: MessengerOptions<xRemoteFns>) {
 		const loggers = new Loggers()
 		this.waiter = new ResponseWaiter(options.timeout ?? defaults.timeout)
-		this.remoteEndpoint = makeRemoteEndpoint(this.waiter, this.onSendRequest.publish)
+		this.remoteEndpoint = makeRemoteEndpoint(this.waiter, this.onSendRequest.pub.bind(this.onSendRequest))
 		this.remote = remote<xRemoteFns>(this.remoteEndpoint, {onCall: options.onCall ?? loggers.onCall})
 	}
 
@@ -42,7 +42,7 @@ export class Messenger<xRemoteFns extends Fns> {
 
 		const outgoing = await handleIncomingRequests(getLocalEndpoint(this.remote, rig), requests)
 		if (outgoing)
-			await this.onSendResponse.publish(outgoing, rig.transfer)
+			await this.onSendResponse.pub(outgoing, rig.transfer)
 	}
 
 	attach(channel: PostableChannel) {
