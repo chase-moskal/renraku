@@ -1,5 +1,5 @@
 
-import {Hat} from "./hat.js"
+import {Hat} from "@e280/stz"
 
 export class RandomUserEmojis extends Hat<string> {
 	constructor() {

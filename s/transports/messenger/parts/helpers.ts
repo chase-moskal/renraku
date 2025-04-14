@@ -1,8 +1,8 @@
 
+import {deferPromise} from "@e280/stz"
 import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
 import {Channel, ChannelMessage} from "../types.js"
-import {deferPromise} from "../../../tools/defer-promise.js"
 import {ResponseWaiter} from "../../utils/response-waiter.js"
 
 export class Rig {
