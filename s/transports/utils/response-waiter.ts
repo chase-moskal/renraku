@@ -1,12 +1,12 @@
 
+import {deadline, deferPromise, DeferredPromise} from "@e280/stz"
+
 import {JsonRpc} from "../../comms/json-rpc.js"
-import {deadline} from "../../tools/deadline.js"
 import {RemoteError} from "../../core/errors.js"
-import {deferPromise, DeferPromise} from "../../tools/defer-promise.js"
 
 type Pend = {
 	method: string
-	deferred: DeferPromise<JsonRpc.Response>
+	deferred: DeferredPromise<JsonRpc.Response>
 }
 
 export class ResponseWaiter {

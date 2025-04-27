@@ -1,8 +1,9 @@
 
+import {deferPromise} from "@e280/stz"
+
 import {Endpoint} from "../../core/types.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {ResponseWaiter} from "./response-waiter.js"
-import {deferPromise} from "../../tools/defer-promise.js"
 
 export type BidirectionalOptions<R = undefined> = {
 	timeout: number
