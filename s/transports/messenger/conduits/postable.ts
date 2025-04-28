@@ -1,5 +1,5 @@
 
-import {Conduit} from "../parts/conduit.js"
+import {Conduit} from "./conduit.js"
 import {PostableChannel} from "../types.js"
 import {onMessage} from "../parts/helpers.js"
 

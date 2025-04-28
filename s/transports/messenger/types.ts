@@ -1,6 +1,6 @@
 
 import {Rig} from "./parts/helpers.js"
-import {Conduit} from "./parts/conduit.js"
+import {Conduit} from "./conduits/conduit.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Endpoint, Fns, OnCall, OnError} from "../../core/types.js"
 

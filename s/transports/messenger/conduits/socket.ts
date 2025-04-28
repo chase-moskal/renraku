@@ -1,6 +1,6 @@
 
 import type * as ws from "ws"
-import {Conduit} from "../parts/conduit.js"
+import {Conduit} from "./conduit.js"
 
 export class SocketConduit extends Conduit {
 	constructor(channel: WebSocket | ws.WebSocket) {

@@ -1,5 +1,5 @@
 
-import {Conduit} from "../parts/conduit.js"
+import {Conduit} from "./conduit.js"
 import {onMessage} from "../parts/helpers.js"
 
 export class BroadcastConduit extends Conduit {

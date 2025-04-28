@@ -16,19 +16,21 @@
 		"s"
 	],
 	"scripts": {
-		"build": "run-s clean && run-p importmap compile",
-		"clean": "rimraf x *.pem && mkdirp x",
-		"importmap": "importly --dev < package-lock.json > x/importmap.json",
-		"compile": "tsc",
-		"watch": "tsc -w",
-		"start": "run-p watch start-http",
-		"start-http": "http-server -p 8080",
-		"api-http": "node x/transports/http/examples/server.js",
-		"api-http-debug": "node inspect x/transports/http/examples/server.js",
-		"api-ws": "node x/transports/websocket/examples/server.js",
-		"api-ws-debug": "node inspect x/transports/websocket/examples/server.js",
-		"test": "cynic node x/tests.test.js",
-		"test-debug": "node inspect node_modules/cynic/dist/cli.js node x/tests.test.js"
+		"build": "run-s _clean && run-p _importmap _tsc",
+		"_clean": "rimraf x *.pem && mkdirp x",
+		"_importmap": "importly --dev < package-lock.json > x/importmap.json",
+		"_tsc": "tsc",
+		"watch": "run-p _tsc_watch _test_watch",
+		"_tsc_watch": "tsc -w",
+		"start": "run-p watch _http",
+		"_http": "http-server -p 8080",
+		"_api": "node x/transports/http/examples/server.js",
+		"_api_debug": "node inspect x/transports/http/examples/server.js",
+		"_ws": "node x/transports/websocket/examples/server.js",
+		"_ws_debug": "node inspect x/transports/websocket/examples/server.js",
+		"test": "node x/tests.test.js",
+		"_test_watch": "node --watch x/tests.test.js --verbose",
+		"_test_inspect": "node inspect x/tests.test.js"
 	},
 	"keywords": [
 		"rpc",
@@ -50,7 +52,6 @@
 	"devDependencies": {
 		"@types/node": "^22.15.2",
 		"@types/ws": "^8.18.1",
-		"cynic": "^0.2.1",
 		"http-server": "^14.1.1",
 		"importly": "^0.2.3",
 		"mkdirp": "^3.0.1",
@@ -59,6 +60,7 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
+		"@e280/science": "^0.0.0-3",
 		"@e280/stz": "^0.0.0-5",
 		"ws": "^8.18.1"
 	}
