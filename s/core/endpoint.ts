@@ -9,6 +9,12 @@ export type EndpointOptions = {
 	onCallError?: OnCallError
 }
 
+/**
+ * Create a renraku endpoint for your fns.
+ *  - an endpoint is a function that accepts json rpc requests
+ *  - for each request, it calls the appropriate fn
+ *  - it then returns the fn's in json rpc response format
+ */
 export function endpoint<F extends Fns>(
 		fns: F,
 		options: EndpointOptions = {},

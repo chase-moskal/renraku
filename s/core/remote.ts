@@ -11,6 +11,12 @@ export type RemoteOptions = {
 	onCall?: OnCall
 }
 
+/**
+ * Create a renraku remote for the given endpoint.
+ *  - the remote uses js proxies to mirror the shape of your fns object
+ *  - so when you make async calls on the remote, it will convert those into json rpc requests that are actuated on the given endpoint
+ *  - the endpoint you provide could be making network calls, or doing something else, the remote doesn't care how the endpoint is implemented
+ */
 export function remote<F extends Fns>(
 		endpoint: Endpoint,
 		options: RemoteOptions = {},
