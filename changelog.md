@@ -9,6 +9,11 @@
 
 ## v0.5
 
+### v0.5.0-7
+- 🟥 rework `Messenger`, which now accepts a new `Conduit`
+  - there used to be different kinds of messengers
+  - now there's one Messenger class, and multiple kinds of Conduits
+
 ### v0.5.0-6
 - 🍏 add new `mock` function, which just wraps functions in a remote
 
