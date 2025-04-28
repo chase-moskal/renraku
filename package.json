@@ -20,17 +20,17 @@
 		"_clean": "rimraf x *.pem && mkdirp x",
 		"_importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"_tsc": "tsc",
-		"watch": "run-p _tsc_watch _test_watch",
-		"_tsc_watch": "tsc -w",
+		"watch": "run-p _tsc-watch _test-watch",
+		"_tsc-watch": "tsc -w",
 		"start": "run-p watch _http",
 		"_http": "http-server -p 8080",
 		"_api": "node x/transports/http/examples/server.js",
-		"_api_debug": "node inspect x/transports/http/examples/server.js",
+		"_api-debug": "node inspect x/transports/http/examples/server.js",
 		"_ws": "node x/transports/websocket/examples/server.js",
-		"_ws_debug": "node inspect x/transports/websocket/examples/server.js",
+		"_ws-debug": "node inspect x/transports/websocket/examples/server.js",
 		"test": "node x/tests.test.js",
-		"_test_watch": "node --watch x/tests.test.js --verbose",
-		"_test_inspect": "node inspect x/tests.test.js"
+		"test-inspect": "node inspect x/tests.test.js",
+		"_test-watch": "node --watch x/tests.test.js --verbose"
 	},
 	"keywords": [
 		"rpc",

@@ -3,7 +3,7 @@ import {RemoteError} from "./errors.js"
 import {JsonRpc} from "../comms/json-rpc.js"
 import {remoteProxy} from "./remote-proxy.js"
 import {Endpoint, Fns, OnCall} from "./types.js"
-import {loggers} from "../tools/logging/loggers.js"
+import {defaultLoggers} from "../tools/logging/loggers.js"
 
 export type RemoteOptions = {
 	label?: string
@@ -17,7 +17,7 @@ export function remote<F extends Fns>(
 	) {
 
 	let id = 1
-	const {onCall = loggers.onCall} = options
+	const {onCall = defaultLoggers.onCall} = options
 
 	return remoteProxy<F>(async(
 			path,

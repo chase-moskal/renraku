@@ -13,16 +13,16 @@ function ok(x: any) {
 }
 
 export class Loggers {
-	log(...data: any[]) {
+	log = (...data: any[]) => {
 		console.log(
 			color.blue(this.#timestamp()),
 			...data,
 		)
 	}
 
-	error(...data: any[]) {
-		console.log(
-			color.blue(this.#timestamp()),
+	error = (...data: any[]) => {
+		console.error(
+			color.red(this.#timestamp()),
 			"🚨",
 			...this.#colorize(color.red, ...data),
 		)
@@ -41,8 +41,7 @@ export class Loggers {
 		const palette = remote
 			? {id: color.green, method: color.green}
 			: {id: color.cyan, method: color.cyan}
-		return ({request}) => console.log(
-			color.blue(this.#timestamp()),
+		return ({request}) => this.log(
 			...[label].filter(ok),
 			...[("id" in request && request.id) && palette.id(request.id.toString())],
 			palette.method([prefix, request.method].filter(ok).join(".") + "()"),
@@ -50,8 +49,7 @@ export class Loggers {
 	}
 
 	labelOnCallError({label, prefix}: LogLabelling = {}): OnCallError {
-		return ({error, request}) => console.error(
-			color.red(this.#timestamp()),
+		return ({error, request}) => this.error(
 			...(label ? [label] : []),
 			...[("id" in request && request.id) && color.red(request.id.toString())],
 			color.red([prefix, request.method].join(".") + "()"),
@@ -60,11 +58,11 @@ export class Loggers {
 		)
 	}
 
-	onCall = this.labelOnCall()
-	onCallError = this.labelOnCallError()
+	onCall: OnCall = this.labelOnCall()
+	onCallError: OnCallError = this.labelOnCallError()
 
 	onError: OnError = error => {
-		console.error(
+		this.error(
 			color.red(this.#timestamp()),
 			"🚨",
 			...this.#err(error),
@@ -104,5 +102,9 @@ export class Loggers {
 	}
 }
 
-export const loggers = new Loggers()
+export const stdLoggers = new Loggers()
+
+export const defaultLoggers = new Loggers()
+defaultLoggers.log = () => {}
+defaultLoggers.error = () => {}
 

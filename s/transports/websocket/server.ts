@@ -5,8 +5,8 @@ import * as http from "http"
 import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
 import {ipAddress} from "../../tools/ip-address.js"
-import {loggers} from "../../tools/logging/loggers.js"
 import {Endpoint, ServerMeta} from "../../core/types.js"
+import {defaultLoggers} from "../../tools/logging/loggers.js"
 import {simplifyHeaders} from "../../tools/simple-headers.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
@@ -46,7 +46,7 @@ export class WebSocketServer {
 		const params = this.params = {
 			timeout: defaults.timeout,
 			maxRequestBytes: defaults.maxRequestBytes,
-			onError: loggers.onError,
+			onError: defaultLoggers.onError,
 			...inputs,
 		}
 

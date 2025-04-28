@@ -1,5 +1,5 @@
 
-import {loggers as stdLoggers} from "./logging/loggers.js"
+import {defaultLoggers} from "./logging/loggers.js"
 
 export type Signal = (
 	| "SIGINT"
@@ -9,7 +9,7 @@ export type Signal = (
 )
 
 export function deathWithDignity(
-		loggers = stdLoggers,
+		loggers = defaultLoggers,
 		options: {dieOnUncaught?: boolean} = {},
 	) {
 

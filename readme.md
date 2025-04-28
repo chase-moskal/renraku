@@ -326,20 +326,22 @@ renraku doesn't do input validation, you might want to use [zod](https://github.
 <br/>
 
 ## ⛩ *RENRAKU* — logging
-- renraku will log everything by default
-- make renraku silent like this:
+- renraku is silent by default
+- make renraku globally log stuff like this:
   ```ts
-  import {loggers} from "renraku"
-  loggers.onCall = () => {}
-  loggers.onCallError = () => {}
-  loggers.onError = () => {}
+  import {defaultLoggers, stdLoggers} from "renraku"
+  defaultLoggers.log = stdLoggers.log
+  defaultLoggers.error = stdLoggers.error
+  defaultLoggers.onCall = stdLoggers.onCall
+  defaultLoggers.onCallError = stdLoggers.onCallError
+  defaultLoggers.onError = stdLoggers.onError
   ```
 - you can prefix a label onto onCall and onCallError, useful for distinguishing clients in the logs
   ```ts
-  import {loggers, RandomUserEmojis, endpoint, remote} from "renraku"
+  import {stdLoggers, RandomUserEmojis, endpoint, remote} from "renraku"
 
   const emojis = new RandomUserEmojis() // provides random emojis like "🧔"
-  const {onCall, onCallError} = loggers.label(emojis.pull())
+  const {onCall, onCallError} = stdLoggers.label(emojis.pull())
 
   // wherever you're setting up your remote/endpoints..
   const myRemote = remote<MyFns>(remoteEndpoint, {onCall})

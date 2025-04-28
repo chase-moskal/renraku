@@ -2,7 +2,7 @@
 import {WebSocketServer} from "../server.js"
 import {remote} from "../../../core/remote.js"
 import {endpoint} from "../../../core/endpoint.js"
-import {loggers} from "../../../tools/logging/loggers.js"
+import {defaultLoggers} from "../../../tools/logging/loggers.js"
 import {ExampleClientsideFns, exampleServersideApi} from "./apis.js"
 
 const server = new WebSocketServer({
@@ -17,5 +17,5 @@ const server = new WebSocketServer({
 	},
 })
 
-server.listen(8000, () => loggers.log("example websocket server listening..."))
+server.listen(8000, () => defaultLoggers.log("example websocket server listening..."))
 

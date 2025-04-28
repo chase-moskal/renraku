@@ -5,8 +5,8 @@ import {MessengerOptions} from "./types.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Endpoint, Fns} from "../../core/types.js"
-import {Loggers} from "../../tools/logging/loggers.js"
 import {ResponseWaiter} from "../utils/response-waiter.js"
+import {defaultLoggers} from "../../tools/logging/loggers.js"
 import {handleIncomingRequests, interpretIncoming, makeRemoteEndpoint, Rig} from "./parts/helpers.js"
 
 export class Messenger<xRemoteFns extends Fns> {
@@ -15,7 +15,6 @@ export class Messenger<xRemoteFns extends Fns> {
 	remote: Remote<xRemoteFns>
 
 	constructor(public options: MessengerOptions<xRemoteFns>) {
-		const loggers = new Loggers()
 		const {conduit} = options
 
 		this.waiter = new ResponseWaiter(options.timeout ?? defaults.timeout)
@@ -27,7 +26,7 @@ export class Messenger<xRemoteFns extends Fns> {
 
 		this.remote = remote<xRemoteFns>(
 			this.remoteEndpoint,
-			{onCall: options.onCall ?? loggers.onCall},
+			{onCall: options.onCall ?? defaultLoggers.onCall},
 		)
 
 		conduit.recv.sub(m => this.recv(m))

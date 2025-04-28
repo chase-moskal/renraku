@@ -5,8 +5,8 @@ import {defaults} from "../../defaults.js"
 import {readStream} from "./read-stream.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
 import {ipAddress} from "../../../tools/ip-address.js"
-import {loggers} from "../../../tools/logging/loggers.js"
 import {Endpoint, ServerMeta} from "../../../core/types.js"
+import {defaultLoggers} from "../../../tools/logging/loggers.js"
 import {simplifyHeaders} from "../../../tools/simple-headers.js"
 
 export type EndpointListenerOptions = {
@@ -21,7 +21,7 @@ export function makeEndpointListener(
 	): RequestListener {
 
 	const {
-		onError = loggers.onError,
+		onError = defaultLoggers.onError,
 		maxRequestBytes = defaults.maxRequestBytes,
 	} = options
 
