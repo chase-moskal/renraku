@@ -98,6 +98,111 @@ renraku doesn't do input validation, you might want to use [zod](https://github.
 
 <br/>
 
+## ⛩ *RENRAKU* — new `Messenger` for post message and more
+
+renraku v0.5 introduces this new `Messenger` class, which will eventually unify more of renraku's systems.
+
+messenger is capable of one-way or two-way communication over any kind of communication `Conduit`.
+
+messenger also implements [Transferables](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects), so we can efficiently transfer large binary things across local postmessage boundaries like web workers (if you're interested in web workers, see [@e280/comrade](https://github.com/e280/comrade) which makes it easy for you).
+
+### one-way messenger for calling fns on a popup
+- create a messenger on the parent window (it sends requests)
+  ```ts
+  import Renraku from "renraku"
+
+    //                                 remote fns type
+    //                                        👇
+  const messenger = new Renraku.Messenger<MyPopupFns>({
+    conduit: new Renraku.conduits.WindowConduit(
+
+      // who we're talking to (a popup we made via window.open)
+      myPopup,
+
+      // origin we're sending to
+      "https://example.e280.org",
+    ),
+  })
+
+  // calling a popup fn
+  await messenger.remote.math.add(2, 3) // 5
+  ```
+- create a messenger on the popup window (it sends responses)
+  ```ts
+  import Renraku from "renraku"
+
+    //                           no remote fns
+    //                                    👇
+  const messenger = new Renraku.Messenger<{}>({
+    conduit: new Renraku.conduits.WindowConduit(
+
+      // who we're talking to (the opener)
+      window.opener,
+
+      // origin we're sending to
+      "https://example.e280.org",
+
+      // only listen to messages from correct origin
+      e => e.origin === "https://example.e280.org",
+    ),
+
+      //                                 exposed popup fns
+      //                                           👇
+    getLocalEndpoint: (remote, rig) => endpoint(myPopupFns),
+  })
+  ```
+
+### two-way messenger
+- create a messenger on the opener window
+  ```ts
+  import Renraku from "renraku"
+
+    //                            remote-side fns type
+    //                                         👇
+  const messenger = new Renraku.Messenger<MyPopupFns>({
+    conduit: new Renraku.conduits.WindowConduit(
+      myPopup,
+      "https://example.e280.org",
+    ),
+
+      //                                     local-side fns
+      //                                            👇
+    getLocalEndpoint: (remote, rig) => endpoint(myOpenerFns),
+  })
+
+  // calling a popup fn
+  await messenger.remote.popup.add(2, 3) // 5
+  ```
+- create a messenger on the popup side, which will respond
+  ```ts
+  import Renraku from "renraku"
+
+    //                              local-side fns type
+    //                                         👇
+  const messenger = new Renraku.Messenger<MyOpenerFns>({
+    conduit: new Renraku.conduits.WindowConduit(
+
+      // who we're talking to (the opener)
+      window.opener,
+
+      // origin we're sending to
+      "https://example.e280.org",
+
+      // only listen to messages from correct origin
+      e => e.origin === "https://example.e280.org",
+    ),
+
+      //                                   remote-side fns
+      //                                            👇
+    getLocalEndpoint: (remote, rig) => endpoint(myPopupFns),
+  })
+
+  // calling an opener fn
+  await messenger.remote.opener.mul(2, 3) // 6
+  ```
+
+<br/>
+
 ## ⛩ *RENRAKU* — auth with `secure` and `authorize`
 - ⛔ right now `secure` and `authorize` do not support arbitrary nesting, so you have to pass in a flat object of async functions.
 - use the `secure` function to section off parts of your api that require auth

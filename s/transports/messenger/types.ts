@@ -15,7 +15,7 @@ export type MessengerOptions<xRemoteFns extends Fns> = {
 	onCall?: OnCall
 }
 
-export type ChannelMessage<D = any> = {data: D}
+export type ChannelMessage<D = any> = {data: D, origin: string}
 
 export type Channel = {
 	addEventListener(e: "message", listener: (event: ChannelMessage) => void): void
