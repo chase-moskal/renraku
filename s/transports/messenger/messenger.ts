@@ -9,6 +9,12 @@ import {Endpoint, Fns} from "../../core/types.js"
 import {ResponseWaiter} from "../utils/response-waiter.js"
 import {handleIncomingRequests, interpretIncoming, makeRemoteEndpoint, Rig} from "./parts/helpers.js"
 
+/**
+ * Establish a renraku remote that communicates over the given conduit.
+ *  - supports two-way or one-way communication
+ *  - you can use a messenger to call a remote messenger
+ *  - you can use a messenger to respond to incoming requests
+ */
 export class Messenger<xRemoteFns extends Fns> {
 	waiter: ResponseWaiter
 	remoteEndpoint: Endpoint
