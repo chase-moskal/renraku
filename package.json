@@ -50,7 +50,7 @@
 	},
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
-		"@types/node": "^22.15.2",
+		"@types/node": "^22.15.3",
 		"@types/ws": "^8.18.1",
 		"http-server": "^14.1.1",
 		"importly": "^0.2.3",
@@ -60,7 +60,7 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
-		"@e280/science": "^0.0.0-3",
+		"@e280/science": "^0.0.0",
 		"@e280/stz": "^0.0.0-5",
 		"ws": "^8.18.1"
 	}
