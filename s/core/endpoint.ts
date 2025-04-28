@@ -1,7 +1,7 @@
 
 import {drill} from "@e280/stz"
+import {logger} from "../logging/logger.js"
 import {respond} from "../comms/respond.js"
-import {defaultLoggers} from "../tools/logging/loggers.js"
 import {Endpoint, Fn, Fns, OnCallError, OnCall} from "./types.js"
 
 export type EndpointOptions = {
@@ -15,8 +15,8 @@ export function endpoint<F extends Fns>(
 	): Endpoint {
 
 	const {
-		onCall = defaultLoggers.onCall,
-		onCallError = defaultLoggers.onCallError,
+		onCall = logger.onCall,
+		onCallError = logger.onCallError,
 	} = options
 
 	return async request => {

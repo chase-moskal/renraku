@@ -1,7 +1,7 @@
 
 # 連絡 <br/> ***R·E·N·R·A·K·U***
 
-### 🎨 make beautiful typescript apis.
+### 🎨 make beautiful typescript apis
 
 📦 **`npm i renraku`**  
 💡 elegantly expose async functions as an api  
@@ -327,21 +327,18 @@ renraku doesn't do input validation, you might want to use [zod](https://github.
 
 ## ⛩ *RENRAKU* — logging
 - renraku is silent by default
-- make renraku globally log stuff like this:
+- each thing like `endpoint` and `remote` accept callbacks like `onCall` and `onCallError`
+- but you can also make renraku globally log stuff like this:
   ```ts
-  import {defaultLoggers, stdLoggers} from "renraku"
-  defaultLoggers.log = stdLoggers.log
-  defaultLoggers.error = stdLoggers.error
-  defaultLoggers.onCall = stdLoggers.onCall
-  defaultLoggers.onCallError = stdLoggers.onCallError
-  defaultLoggers.onError = stdLoggers.onError
+  import {logger, Logcore} from "renraku"
+  logger.logcore = new Logcore()
   ```
 - you can prefix a label onto onCall and onCallError, useful for distinguishing clients in the logs
   ```ts
-  import {stdLoggers, RandomUserEmojis, endpoint, remote} from "renraku"
+  import {logger, RandomUserEmojis, endpoint, remote} from "renraku"
 
   const emojis = new RandomUserEmojis() // provides random emojis like "🧔"
-  const {onCall, onCallError} = stdLoggers.label(emojis.pull())
+  const {onCall, onCallError} = logger.logtool.label(emojis.pull())
 
   // wherever you're setting up your remote/endpoints..
   const myRemote = remote<MyFns>(remoteEndpoint, {onCall})

@@ -2,9 +2,9 @@
 import {deadline} from "@e280/stz"
 import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
+import {logger} from "../../logging/logger.js"
 import {Endpoint, Fns} from "../../core/types.js"
 import {remote, RemoteOptions} from "../../core/remote.js"
-import {defaultLoggers} from "../../tools/logging/loggers.js"
 
 type Options<F extends Fns> = {
 	url: string
@@ -22,7 +22,7 @@ export async function webSocketRemote<F extends Fns>(
 		url,
 		onClose,
 		timeout = defaults.timeout,
-		onError = defaultLoggers.onError,
+		onError = logger.onError,
 		getLocalEndpoint = () => null,
 	} = params
 
