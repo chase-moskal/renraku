@@ -8,6 +8,9 @@
 
 ## v0.5
 
+### v0.5.0-10
+- 🟥 WindowConduit now takes a localWindow vs a targetWindow, as apparently we listen for messages on our own window, and post to another
+
 ### v0.5.0-9
 - 🍏 most conduit subclasses now have a `conduit.dispose()` method to detach event listeners
 
