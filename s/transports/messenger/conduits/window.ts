@@ -8,7 +8,8 @@ export class WindowConduit extends Conduit {
 	#trash = new Trash()
 
 	constructor(
-			channel: Window,
+			localWindow: Window,
+			targetWindow: WindowProxy,
 			targetOrigin: string,
 			allow: (e: ChannelMessage) => boolean,
 		) {
@@ -16,9 +17,9 @@ export class WindowConduit extends Conduit {
 		super()
 
 		this.#trash.add(
-			this.sendRequest.sub((m, transfer) => channel.postMessage(m, targetOrigin, transfer)),
-			this.sendResponse.sub((m, transfer) => channel.postMessage(m, targetOrigin, transfer)),
-			onMessage(channel, e => {
+			this.sendRequest.sub((m, transfer) => targetWindow.postMessage(m, targetOrigin, transfer)),
+			this.sendResponse.sub((m, transfer) => targetWindow.postMessage(m, targetOrigin, transfer)),
+			onMessage(localWindow, e => {
 				if (allow(e))
 					this.recv(e.data)
 			}),
