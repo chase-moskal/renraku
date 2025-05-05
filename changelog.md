@@ -1,15 +1,17 @@
 
 # changelog for `renraku`
-
-- 🟥 *harmful -- breaking change*
-- 🔶 *maybe harmful -- deprecation, or possible breaking change*
-- 🍏 *harmlesss -- addition, fix, or enhancement*
+- 🟥 breaking change
+- 🔶 deprecation or possible breaking change
+- 🍏 harmless addition, fix, or enhancement
 
 <br/>
 
 ## v0.5
 
-### v0.5.0-7
+### v0.5.0-9
+- 🍏 most conduit subclasses now have a `conduit.dispose()` method to detach event listeners
+
+### v0.5.0-8
 - 🟥 rework `Messenger`, which now accepts a new `Conduit`
   - there used to be different kinds of messengers
   - now there's one Messenger class, and multiple kinds of Conduits
