@@ -30,7 +30,7 @@
 		"_ws-debug": "node inspect x/transports/websocket/examples/server.js",
 		"test": "node x/tests.test.js",
 		"test-inspect": "node inspect x/tests.test.js",
-		"_test-watch": "node --watch x/tests.test.js --verbose"
+		"_test-watch": "node --watch x/tests.test.js"
 	},
 	"keywords": [
 		"rpc",
