@@ -10,7 +10,7 @@ export class WindowConduit extends Conduit {
 	constructor(
 			channel: Window,
 			targetOrigin: string,
-			allow: (e: ChannelMessage) => boolean = () => false,
+			allow: (e: ChannelMessage) => boolean,
 		) {
 
 		super()
