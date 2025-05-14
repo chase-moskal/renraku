@@ -12,7 +12,7 @@ export class PostableConduit extends Conduit {
 		this.#trash.add(
 			this.sendRequest.sub((m, transfer) => channel.postMessage(m, transfer)),
 			this.sendResponse.sub((m, transfer) => channel.postMessage(m, transfer)),
-			onMessage(channel, e => this.recv(e.data)),
+			onMessage(channel, e => this.recv(e.data, e)),
 		)
 	}
 

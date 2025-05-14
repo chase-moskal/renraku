@@ -13,7 +13,11 @@ export class WebSocketConduit extends Conduit {
 			this.sendResponse.sub(m => channel.send(JSON.stringify(m))),
 		)
 
-		channel.onmessage = (e: MessageEvent) => this.recv(JSON.parse(e.data.toString()))
+		channel.onmessage = (e: MessageEvent) => this.recv(
+			JSON.parse(e.data.toString()),
+			e,
+		)
+
 		this.#trash.add(() => {
 			channel.onmessage = () => {}
 		})

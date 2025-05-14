@@ -10,18 +10,22 @@ export class WindowConduit extends Conduit {
 	constructor(
 			localWindow: Window,
 			targetWindow: WindowProxy,
-			targetOrigin: string,
+			public targetOrigin: string,
 			allow: (e: ChannelMessage) => boolean,
 		) {
 
 		super()
 
 		this.#trash.add(
-			this.sendRequest.sub((m, transfer) => targetWindow.postMessage(m, targetOrigin, transfer)),
-			this.sendResponse.sub((m, transfer) => targetWindow.postMessage(m, targetOrigin, transfer)),
+			this.sendRequest.sub((m, transfer) =>
+				targetWindow.postMessage(m, this.targetOrigin, transfer)),
+
+			this.sendResponse.sub((m, transfer) =>
+				targetWindow.postMessage(m, this.targetOrigin, transfer)),
+
 			onMessage(localWindow, e => {
 				if (allow(e))
-					this.recv(e.data)
+					this.recv(e.data, e)
 			}),
 		)
 	}

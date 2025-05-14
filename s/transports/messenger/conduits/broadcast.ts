@@ -11,7 +11,7 @@ export class BroadcastConduit extends Conduit {
 		this.#trash.add(
 			this.sendRequest.sub(m => channel.postMessage(m)),
 			this.sendResponse.sub(m => channel.postMessage(m)),
-			onMessage(channel, e => this.recv(e.data)),
+			onMessage(channel, e => this.recv(e.data, e)),
 		)
 	}
 
