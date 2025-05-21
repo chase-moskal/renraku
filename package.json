@@ -17,6 +17,7 @@
 	],
 	"scripts": {
 		"build": "run-s _clean && run-p _importmap _tsc",
+		"count": "find s -path '*/_archive' -prune -o -name '*.ts' -exec wc -l {} +",
 		"_clean": "rimraf x *.pem && mkdirp x",
 		"_importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"_tsc": "tsc",
@@ -50,7 +51,7 @@
 	},
 	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
-		"@types/node": "^22.15.18",
+		"@types/node": "^22.15.21",
 		"@types/ws": "^8.18.1",
 		"http-server": "^14.1.1",
 		"importly": "^0.2.3",
