@@ -1,5 +1,5 @@
 
-import {deferPromise} from "@e280/stz"
+import {defer} from "@e280/stz"
 import {Endpoint} from "../../../core/types.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
 import {Channel, ChannelMessage} from "../types.js"
@@ -25,7 +25,7 @@ export type SendRequestFn = (
 export function makeRemoteEndpoint(waiter: ResponseWaiter, sendRequest: SendRequestFn): Endpoint {
 	return async(request, transfer) => {
 		if ("id" in request) {
-			const done = deferPromise<JsonRpc.Response | null>()
+			const done = defer<JsonRpc.Response | null>()
 			sendRequest(request, transfer, done.promise)
 			return waiter.wait(request.id, request.method).then(response => {
 				done.resolve(response)
