@@ -2,7 +2,7 @@
 import {deadline} from "@e280/stz"
 import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
-import {logger} from "../../logging/logger.js"
+import {logger} from "../../tools/logger.js"
 import {Endpoint, Fns} from "../../core/types.js"
 import {remote, RemoteOptions} from "../../core/remote.js"
 

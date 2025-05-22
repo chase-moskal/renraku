@@ -2,7 +2,7 @@
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
 import {MessengerOptions} from "./types.js"
-import {logger} from "../../logging/logger.js"
+import {logger} from "../../tools/logger.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Endpoint, Fns} from "../../core/types.js"

@@ -4,7 +4,7 @@ import * as http from "http"
 
 import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
-import {logger} from "../../logging/logger.js"
+import {logger} from "../../tools/logger.js"
 import {ipAddress} from "../../tools/ip-address.js"
 import {Endpoint, ServerMeta} from "../../core/types.js"
 import {simplifyHeaders} from "../../tools/simple-headers.js"

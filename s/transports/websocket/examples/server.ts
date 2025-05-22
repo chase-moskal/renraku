@@ -1,9 +1,11 @@
 
 import {WebSocketServer} from "../server.js"
 import {remote} from "../../../core/remote.js"
-import {logger} from "../../../logging/logger.js"
+import {logger} from "../../../tools/logger.js"
 import {endpoint} from "../../../core/endpoint.js"
 import {ExampleClientsideFns, exampleServersideApi} from "./apis.js"
+
+logger.enable()
 
 const server = new WebSocketServer({
 	acceptConnection: async({remoteEndpoint}) => {
@@ -17,5 +19,5 @@ const server = new WebSocketServer({
 	},
 })
 
-server.listen(8000, () => logger.logcore.log("example websocket server listening..."))
+server.listen(8000, () => logger.log("example websocket server listening..."))
 

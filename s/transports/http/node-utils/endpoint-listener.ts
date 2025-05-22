@@ -3,7 +3,7 @@ import {RequestListener} from "http"
 
 import {defaults} from "../../defaults.js"
 import {readStream} from "./read-stream.js"
-import {logger} from "../../../logging/logger.js"
+import {logger} from "../../../tools/logger.js"
 import {JsonRpc} from "../../../comms/json-rpc.js"
 import {ipAddress} from "../../../tools/ip-address.js"
 import {Endpoint, ServerMeta} from "../../../core/types.js"

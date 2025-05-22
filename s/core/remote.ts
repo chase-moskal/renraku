@@ -1,9 +1,9 @@
 
 import {RemoteError} from "./errors.js"
+import {logger} from "../tools/logger.js"
 import {JsonRpc} from "../comms/json-rpc.js"
 import {remoteProxy} from "./remote-proxy.js"
 import {Endpoint, Fns, OnCall} from "./types.js"
-import {logger} from "../logging/logger.js"
 
 export type RemoteOptions = {
 	label?: string

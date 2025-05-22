@@ -1,7 +1,7 @@
 
 import {drill} from "@e280/stz"
-import {logger} from "../logging/logger.js"
 import {respond} from "../comms/respond.js"
+import {logger} from "../tools/logger.js"
 import {Endpoint, Fn, Fns, OnCallError, OnCall} from "./types.js"
 
 export type EndpointOptions = {
