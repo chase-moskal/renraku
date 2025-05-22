@@ -32,5 +32,6 @@ export class RenrakuLogger extends Logger {
 	}
 }
 
+/** the default global renraku logger, starts disabled, you can enable it with .enable() */
 export const logger = new RenrakuLogger()
 

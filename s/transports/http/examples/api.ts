@@ -19,6 +19,7 @@ export const example = fns({
 
 		return {
 			async now() {
+				throw new Error("lmao, rofl")
 				return Date.now()
 			},
 		}
