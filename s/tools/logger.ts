@@ -5,11 +5,7 @@ import {OnCall, OnCallError, OnError} from "../core/types.js"
 export class RenrakuLogger extends Logger {
 	constructor() {
 		super()
-		this
-			.setWriter(Logger.writers.void())
-			.setColors(Logger.colors.auto())
-			.addShaper(Logger.shapers.errors())
-			.addShaper(Logger.shapers.timestamp())
+		this.setWriter(Logger.writers.void())
 	}
 
 	enable() {
