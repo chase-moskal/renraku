@@ -8,12 +8,17 @@ import {ExampleClientsideFns, exampleServersideApi} from "./apis.js"
 logger.enable()
 
 const server = new WebSocketServer({
-	acceptConnection: async({remoteEndpoint}) => {
-		const clientside = remote<ExampleClientsideFns>(remoteEndpoint)
+	acceptConnection: async connection => {
+		const personalLogger = logger.personal(connection)
+		const clientside = remote<ExampleClientsideFns>(
+			connection.remoteEndpoint,
+			personalLogger.remote,
+		)
 		return {
 			closed: () => {},
 			localEndpoint: endpoint(
 				exampleServersideApi(clientside),
+				personalLogger.local,
 			),
 		}
 	},

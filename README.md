@@ -431,23 +431,12 @@ messenger also implements [Transferables](https://developer.mozilla.org/en-US/do
 <br/>
 
 ## ⛩ *RENRAKU* — logging
-- renraku is silent by default
-- each thing like `endpoint` and `remote` accept callbacks like `onCall` and `onCallError`
-- but you can also make renraku globally log stuff like this:
+- renraku's fallback logger is silent by default
+- `endpoint` and `remote` accept callbacks like `onCall` and `onCallError` -- and these override the usage of the fallback logger
+- but you can enable renraku's fallback logger like this
   ```ts
-  import {logger, Logcore} from "renraku"
-  logger.logcore = new Logcore()
-  ```
-- you can prefix a label onto onCall and onCallError, useful for distinguishing clients in the logs
-  ```ts
-  import {logger, RandomUserEmojis, endpoint, remote} from "renraku"
-
-  const emojis = new RandomUserEmojis() // provides random emojis like "🧔"
-  const {onCall, onCallError} = logger.logtool.label(emojis.pull())
-
-  // wherever you're setting up your remote/endpoints..
-  const myRemote = remote<MyFns>(remoteEndpoint, {onCall})
-  const myEndpoint = endpoint(signalingApi, {onCall, onCallError})
+  import {logger} from "renraku"
+  logger.enable()
   ```
 
 <br/>

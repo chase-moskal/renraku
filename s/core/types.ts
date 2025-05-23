@@ -22,11 +22,13 @@ export type OnError = (error: any) => void
 
 export type OnCall = (options: {
 	request: JsonRpc.Request
+	label?: string
 }) => void
 
 export type OnCallError = (options: {
 	error: any
 	request: JsonRpc.Request
+	label?: string
 }) => void
 
 export type Endpoint = (
