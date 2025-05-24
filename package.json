@@ -21,10 +21,9 @@
 		"_clean": "rimraf x *.pem && mkdirp x",
 		"_importmap": "importly --dev < package-lock.json > x/importmap.json",
 		"_tsc": "tsc",
-		"watch": "run-p _tsc-watch",
 		"_tsc-watch": "tsc -w",
-		"start": "run-p watch _http",
 		"_http": "http-server -p 8080",
+		"watch": "run-p _tsc-watch _http",
 		"api": "node x/transports/http/examples/server.js",
 		"api-watch": "node --watch x/transports/http/examples/server.js",
 		"api-debug": "node inspect x/transports/http/examples/server.js",
@@ -35,23 +34,12 @@
 		"test-inspect": "node inspect x/tests.test.js",
 		"test-watch": "node --watch x/tests.test.js"
 	},
-	"keywords": [
-		"rpc",
-		"json",
-		"jsonrpc",
-		"json-rpc",
-		"api",
-		"web-api",
-		"node-api"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/chase-moskal/renraku.git"
+	"dependencies": {
+		"@e280/science": "^0.0.5",
+		"@e280/sten": "^0.0.0-5",
+		"@e280/stz": "^0.0.0-18",
+		"ws": "^8.18.2"
 	},
-	"bugs": {
-		"url": "https://github.com/chase-moskal/renraku/issues"
-	},
-	"homepage": "https://github.com/chase-moskal/renraku#readme",
 	"devDependencies": {
 		"@types/node": "^22.15.21",
 		"@types/ws": "^8.18.1",
@@ -63,10 +51,21 @@
 		"rimraf": "^6.0.1",
 		"typescript": "^5.8.3"
 	},
-	"dependencies": {
-		"@e280/science": "^0.0.5",
-		"@e280/sten": "^0.0.0-5",
-		"@e280/stz": "^0.0.0-18",
-		"ws": "^8.18.2"
+	"keywords": [
+		"rpc",
+		"remote procedure call",
+		"json api",
+		"json rpc",
+		"api",
+		"web api",
+		"node api"
+	],
+	"homepage": "https://github.com/chase-moskal/renraku#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/chase-moskal/renraku.git"
+	},
+	"bugs": {
+		"url": "https://github.com/chase-moskal/renraku/issues"
 	}
 }
