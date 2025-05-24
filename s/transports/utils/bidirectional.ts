@@ -18,7 +18,7 @@ export class Bidirectional<R = undefined> {
 		this.waiter = new ResponseWaiter(this.options.timeout)
 	}
 
-	remoteEndpoint: Endpoint = async(request, transfer) => {
+	remoteEndpoint: Endpoint = async(request, {transfer} = {}) => {
 		const {sendRequest} = this.options
 
 		if ("id" in request) {

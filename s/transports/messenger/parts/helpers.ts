@@ -23,7 +23,7 @@ export type SendRequestFn = (
 ) => void
 
 export function makeRemoteEndpoint(waiter: ResponseWaiter, sendRequest: SendRequestFn): Endpoint {
-	return async(request, transfer) => {
+	return async(request, {transfer} = {}) => {
 		if ("id" in request) {
 			const done = defer<JsonRpc.Response | null>()
 			sendRequest(request, transfer, done.promise)

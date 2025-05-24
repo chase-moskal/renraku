@@ -33,11 +33,14 @@ export type Tap = {
 	}) => Promise<void>
 }
 
-// TODO move transfer into object
+export type EndpointSpecial = {
+	transfer?: Transferable[]
+}
+
 export type Endpoint = (
-	(request: JsonRpc.Request, transfer?: Transferable[]) =>
-		Promise<JsonRpc.Response | null>
-)
+	request: JsonRpc.Request,
+	special?: EndpointSpecial,
+) => Promise<JsonRpc.Response | null>
 
 export {SimpleHeaders}
 

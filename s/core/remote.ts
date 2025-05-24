@@ -45,7 +45,7 @@ export function remote<F extends Fns>(options: RemoteOptions) {
 		if (tap)
 			await tap.request({request})
 
-		const response = await endpoint(request, transfer)
+		const response = await endpoint(request, {transfer})
 
 		if (notify && !response)
 			return null
