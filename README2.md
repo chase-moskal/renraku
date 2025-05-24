@@ -153,7 +153,7 @@ i've been using and sharpening this typescript implementation for many years.
   import {myFunctions} from "./my-functions.js"
 
   // create a renraku endpoint for your functions
-  const myEndpoint = endpoint(myFunctions)
+  const myEndpoint = endpoint({fns: myFunctions})
 
   // create your wacky carrier pigeon server
   const pigeons = new CarrierPigeonServer({
@@ -179,12 +179,12 @@ i've been using and sharpening this typescript implementation for many years.
   const pigeons = new CarrierPigeonClient()
 
   // create a remote with the type of your async functions
-  const myRemote = remote<typeof myFunctions>(
+  const myRemote = remote<typeof myFunctions>({
 
     // your carrier pigeon implementation needs only to
     // transmit the json request object, and return then json response object
-    async request => await carrierPigeon.send(request)
-  )
+    endpoint: async request => await carrierPigeon.send(request)
+  })
 
   // usage
   await myRemote.math.sum(1, 2) // 3
