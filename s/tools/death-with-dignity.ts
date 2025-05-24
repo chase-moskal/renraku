@@ -1,5 +1,5 @@
+
 import {Logger} from "@e280/sten"
-import {logger as defaultLogger} from "./logger.js"
 
 export type Signal = (
 	| "SIGINT"
@@ -9,7 +9,7 @@ export type Signal = (
 )
 
 export function deathWithDignity(
-		logger: Logger = defaultLogger,
+		logger: Logger = new Logger(),
 		options: {dieOnUncaught?: boolean} = {},
 	) {
 

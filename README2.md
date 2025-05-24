@@ -94,9 +94,9 @@ i've been using and sharpening this typescript implementation for many years.
   ```
 
 ### logging
-- you can stick a `RenrakuLogger` into many things
+- you can stick a `LogResponder` into many things
   ```ts
-  import {RenrakuLogger} from "@e280/renraku"
+  import {LoggerTap} from "@e280/renraku"
   ```
 - use it to enable logging on the serverside
   ```ts
@@ -105,7 +105,7 @@ i've been using and sharpening this typescript implementation for many years.
     expose: () => exampleFns,
 
     // ✅ logging enabled
-    logger: new RenrakuLogger(),
+    tap: new LoggerTap(),
   })
   ```
 - use it to enable logging on the clientside
@@ -114,7 +114,7 @@ i've been using and sharpening this typescript implementation for many years.
     url: "http://localhost:8000/",
 
     // ✅ logging enabled
-    logger: new RenrakuLogger(),
+    tap: new LoggerTap(),
   })
   ```
 

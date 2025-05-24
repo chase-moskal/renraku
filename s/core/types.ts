@@ -12,25 +12,28 @@ export function fns<F extends Fns>(f: F) {
 	return f
 }
 
-export type ServerMeta = {
+export type HttpMeta = {
 	req: IncomingMessage
 	headers: SimpleHeaders
 	ip: string
 }
 
-export type OnError = (error: any) => void
+export type Tap = {
+	error: (error: any) => Promise<void>
 
-export type OnCall = (options: {
-	request: JsonRpc.Request
-	label?: string
-}) => void
+	request: (options: {
+		request: JsonRpc.Request
+		label?: string
+	}) => Promise<void>
 
-export type OnCallError = (options: {
-	error: any
-	request: JsonRpc.Request
-	label?: string
-}) => void
+	requestError: (options: {
+		error: any
+		request: JsonRpc.Request
+		label?: string
+	}) => Promise<void>
+}
 
+// TODO move transfer into object
 export type Endpoint = (
 	(request: JsonRpc.Request, transfer?: Transferable[]) =>
 		Promise<JsonRpc.Response | null>

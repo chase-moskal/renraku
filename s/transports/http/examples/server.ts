@@ -1,11 +1,15 @@
 
 import {example} from "./api.js"
 import {httpServer} from "../server.js"
-import {logger} from "../../../tools/logger.js"
+import {LoggerTap} from "../../../universal.index.js"
 
-logger.enable()
+const logger = new LoggerTap()
 
-await httpServer({port: 8000, expose: () => example})
+await httpServer({
+	port: 8000,
+	tap: logger,
+	expose: () => example,
+})
 
 logger.log("example http server listening...")
 

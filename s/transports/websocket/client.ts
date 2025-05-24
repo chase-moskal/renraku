@@ -2,7 +2,6 @@
 import {deadline} from "@e280/stz"
 import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
-import {logger} from "../../tools/logger.js"
 import {Endpoint, Fns} from "../../core/types.js"
 import {remote, RemoteOptions} from "../../core/remote.js"
 
@@ -10,19 +9,15 @@ type Options<F extends Fns> = {
 	url: string
 	timeout?: number
 	onClose: () => void
-	onError?: (error: any) => void
 	getLocalEndpoint?: (remote: F) => Endpoint | null
-} & RemoteOptions
+} & Omit<RemoteOptions, "endpoint">
 
-export async function webSocketRemote<F extends Fns>(
-		params: Options<F>
-	) {
-
+export async function webSocketRemote<F extends Fns>(params: Options<F>) {
 	const {
 		url,
-		onClose,
+		tap,
 		timeout = defaults.timeout,
-		onError = logger.onError,
+		onClose,
 		getLocalEndpoint = () => null,
 	} = params
 
@@ -37,10 +32,10 @@ export async function webSocketRemote<F extends Fns>(
 		const socketry = new Socketry({
 			socket,
 			timeout,
-			onError,
+			tap,
 		})
 
-		const r = remote<F>(socketry.remoteEndpoint, params)
+		const r = remote<F>({...params, endpoint: socketry.remoteEndpoint})
 		const localEndpoint = getLocalEndpoint(r as F)
 
 		socket.onclose = () => onClose()

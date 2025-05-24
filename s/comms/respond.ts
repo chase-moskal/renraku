@@ -1,16 +1,16 @@
 
+import {Tap} from "../core/types.js"
 import {JsonRpc} from "./json-rpc.js"
-import {OnCallError} from "../core/types.js"
 import {ExposedError} from "../core/errors.js"
 
 export async function respond<R>({
 		request,
 		action,
-		onCallError,
+		tap,
 	}: {
 		request: JsonRpc.Request
 		action: () => Promise<R>
-		onCallError: OnCallError
+		tap?: Tap
 	}): Promise<JsonRpc.Response<R> | null> {
 
 	const id = JsonRpc.getId(request)
@@ -29,7 +29,8 @@ export async function respond<R>({
 	}
 
 	catch (error) {
-		onCallError({error, request})
+		if (tap)
+			tap.requestError({request, error})
 
 		if (!("id" in request))
 			return null

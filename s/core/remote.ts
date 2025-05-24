@@ -1,14 +1,14 @@
 
 import {RemoteError} from "./errors.js"
-import {logger} from "../tools/logger.js"
 import {JsonRpc} from "../comms/json-rpc.js"
 import {remoteProxy} from "./remote-proxy.js"
-import {Endpoint, Fns, OnCall} from "./types.js"
+import {Endpoint, Fns, Tap} from "./types.js"
 
 export type RemoteOptions = {
+	endpoint: Endpoint
 	label?: string
 	notify?: boolean
-	onCall?: OnCall
+	tap?: Tap
 }
 
 /**
@@ -17,13 +17,9 @@ export type RemoteOptions = {
  *  - so when you make async calls on the remote, it will convert those into json rpc requests that are actuated on the given endpoint
  *  - the endpoint you provide could be making network calls, or doing something else, the remote doesn't care how the endpoint is implemented
  */
-export function remote<F extends Fns>(
-		endpoint: Endpoint,
-		options: RemoteOptions = {},
-	) {
-
+export function remote<F extends Fns>(options: RemoteOptions) {
+	const {endpoint, tap} = options
 	let id = 1
-	const {onCall = logger.onCall} = options
 
 	return remoteProxy<F>(async(
 			path,
@@ -46,7 +42,9 @@ export function remote<F extends Fns>(
 				: {...base, id: id++}
 		)
 
-		onCall({request})
+		if (tap)
+			await tap.request({request})
+
 		const response = await endpoint(request, transfer)
 
 		if (notify && !response)

@@ -1,12 +1,12 @@
 
 import * as ws from "ws"
-import {Endpoint} from "../../../core/types.js"
+import {Endpoint, Tap} from "../../../core/types.js"
 import {Bidirectional} from "../../utils/bidirectional.js"
 
 export type SocketryOptions = {
 	timeout: number
 	socket: WebSocket | ws.WebSocket
-	onError: (error: any) => void
+	tap?: Tap
 }
 
 export type SocketryMessageEvent = {
@@ -34,7 +34,9 @@ export class Socketry {
 			return await this.bidirectional.receive(localEndpoint, incoming, undefined)
 		}
 		catch (error) {
-			this.options.onError(error)
+			const {tap} = this.options
+			if (tap)
+				await tap.error(error)
 		}
 	}
 }
