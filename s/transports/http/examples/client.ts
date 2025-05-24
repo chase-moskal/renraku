@@ -1,6 +1,6 @@
 
-import {httpRemote} from "../client.js"
 import type {example} from "./api.js"
+import {httpRemote} from "../client.js"
 import {authorize} from "../../../auth/authorize.js"
 
 const service = httpRemote<typeof example>({

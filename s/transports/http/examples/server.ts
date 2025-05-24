@@ -1,7 +1,7 @@
 
 import {example} from "./api.js"
 import {httpServer} from "../server.js"
-import {LoggerTap} from "../../../universal.index.js"
+import {LoggerTap} from "../../../tools/logger.js"
 
 const logger = new LoggerTap()
 

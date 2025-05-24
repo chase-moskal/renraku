@@ -5,10 +5,10 @@
 	"license": "MIT",
 	"author": "Chase Moskal <chasemoskal@gmail.com>",
 	"type": "module",
-	"main": "./x/universal.exports.js",
+	"main": "./x/index.universal.js",
 	"exports": {
-		".": "./x/universal.exports.js",
-		"./node": "./x/node.exports.js",
+		".": "./x/index.universal.js",
+		"./node": "./x/index.node.js",
 		"./*": "./*"
 	},
 	"files": [

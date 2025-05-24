@@ -1,5 +1,5 @@
 
-export * from "./universal.index.js"
+export * from "./index.universal.js"
 
 export * from "./transports/http/node-utils/listener-transforms/allow-cors.js"
 export * from "./transports/http/node-utils/listener-transforms/health-check.js"
