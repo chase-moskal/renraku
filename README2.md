@@ -94,7 +94,7 @@ i've been using and sharpening this typescript implementation for many years.
   ```
 
 ### logging
-- you can stick a `LogResponder` into many things
+- you can stick a `LoggerTap` into many things
   ```ts
   import {LoggerTap} from "@e280/renraku"
   ```
