@@ -1,7 +1,8 @@
 
 import {webSocketRemote} from "../client.js"
+import {exampleClientsideApi} from "./apis.js"
+import {ExampleServersideFns} from "./types.js"
 import {endpoint} from "../../../core/endpoint.js"
-import {exampleClientsideApi, ExampleServersideFns} from "./apis.js"
 
 let calls = 0
 let rememberCall = () => calls++

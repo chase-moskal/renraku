@@ -42,7 +42,7 @@ export class LoggerTap extends Logger implements Tap {
 		}
 	}
 
-	personal(meta: HttpMeta) {
+	webSocket(meta: HttpMeta) {
 		const info = this.#requestInfo(meta)
 		const emoji = this.#emojis.pull()
 		const g = this.colors.yellow
