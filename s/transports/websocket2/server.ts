@@ -1,10 +1,12 @@
 
 import * as ws from "ws"
 import * as http from "http"
-
 import {sub} from "@e280/stz"
+
 import {Fns} from "../../core/types.js"
+import {defaults} from "../defaults.js"
 import {Ws, WsOptions} from "./types.js"
+import {keepAlive} from "./utils/keep-alive.js"
 import {endpoint} from "../../core/endpoint.js"
 import {Messenger} from "../messenger/messenger.js"
 import {ipAddress} from "../../tools/ip-address.js"
@@ -17,12 +19,12 @@ export function webSocketServer<ClientFns extends Fns>(
 		options: WsOptions<ClientFns>
 	) {
 
+	const timeout = options.timeout ?? defaults.timeout
+	const maxPayload = options.maxRequestBytes ?? defaults.maxRequestBytes
 	const onError = options.tap?.error ?? (() => {})
+
 	const httpServer = http.createServer()
-	const wsServer = new ws.WebSocketServer({
-		noServer: true,
-		maxPayload: options.maxRequestBytes,
-	})
+	const wsServer = new ws.WebSocketServer({noServer: true, maxPayload})
 
 	async function acceptConnection(
 			socket: ws.WebSocket,
@@ -34,6 +36,30 @@ export function webSocketServer<ClientFns extends Fns>(
 		const onClosed = sub()
 		const taps = options.tap?.webSocket({ip, headers, req})
 
+		const stop = keepAlive({
+			socket,
+			timeout,
+			heartbeat: timeout === Infinity
+				? 20_000
+				: (timeout * (2 / 3)),
+			onTimeout: () => {
+				onClosed.pub()
+				taps?.remote?.error(new Error("timed out"))
+			},
+		})
+
+		socket.onerror = error => {
+			stop()
+			socket.close()
+			onError(error)
+			onClosed.pub()
+		}
+
+		socket.onclose = () => {
+			stop()
+			onClosed.pub()
+		}
+
 		const messenger = new Messenger<ClientFns>({
 			tap: taps?.remote,
 			timeout: options.timeout,
@@ -44,9 +70,6 @@ export function webSocketServer<ClientFns extends Fns>(
 			}),
 		})
 
-		socket.onerror = onError
-		socket.onclose = () => onClosed.pub()
-
 		const serversideFns = await options.accept({
 			ip,
 			req,
@@ -54,7 +77,10 @@ export function webSocketServer<ClientFns extends Fns>(
 			onClosed,
 			clientside: messenger.remote,
 			ping: () => socket.ping(),
-			close: () => socket.close(),
+			close: () => {
+				stop()
+				socket.close()
+			},
 		})
 	}
 
