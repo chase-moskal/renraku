@@ -5,7 +5,7 @@ import {sub} from "@e280/stz"
 
 import {Fns} from "../../core/types.js"
 import {defaults} from "../defaults.js"
-import {Ws, WsOptions} from "./types.js"
+import {Wss, WssOptions} from "./types.js"
 import {keepAlive} from "./utils/keep-alive.js"
 import {endpoint} from "../../core/endpoint.js"
 import {Messenger} from "../messenger/messenger.js"
@@ -16,7 +16,7 @@ import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
 
 export function webSocketServer<ClientFns extends Fns>(
-		options: WsOptions<ClientFns>
+		options: WssOptions<ClientFns>
 	) {
 
 	const timeout = options.timeout ?? defaults.timeout
@@ -61,9 +61,9 @@ export function webSocketServer<ClientFns extends Fns>(
 		}
 
 		const messenger = new Messenger<ClientFns>({
+			timeout,
 			tap: taps?.remote,
-			timeout: options.timeout,
-			conduit: new WebSocketConduit(socket),
+			conduit: new WebSocketConduit({socket, timeout}),
 			getLocalEndpoint: () => endpoint({
 				tap: taps?.local,
 				fns: serversideFns,
@@ -84,7 +84,7 @@ export function webSocketServer<ClientFns extends Fns>(
 		})
 	}
 
-	return new Promise<Ws>((resolve, reject) => {
+	return new Promise<Wss>((resolve, reject) => {
 		const handleError = (error: Error) => {
 			onError(error)
 			reject(error)

@@ -8,6 +8,9 @@
 
 ## v0.5
 
+### v0.5.0-12
+- 🟥 `conduit.recv` 2nd argument `event` no longer has `data`
+
 ### v0.5.0-11
 - 🟥 `conduit.recv` now requires a 2nd argument `event`
   - is type `ChannelMessage` (requires `data` and `origin`)

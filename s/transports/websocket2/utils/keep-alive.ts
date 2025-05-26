@@ -8,6 +8,7 @@ export type KeepAliveOptions = {
 	onTimeout: () => void
 }
 
+/** @deprecated being replaced by fancy websocket conduit with pingponger and heartbeat */
 export function keepAlive(options: KeepAliveOptions) {
 	const {socket, timeout, heartbeat, onTimeout} = options
 	let timeoutId: NodeJS.Timeout | undefined
