@@ -1,5 +1,5 @@
 
-# changelog for `renraku`
+# changelog for `@e280/renraku`
 - 🟥 breaking change
 - 🔶 deprecation or possible breaking change
 - 🍏 harmless addition, fix, or enhancement
@@ -8,8 +8,11 @@
 
 ## v0.5
 
-### v0.5.0-12
-- 🟥 `conduit.recv` 2nd argument `event` no longer has `data`
+### v0.5.0-14
+- 🟥 **project moved to `@e280/renraku`**
+- 🟥 massive refactor, many such changes, all new readme
+
+---
 
 ### v0.5.0-11
 - 🟥 `conduit.recv` now requires a 2nd argument `event`
