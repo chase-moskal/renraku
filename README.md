@@ -14,6 +14,11 @@
 
 i've been using and sharpening this typescript implementation for many years.
 
+> ⚠️ ***IMPORTANT***  
+> renraku is in the middle of an ongoing fat refactor!
+> - [`renraku@0.5.0-11`](https://www.npmjs.com/package/renraku/v/0.5.0-11) is the most recent *stable* version, which has more features
+> - `@e280/renraku@0.5.0-14` is the first of an *unstable* new line of wip development
+
 <br/>
 
 ## ⛩️ *RENRAKU* http
