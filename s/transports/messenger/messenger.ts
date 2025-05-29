@@ -2,7 +2,6 @@
 import {defaults} from "../defaults.js"
 import {remote} from "../../core/remote.js"
 import {MessengerOptions} from "./types.js"
-import {logger} from "../../logging/logger.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {Remote} from "../../core/remote-proxy.js"
 import {Endpoint, Fns} from "../../core/types.js"
@@ -30,10 +29,10 @@ export class Messenger<xRemoteFns extends Fns> {
 			conduit.sendRequest.pub.bind(conduit.sendRequest),
 		)
 
-		this.remote = remote<xRemoteFns>(
-			this.remoteEndpoint,
-			{onCall: options.onCall ?? logger.onCall},
-		)
+		this.remote = remote<xRemoteFns>({
+			endpoint: this.remoteEndpoint,
+			tap: options.tap,
+		})
 
 		conduit.recv.sub(m => this.recv(m))
 	}

@@ -1,5 +1,5 @@
 
-import {deferPromise} from "@e280/stz"
+import {defer} from "@e280/stz"
 
 import {Endpoint} from "../../core/types.js"
 import {JsonRpc} from "../../comms/json-rpc.js"
@@ -18,11 +18,11 @@ export class Bidirectional<R = undefined> {
 		this.waiter = new ResponseWaiter(this.options.timeout)
 	}
 
-	remoteEndpoint: Endpoint = async(request, transfer) => {
+	remoteEndpoint: Endpoint = async(request, {transfer} = {}) => {
 		const {sendRequest} = this.options
 
 		if ("id" in request) {
-			const done = deferPromise<JsonRpc.Respondish | null>()
+			const done = defer<JsonRpc.Respondish | null>()
 			sendRequest(request, transfer, done.promise)
 			return this.waiter.wait(request.id, request.method)
 				.then(response => {

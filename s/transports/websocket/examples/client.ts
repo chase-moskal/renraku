@@ -1,15 +1,18 @@
 
 import {webSocketRemote} from "../client.js"
+import {exampleClientsideApi} from "./apis.js"
+import {ExampleServersideFns} from "./types.js"
 import {endpoint} from "../../../core/endpoint.js"
-import {exampleClientsideApi, ExampleServersideFns} from "./apis.js"
 
 let calls = 0
 let rememberCall = () => calls++
 
 const {socket, remote: serverside} = await webSocketRemote<ExampleServersideFns>({
 	url: "http://localhost:8000",
-	getLocalEndpoint: fns => endpoint(exampleClientsideApi(fns, rememberCall)),
-	onClose: () => console.error("web socket remote disconnected"),
+	getLocalEndpoint: fns => endpoint({
+		fns: exampleClientsideApi(fns, rememberCall),
+	}),
+	onClose: () => console.log("web socket remote disconnected"),
 })
 
 const result = await serverside.now()

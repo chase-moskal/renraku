@@ -1,5 +1,5 @@
 
-# changelog for `renraku`
+# changelog for `@e280/renraku`
 - 🟥 breaking change
 - 🔶 deprecation or possible breaking change
 - 🍏 harmless addition, fix, or enhancement
@@ -7,6 +7,12 @@
 <br/>
 
 ## v0.5
+
+### v0.5.0-14
+- 🟥 **project moved to `@e280/renraku`**
+- 🟥 massive refactor, many such changes, all new readme
+
+---
 
 ### v0.5.0-11
 - 🟥 `conduit.recv` now requires a 2nd argument `event`
@@ -20,6 +26,9 @@
 - 🍏 most conduit subclasses now have a `conduit.dispose()` method to detach event listeners
 
 ### v0.5.0-8
+- 🟥 rework replace loggers with `logger`, `logger.logcore`, and `logger.logtool` -- see the readme
+  - `color` is no longer exported, now we yoink color from `@e280/science`
+  - ngl this situation kinda stinks, we really need an official logging lib
 - 🟥 rework `Messenger`, which now accepts a new `Conduit`
   - there used to be different kinds of messengers
   - now there's one Messenger class, and multiple kinds of Conduits

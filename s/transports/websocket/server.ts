@@ -4,9 +4,8 @@ import * as http from "http"
 
 import {defaults} from "../defaults.js"
 import {Socketry} from "./utils/socketry.js"
-import {logger} from "../../logging/logger.js"
 import {ipAddress} from "../../tools/ip-address.js"
-import {Endpoint, ServerMeta} from "../../core/types.js"
+import {Endpoint, HttpMeta, Tap} from "../../core/types.js"
 import {simplifyHeaders} from "../../tools/simple-headers.js"
 import {allowCors} from "../http/node-utils/listener-transforms/allow-cors.js"
 import {healthCheck} from "../http/node-utils/listener-transforms/health-check.js"
@@ -14,7 +13,7 @@ import {healthCheck} from "../http/node-utils/listener-transforms/health-check.j
 type Options = {
 	timeout: number
 	maxRequestBytes: number
-	onError: (error: any) => void
+	tap?: Tap
 }
 
 type Requirements = {
@@ -30,7 +29,7 @@ type Connection = {
 	ping: () => void
 	close: () => void
 	remoteEndpoint: Endpoint
-} & ServerMeta
+} & HttpMeta
 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
@@ -46,7 +45,6 @@ export class WebSocketServer {
 		const params = this.params = {
 			timeout: defaults.timeout,
 			maxRequestBytes: defaults.maxRequestBytes,
-			onError: logger.onError,
 			...inputs,
 		}
 
@@ -58,12 +56,14 @@ export class WebSocketServer {
 			maxPayload: params.maxRequestBytes,
 		})
 
+		const onError = this.#onError
+
 		wsServer
-			.on("error", params.onError)
+			.on("error", onError)
 			.on("connection", this.#handle_websocket_connection)
 
 		httpServer
-			.on("error", params.onError)
+			.on("error", onError)
 			.on("request", allowCors(healthCheck("/health")))
 			.on("upgrade", (request, socket, head) => {
 				wsServer.handleUpgrade(request, socket, head, ws => {
@@ -72,19 +72,27 @@ export class WebSocketServer {
 			})
 	}
 
+	get #onError() {
+		const {tap} = this.params
+		return tap
+			? tap.error.bind(tap)
+			: () => {}
+	}
+
 	#handle_websocket_connection = async(
 			socket: ws.WebSocket,
 			req: http.IncomingMessage,
 		) => {
 
-		const {timeout, acceptConnection, onError} = this.params
+		const onError = this.#onError
+		const {timeout, tap, acceptConnection} = this.params
 		const ip = ipAddress(req)
 		const headers = simplifyHeaders(req.headers)
 
 		const socketry = new Socketry({
 			socket,
 			timeout,
-			onError,
+			tap,
 		})
 
 		const {localEndpoint, closed} = await acceptConnection({

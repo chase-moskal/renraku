@@ -1,5 +1,5 @@
 
-import {logger as defaultLogger} from "../logging/logger.js"
+import {Logger} from "@e280/sten"
 
 export type Signal = (
 	| "SIGINT"
@@ -9,7 +9,7 @@ export type Signal = (
 )
 
 export function deathWithDignity(
-		loggers = defaultLogger.logcore,
+		logger: Logger = new Logger(),
 		options: {dieOnUncaught?: boolean} = {},
 	) {
 
@@ -21,19 +21,19 @@ export function deathWithDignity(
 	}
 
 	process.on("SIGINT", () => {
-		loggers.log("💣 SIGINT")
+		logger.log("💣 SIGINT")
 		triggerDeathListeners("SIGINT")
 		process.exit(0)
 	})
 
 	process.on("SIGTERM", () => {
-		loggers.log("🗡️ SIGTERM")
+		logger.log("🗡️ SIGTERM")
 		triggerDeathListeners("SIGTERM")
 		process.exit(0)
 	})
 
 	process.on("uncaughtException", error => {
-		loggers.error("🚨 unhandled exception:", error)
+		logger.error("🚨 unhandled exception:", error)
 		if (options.dieOnUncaught) {
 			triggerDeathListeners("uncaughtException")
 			process.exit(1)
@@ -41,7 +41,7 @@ export function deathWithDignity(
 	})
 
 	process.on("unhandledRejection", (reason, error) => {
-		loggers.error("🚨 unhandled rejection:", reason, error)
+		logger.error("🚨 unhandled rejection:", reason, error)
 		if (options.dieOnUncaught) {
 			triggerDeathListeners("unhandledRejection")
 			process.exit(1)

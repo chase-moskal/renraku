@@ -1,12 +1,12 @@
 
-import {deadline, deferPromise, DeferredPromise} from "@e280/stz"
+import {deadline, defer, Deferred} from "@e280/stz"
 
 import {JsonRpc} from "../../comms/json-rpc.js"
 import {RemoteError} from "../../core/errors.js"
 
 type Pend = {
 	method: string
-	deferred: DeferredPromise<JsonRpc.Response>
+	deferred: Deferred<JsonRpc.Response>
 }
 
 export class ResponseWaiter {
@@ -15,7 +15,7 @@ export class ResponseWaiter {
 	constructor(public timeout: number) {}
 
 	async wait(id: JsonRpc.Id, method: string) {
-		const deferred = deferPromise<JsonRpc.Response>()
+		const deferred = defer<JsonRpc.Response>()
 		this.pending.set(id, {method, deferred})
 		return await deadline(this.timeout, `request #${id} ${method}()`, () => deferred.promise)
 	}

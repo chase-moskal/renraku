@@ -1,21 +1,29 @@
 
 import {WebSocketServer} from "../server.js"
 import {remote} from "../../../core/remote.js"
-import {logger} from "../../../logging/logger.js"
+import {exampleServersideApi} from "./apis.js"
+import {ExampleClientsideFns} from "./types.js"
 import {endpoint} from "../../../core/endpoint.js"
-import {ExampleClientsideFns, exampleServersideApi} from "./apis.js"
+import {LoggerTap} from "../../../tools/logger.js"
+
+export const logger = new LoggerTap()
 
 const server = new WebSocketServer({
-	acceptConnection: async({remoteEndpoint}) => {
-		const clientside = remote<ExampleClientsideFns>(remoteEndpoint)
+	acceptConnection: async connection => {
+		const personalLogger = logger.webSocket(connection)
+		const clientside = remote<ExampleClientsideFns>({
+			endpoint: connection.remoteEndpoint,
+			tap: personalLogger.remote,
+		})
 		return {
 			closed: () => {},
-			localEndpoint: endpoint(
-				exampleServersideApi(clientside),
-			),
+			localEndpoint: endpoint({
+				fns: exampleServersideApi(clientside),
+				tap: personalLogger.local,
+			}),
 		}
 	},
 })
 
-server.listen(8000, () => logger.logcore.log("example websocket server listening..."))
+server.listen(8000, () => logger.log("example websocket server listening..."))
 

@@ -1,9 +1,15 @@
 
 import {example} from "./api.js"
-import {HttpServer} from "../server.js"
-import {endpoint} from "../../../core/endpoint.js"
+import {httpServer} from "../server.js"
+import {LoggerTap} from "../../../tools/logger.js"
 
-const server = new HttpServer(() => endpoint(example))
+const logger = new LoggerTap()
 
-server.listen(8000, () => console.log("example http server listening..."))
+await httpServer({
+	port: 8000,
+	tap: logger,
+	expose: () => example,
+})
+
+logger.log("example http server listening...")
 

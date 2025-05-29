@@ -2,7 +2,7 @@
 import {Rig} from "./parts/helpers.js"
 import {Conduit} from "./conduits/conduit.js"
 import {Remote} from "../../core/remote-proxy.js"
-import {Endpoint, Fns, OnCall, OnError} from "../../core/types.js"
+import {Endpoint, Fns, Tap} from "../../core/types.js"
 
 export type MessengerOptions<xRemoteFns extends Fns> = {
 	conduit: Conduit
@@ -11,8 +11,7 @@ export type MessengerOptions<xRemoteFns extends Fns> = {
 		rig: Rig,
 	) => Endpoint
 	timeout?: number
-	onError?: OnError
-	onCall?: OnCall
+	tap?: Tap
 }
 
 export type ChannelMessage<D = any> = {data: D, origin: string}
