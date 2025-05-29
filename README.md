@@ -1,7 +1,7 @@
 
 # 連絡 <br/> ***R·E·N·R·A·K·U***
 
-> ***"an api should just be a bunch of async functions, damn it"***
+> ***"an api should just be a bunch of async functions, damn it"***  
 > &nbsp; &nbsp; — *Chase Moskal, many years ago*
 
 💡 elegantly expose async functions as an api  
@@ -15,9 +15,9 @@
 i've been using and sharpening this typescript implementation for many years.
 
 > ⚠️ ***IMPORTANT***  
-> renraku is in the middle of an ongoing fat refactor!
-> - [`renraku@0.5.0-11`](https://www.npmjs.com/package/renraku/v/0.5.0-11) is the most recent *stable* version, which has more features
-> - `@e280/renraku@0.5.0-14` is the first of an *unstable* new line of wip development
+> renraku is in the middle of an ongoing fat refactor!  
+> [`renraku@0.5.0-11`](https://www.npmjs.com/package/renraku/v/0.5.0-11) is the most recent *stable* version, which has more features.  
+> `@e280/renraku@0.5.0-14` is the first of an *unstable* new line of wip development.  
 
 <br/>
 
