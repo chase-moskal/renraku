@@ -8,6 +8,10 @@
 
 ## v0.5
 
+### v0.5.0-15
+- 🟥 rename tap's `requestError` to `rpcError`
+  - because it's not request specific, it's for errors that happen during the course of an rpc call
+
 ### v0.5.0-14
 - 🟥 **project moved to `@e280/renraku`**
 - 🟥 massive refactor, many such changes, all new readme

@@ -16,7 +16,7 @@ export class LoggerTap extends Logger implements Tap {
 		)
 	}
 
-	requestError: Tap["requestError"] = async({request, error, label}) => {
+	rpcError: Tap["rpcError"] = async({request, error, label}) => {
 		this.error(
 			...[label].filter(Boolean),
 			`${request.method}()`,
@@ -38,7 +38,7 @@ export class LoggerTap extends Logger implements Tap {
 		return {
 			error: this.error.bind(this),
 			request: o => this.request({...o, label}),
-			requestError: o => this.requestError({...o, label}),
+			rpcError: o => this.rpcError({...o, label}),
 		}
 	}
 
@@ -55,7 +55,7 @@ export class LoggerTap extends Logger implements Tap {
 			return {
 				error: this.error.bind(this),
 				request: o => this.request({...o, label}),
-				requestError: o => this.requestError({...o, label}),
+				rpcError: o => this.rpcError({...o, label}),
 			}
 		}
 		return {

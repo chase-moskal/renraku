@@ -26,7 +26,7 @@ export type Tap = {
 		label?: string
 	}) => Promise<void>
 
-	requestError: (options: {
+	rpcError: (options: {
 		error: any
 		request: JsonRpc.Request
 		label?: string

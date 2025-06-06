@@ -30,7 +30,7 @@ export async function respond<R>({
 
 	catch (error) {
 		if (tap)
-			tap.requestError({request, error})
+			tap.rpcError({request, error})
 
 		if (!("id" in request))
 			return null
