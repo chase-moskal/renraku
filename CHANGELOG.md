@@ -8,6 +8,12 @@
 
 ## v0.5
 
+### v0.5.0-17
+- 🍏 add new `DudTap` which is a pure tap that does nothing
+
+### v0.5.0-16
+- 🍏 fix: mock passes tap to remote
+
 ### v0.5.0-15
 - 🟥 rename tap's `requestError` to `rpcError`
   - because it's not request specific, it's for errors that happen during the course of an rpc call

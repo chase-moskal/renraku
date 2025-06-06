@@ -20,6 +20,7 @@ export * from "./transports/utils/response-waiter.js"
 export * from "./transports/websocket/client.js"
 
 export * from "./tools/death-with-dignity.js"
+export * from "./tools/dud-tap.js"
 export * from "./tools/ip-address.js"
 export * from "./tools/logger.js"
 export * from "./tools/random-user-emojis.js"
