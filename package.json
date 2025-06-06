@@ -41,9 +41,9 @@
 		"ws": "^8.18.2"
 	},
 	"devDependencies": {
-		"@types/node": "^22.15.24",
+		"@types/node": "^22.15.30",
 		"@types/ws": "^8.18.1",
-		"es-module-shims": "^2.5.1",
+		"es-module-shims": "^2.6.0",
 		"http-server": "^14.1.1",
 		"importly": "^0.2.3",
 		"mkdirp": "^3.0.1",
