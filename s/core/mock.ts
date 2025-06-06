@@ -10,6 +10,6 @@ import {endpoint, EndpointOptions} from "./endpoint.js"
  *  - this is useful for when you have special logic that relies on that special renraku functionality
  */
 export function mock<F extends Fns>(options: EndpointOptions<F>): Remote<F> {
-	return remote<F>({endpoint: endpoint(options)})
+	return remote<F>({endpoint: endpoint(options), tap: options.tap})
 }
 
