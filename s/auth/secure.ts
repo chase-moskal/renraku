@@ -1,5 +1,5 @@
 
-import {AuthWrap} from "./types.js"
+import {Secure} from "./types.js"
 import {Service} from "../core/types.js"
 
 export function secure<A, S extends Service>(s: (auth: A) => Promise<S>) {
@@ -20,6 +20,6 @@ export function secure<A, S extends Service>(s: (auth: A) => Promise<S>) {
 			return true
 		},
 
-	}) as AuthWrap<A, S>
+	}) as Secure<A, S>
 }
 

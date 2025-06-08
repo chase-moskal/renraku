@@ -148,6 +148,57 @@ i've been using and sharpening this typescript implementation for many years.
 
 <br/>
 
+## ⛩ *RENRAKU* — auth via `secure` and `authorize`
+- `secure` and `authorize` do not support arbitrary nesting, so you have to pass them a flat object of async functions
+- use the `secure` function to section off parts of your api that require auth
+  ```ts
+  import {secure} from "renraku"
+
+  export const exampleFns = {
+
+      // declaring this area requires auth
+      //    |
+      //    |   auth can be any type you want
+      //    ↓                  ↓
+    math: secure(async(auth: string) => {
+
+      // here you can do any auth work you need
+      if (auth !== "hello")
+        throw new Error("auth error: did not receive warm greeting")
+
+      return {
+        async sum(a: number, b: number) {
+          return a + b
+        },
+      }
+    }),
+  }
+  ```
+  - you see, `secure` merely adds your initial auth parameter as a required argument to each function
+    ```ts
+      //                  auth param
+      //                      ↓
+    await example.math.sum("hello", 1, 2)
+    ```
+- use the `authorize` function on the clientside to provide the auth param upfront
+  ```ts
+  import {authorize} from "renraku"
+
+    //             (the secured area)  (async getter for auth param)
+    //                          ↓              ↓
+  const math = authorize(example.math, async() => "hello")
+    // it's an async function so you could refresh
+    // tokens or whatever
+
+  // now the auth is magically provided for each call
+  await math.sum(1, 2)
+  ```
+  - but why an async getter function?  
+    ah, well that's because it's a perfect opportunity for you to refresh your tokens or what-have-you.  
+    the getter is called for each api call.  
+
+<br/>
+
 ## ⛩️ *RENRAKU* custom transports
 - do you need renraku to operate over another medium, like carrier pigeons?
 - well, you're in luck, because it's easy to setup your own transport medium

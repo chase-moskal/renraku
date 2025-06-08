@@ -1,5 +1,5 @@
 
-import {AuthFns, AuthUnwrap} from "./types.js"
+import {AuthFns, Authorize} from "./types.js"
 
 export function authorize<A, S extends AuthFns<A>>(
 		service: S,
@@ -21,6 +21,6 @@ export function authorize<A, S extends AuthFns<A>>(
 			target[key] = value
 			return true
 		},
-	}) as AuthUnwrap<S>
+	}) as Authorize<S>
 }
 

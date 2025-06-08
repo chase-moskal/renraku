@@ -16,12 +16,12 @@ export type OtherParams<F extends Fn> = (
 		: never
 )
 
-export type AuthWrap<A, S extends Service> = {
+export type Secure<A, S extends Service> = {
 	[K in keyof S]:
 		(auth: A, ...params: Parameters<S[K]>) => ReturnType<S[K]>
 }
 
-export type AuthUnwrap<S extends Service> = {
+export type Authorize<S extends Service> = {
 	[K in keyof S]:
 		(...p: OtherParams<S[K]>) => ReturnType<S[K]>
 }

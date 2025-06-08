@@ -8,6 +8,10 @@
 
 ## v0.5
 
+### v0.5.0-18
+- 🟥 rename `AuthWrap` to `Secure`
+- 🟥 rename `AuthUnwrap` to `Authorize`
+
 ### v0.5.0-17
 - 🍏 add new `DudTap` which is a pure tap that does nothing
 
