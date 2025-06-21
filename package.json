@@ -37,11 +37,11 @@
 	"dependencies": {
 		"@e280/science": "^0.0.5",
 		"@e280/sten": "^0.0.0-5",
-		"@e280/stz": "^0.0.0-22",
+		"@e280/stz": "^0.0.0-24",
 		"ws": "^8.18.2"
 	},
 	"devDependencies": {
-		"@types/node": "^22.15.30",
+		"@types/node": "^24.0.3",
 		"@types/ws": "^8.18.1",
 		"es-module-shims": "^2.6.0",
 		"http-server": "^14.1.1",
