@@ -22,17 +22,19 @@ export class WebSocketConduit extends Conduit {
 		super()
 		this.socket = options.socket
 
+		const outgoingRpc = (json: JsonRpc.Bidirectional) =>
+			this.socket.send(JSON.stringify(json))
+
 		// sending rpc messages
 		this.#trash.add(
-			this.sendRequest.sub(this.#outgoingRpc),
-			this.sendResponse.sub(this.#outgoingRpc),
+			this.sendRequest.sub(outgoingRpc),
+			this.sendResponse.sub(outgoingRpc),
 		)
 
 		// listen for incoming messages
 		this.socket.addEventListener("message", this.#messageListener)
-		this.#trash.add(() => {
-			this.socket.removeEventListener("message", this.#messageListener)
-		})
+		this.#trash.add(() =>
+			this.socket.removeEventListener("message", this.#messageListener))
 
 		// establish ping ponger
 		this.pingponger = new Pingponger({
@@ -47,28 +49,16 @@ export class WebSocketConduit extends Conduit {
 		const message = JSON.parse(e.data.toString()) as Message
 		switch (message[0]) {
 			case "infra":
-				this.#inboundInfra(message[1])
+				this.pingponger.recv(message[1])
 				break
 
 			case "rpc":
-				this.#inboundRpc(message[1], e.origin)
+				await this.recv(message[1], {origin: e.origin ?? ""})
 				break
 
 			default:
 				throw new Error("message listener")
 		}
-	}
-
-	#outgoingRpc = (json: JsonRpc.Bidirectional) => {
-		this.socket.send(JSON.stringify(json))
-	}
-
-	#inboundInfra = (infra: Ping | Pong) => {
-		this.pingponger.recv(infra)
-	}
-
-	#inboundRpc = async(rpc: JsonRpc.Bidirectional, origin: string = "") => {
-		await this.recv(rpc, {origin})
 	}
 
 	dispose() {
